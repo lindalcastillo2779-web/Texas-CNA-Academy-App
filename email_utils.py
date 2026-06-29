@@ -8,6 +8,7 @@ from email.mime.text import MIMEText
 
 import streamlit as st
 
+APP_URL = "https://texascnaacademyapp.com"
 
 def smtp_config() -> dict:
     """Return SMTP settings; Render env vars take priority over secrets.toml."""
@@ -64,7 +65,7 @@ def send_welcome_email(name: str, to_address: str) -> bool:
     <p>Thank you for joining the <strong>Texas CNA Academy</strong> (TULIP-Link) portal.</p>
     <p>You can now access exam prep, track your CEUs, and manage your renewal readiness.</p>
     <p>Questions? Reply to this email or visit
-       <a href="https://texascnaacademyapp.com">texascnaacademyapp.com</a>.</p>
+       <a href="{APP_URL}">{APP_URL}</a>.</p>
     <p>— Texas CNA Academy Team</p>
     </body></html>
     """
@@ -77,7 +78,7 @@ def send_ceu_reminder(name: str, to_address: str, hours_remaining: float) -> boo
     <html><body>
     <h2>CEU Reminder, {name}</h2>
     <p>You still need <strong>{hours_remaining:.1f} CEU hours</strong> to meet your renewal requirement.</p>
-    <p>Log in to <a href="https://texascnaacademyapp.com">texascnaacademyapp.com</a> to log completed courses.</p>
+    <p>Log in to <a href="{APP_URL}">{APP_URL}</a> to log completed courses.</p>
     <p>— Texas CNA Academy Team</p>
     </body></html>
     """

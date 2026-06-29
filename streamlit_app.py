@@ -71,5 +71,7 @@ elif page == "staffing":
     from pages import staffing as _page
 elif page == "admin":
     from pages import admin as _page
+else:
+    from pages import home as _page
 
 _page.show()

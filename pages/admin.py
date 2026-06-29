@@ -91,10 +91,14 @@ def show() -> None:
     with tab_db:
         st.subheader("Database Info")
         st.code(f"DB_PATH = {db.DB_PATH}")
+        _KNOWN_TABLES = frozenset(
+            ["users", "ceu_records", "exam_questions", "quiz_attempts", "staff_records"]
+        )
         with db.get_conn() as conn:
-            for table in ["users", "ceu_records", "exam_questions",
-                          "quiz_attempts", "staff_records"]:
+            for table in sorted(_KNOWN_TABLES):
+                if table not in _KNOWN_TABLES:
+                    continue
                 count = conn.execute(
-                    f"SELECT COUNT(*) FROM {table}"  # noqa: S608
+                    f"SELECT COUNT(*) FROM {table}"  # noqa: S608 – table is whitelisted above
                 ).fetchone()[0]
                 st.write(f"**{table}**: {count} rows")

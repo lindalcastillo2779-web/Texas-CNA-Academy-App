@@ -45,6 +45,8 @@ def show() -> None:
             "C": q["option_c"],
             "D": q["option_d"],
         }
+        saved_answer = answers.get(str(i), "A")
+        safe_index = LETTERS.index(saved_answer) if saved_answer in LETTERS else 0
         choice = st.radio(
             f"Q{i+1} options",
             options=list(opts.keys()),
@@ -52,7 +54,7 @@ def show() -> None:
             key=f"q_{i}",
             label_visibility="collapsed",
             disabled=submitted,
-            index=LETTERS.index(answers.get(str(i), "A")),
+            index=safe_index,
         )
         answers[str(i)] = choice
 

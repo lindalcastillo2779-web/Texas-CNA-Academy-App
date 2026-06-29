@@ -18,7 +18,15 @@ else:
 
 @contextmanager
 def get_conn():
-    """Yield a SQLite connection that closes automatically."""
+    """Yield a SQLite connection that closes automatically.
+
+    Each call opens a fresh connection and closes it on exit, which is the
+    standard thread-safe pattern for SQLite in Streamlit: one short-lived
+    connection per request rather than a shared long-lived connection.
+    check_same_thread=False is required because Streamlit may run the same
+    session across threads; the context-manager scope ensures the connection
+    is never shared between concurrent calls.
+    """
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     try:
