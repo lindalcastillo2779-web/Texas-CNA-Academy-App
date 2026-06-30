@@ -1,57 +1,95 @@
-# Christian based CNA Curriculum using the NABRE
+# Christian-Based CNA Curriculum Using the NABRE
 
-A faith-informed Certified Nursing Assistant (CNA) curriculum project for Texas-focused nurse aide training, designed around the NABRE and intended to support alignment with TULIP, Prometric, and Texas Workforce Commission expectations.
+A faith-informed Texas CNA curriculum and resource hub that integrates NABRE-based Christian values with nurse aide education, exam readiness, compliance planning, and workforce-aligned training support.
 
 ## Overview
-This repository contains planning and curriculum materials for building a Christian-based CNA Academy curriculum. The project combines:
+This repository supports the development of a Christian-based Certified Nursing Assistant (CNA) curriculum for Texas. It is designed to combine:
 
-- Christian formation and values with Scripture references from the **New American Bible, Revised Edition (NABRE)**
-- Texas nurse aide training goals and instructional planning
-- Program planning considerations related to **TULIP**, **Prometric**, and the **Texas Workforce Commission (TWC)**
+- **Christian formation and care values** using the **New American Bible, Revised Edition (NABRE)**
+- **Texas-focused nurse aide training content** and instructional planning
+- **Exam preparation and readiness support** connected to CNA competency expectations
+- **Program and workforce planning** informed by **TULIP**, **Prometric**, the **Texas Workforce Commission (TWC)**, and related Texas guidance
 
-This repository is intended to serve as a central workspace for organizing curriculum content, requirements, references, and supporting materials for a Texas CNA training program.
+This repository can function both as an application codebase and as a central content hub for curriculum planning, reference materials, policy guidance, and future training resources.
 
 ## What this project is about
-The purpose of this project is to create a structured CNA curriculum that:
+The goal of this project is to build and organize a CNA education platform and curriculum that:
 
-- teaches core nurse aide knowledge and skills
-- supports preparation for competency expectations and testing workflows
-- integrates Christian principles such as dignity, compassion, service, honesty, and care for vulnerable people
-- provides a central place to collect policies, outlines, lesson plans, assessments, and compliance references
+- teaches core nurse aide knowledge, skills, and professionalism
+- supports students preparing for nurse aide competency expectations and exam workflows
+- integrates Christian principles such as dignity, compassion, service, integrity, and care for vulnerable people
+- helps instructors and administrators organize policies, assessments, lesson plans, and compliance references
+- supports a Texas-centered training model for students, instructors, and healthcare partners
 
 ## How to use this repository
-You can use this repository to:
+You can use this repository in several ways:
 
-1. Review the curriculum structure and planning documents.
-2. Develop lessons and training materials for CNA instruction.
-3. Track regulatory and program requirements relevant to Texas-based nurse aide education.
-4. Collect reference materials and external guidance in one place.
-5. Collaborate on updates to curriculum documents, schedules, policies, and supporting resources.
+1. **As an application repository** for the Texas CNA Academy platform.
+2. **As a curriculum workspace** for creating lesson plans, module outlines, assessments, and classroom resources.
+3. **As a compliance reference hub** for organizing Texas training, workforce, and testing information.
+4. **As a collaboration space** for updating instructional content, program policies, faith-based integration notes, and operational resources.
 
-### Suggested workflow
-- Create folders for modules, lesson plans, skills checklists, assessments, and policies.
-- Add source references for any state, testing, or workforce requirement.
-- Update curriculum documents as standards or administrative requirements change.
-- Keep faith-based content clearly identified where it supplements instructional material.
+### Recommended workflow
+- Use the application for student, instructor, and program support features.
+- Create curriculum modules and lesson plans under the `docs/` area.
+- Add compliance notes and external references for Texas-specific requirements.
+- Keep Scripture integration and Christian worldview notes clearly identified in curriculum documents.
+- Review external requirements regularly and update repository materials when standards or processes change.
 
 ## Important resources
-Important resources for this project may include:
+Use these resources as primary reference points for this project:
 
-- **NABRE** for Scripture references and Christian integration
-- **TULIP** materials and implementation guidance used by your program
-- **Prometric Nurse Aide** testing and candidate resources
-- **Texas Workforce Commission (TWC)** workforce and training guidance
-- **Texas Health and Human Services (HHSC)** nurse aide training and competency information
+- **NABRE (New American Bible, Revised Edition)** — for Scripture references and Christian integration
+- **Prometric Nurse Aide resources** — for candidate, exam, and testing-related guidance
+- **Texas Workforce Commission (TWC)** — for workforce and training-related guidance
+- **Texas Health and Human Services (HHSC)** — for nurse aide training and competency-related information
+- **TULIP** — for applicable implementation, program, and administrative workflows used by your institution or operating model
 
-## Suggested repository structure
-You may want to organize the repository like this:
+## Suggested curriculum and documentation structure
+To keep the repository organized, use the following structure for curriculum and program content:
 
-- `README.md` — project overview and key links
-- `docs/requirements/` — compliance and requirement notes
-- `docs/curriculum/` — course outlines, lesson plans, and module content
-- `docs/assessments/` — quizzes, exams, and competency checklists
-- `docs/policies/` — attendance, conduct, clinical, and program policies
-- `docs/resources/` — links, references, and supporting documents
+```text
+README.md
+/docs
+  /curriculum
+    /module-01-foundations
+    /module-02-resident-care
+    /module-03-safety-infection-control
+    /module-04-restorative-skills
+    /module-05-communication-ethics-faith
+  /assessments
+  /requirements
+  /policies
+  /resources
+  /scripture-integration
+```
+
+### Suggested content by section
+- `docs/curriculum/` — module outlines, lesson plans, presentations, labs, and skills instruction
+- `docs/assessments/` — quizzes, exams, return-demonstration checklists, and competency tools
+- `docs/requirements/` — Texas-specific compliance notes, planning checklists, and regulatory references
+- `docs/policies/` — attendance, dress code, conduct, grievance, clinical, and handbook materials
+- `docs/resources/` — links, forms, templates, glossaries, and support documents
+- `docs/scripture-integration/` — faith-based themes, devotion ideas, NABRE references, and ethics connections
+
+## Direct resource links
+Important resource links for program development and maintenance:
+
+- Texas CNA Academy App: `https://github.com/lindalcastillo2779-web/Texas-CNA-Academy-App`
+- Project settings: `https://github.com/users/lindalcastillo2779-web/projects/1/settings`
+- Texas Workforce Commission: `https://www.twc.texas.gov/`
+- Texas Health and Human Services: `https://www.hhs.texas.gov/`
+- Prometric: `https://www.prometric.com/`
+- NABRE: `https://bible.usccb.org/bible`
+
+## For contributors
+When adding or editing materials:
+
+- keep instructional content accurate and clearly written
+- separate official requirements from internal planning notes
+- identify when content is faith-based reflection versus regulatory instruction
+- document sources for Texas policies, exam expectations, and workforce guidance
+- prefer consistent file naming and module organization under `docs/`
 
 ## Notes
-This repository should not replace official legal, regulatory, licensing, accreditation, or testing guidance. Always verify current requirements with the applicable Texas agencies, testing vendors, and program authorities before finalizing or delivering instruction.
+This repository does **not** replace official legal, regulatory, licensing, accreditation, or testing guidance. Always verify the latest requirements directly with the appropriate Texas agencies, testing vendors, and program authorities before finalizing instruction, publishing training materials, or making compliance decisions.
