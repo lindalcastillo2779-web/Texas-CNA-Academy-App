@@ -1,123 +1,57 @@
-# Texas CNA Academy – TULIP-Link Portal
+# Christian based CNA Curriculum using the NABRE
 
-TULIP-Link & CNA Academy is a mobile-friendly **Streamlit** application for Texas nurse aide
-students, active CNAs, DONs, instructors, and healthcare facilities to manage exam prep,
-renewal readiness, CEU tracking, and staffing compliance.
+A faith-informed Certified Nursing Assistant (CNA) curriculum project for Texas-focused nurse aide training, designed around the NABRE and intended to support alignment with TULIP, Prometric, and Texas Workforce Commission expectations.
 
----
+## Overview
+This repository contains planning and curriculum materials for building a Christian-based CNA Academy curriculum. The project combines:
 
-## Features
+- Christian formation and values with Scripture references from the **New American Bible, Revised Edition (NABRE)**
+- Texas nurse aide training goals and instructional planning
+- Program planning considerations related to **TULIP**, **Prometric**, and the **Texas Workforce Commission (TWC)**
 
-| Page | Description |
-|------|-------------|
-| 🏠 Home | Self-registration & sign-in |
-| 📚 Exam Prep | NATCEP-aligned practice quizzes |
-| 📋 CEU Tracker | Log & track continuing-education hours |
-| ✅ Renewal Check | Renewal readiness dashboard with email reminders |
-| 🏥 Staffing Log | Facility shift & compliance tracking |
-| 🔧 Admin Panel | Admin-only management (users, questions, quiz log) |
+This repository is intended to serve as a central workspace for organizing curriculum content, requirements, references, and supporting materials for a Texas CNA training program.
 
----
+## What this project is about
+The purpose of this project is to create a structured CNA curriculum that:
 
-## Local Development
+- teaches core nurse aide knowledge and skills
+- supports preparation for competency expectations and testing workflows
+- integrates Christian principles such as dignity, compassion, service, honesty, and care for vulnerable people
+- provides a central place to collect policies, outlines, lesson plans, assessments, and compliance references
 
-```bash
-# 1. Create & activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+## How to use this repository
+You can use this repository to:
 
-# 2. Install dependencies
-pip install -r requirements.txt
+1. Review the curriculum structure and planning documents.
+2. Develop lessons and training materials for CNA instruction.
+3. Track regulatory and program requirements relevant to Texas-based nurse aide education.
+4. Collect reference materials and external guidance in one place.
+5. Collaborate on updates to curriculum documents, schedules, policies, and supporting resources.
 
-# 3. Copy and edit secrets (never commit secrets.toml)
-cp .streamlit/secrets.toml.example .streamlit/secrets.toml
-# Edit .streamlit/secrets.toml with your SMTP and admin credentials
+### Suggested workflow
+- Create folders for modules, lesson plans, skills checklists, assessments, and policies.
+- Add source references for any state, testing, or workforce requirement.
+- Update curriculum documents as standards or administrative requirements change.
+- Keep faith-based content clearly identified where it supplements instructional material.
 
-# 4. Run the app
-streamlit run streamlit_app.py
-```
+## Important resources
+Important resources for this project may include:
 
-The local SQLite database is stored at `data/cna_academy.db` (git-ignored).
+- **NABRE** for Scripture references and Christian integration
+- **TULIP** materials and implementation guidance used by your program
+- **Prometric Nurse Aide** testing and candidate resources
+- **Texas Workforce Commission (TWC)** workforce and training guidance
+- **Texas Health and Human Services (HHSC)** nurse aide training and competency information
 
----
+## Suggested repository structure
+You may want to organize the repository like this:
 
-## Deploying to Render
+- `README.md` — project overview and key links
+- `docs/requirements/` — compliance and requirement notes
+- `docs/curriculum/` — course outlines, lesson plans, and module content
+- `docs/assessments/` — quizzes, exams, and competency checklists
+- `docs/policies/` — attendance, conduct, clinical, and program policies
+- `docs/resources/` — links, references, and supporting documents
 
-### 1. Push this repository to GitHub, then create a new **Web Service** on [Render](https://render.com).
-
-The `render.yaml` in this repo is pre-configured:
-
-```yaml
-buildCommand: pip install -r requirements.txt
-startCommand: streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
-disk:
-  name: cna-data
-  mountPath: /data
-  sizeGB: 1
-```
-
-### 2. Set environment variables in Render → Environment
-
-| Key | Value |
-|-----|-------|
-| `STREAMLIT_SERVER_HEADLESS` | `true` |
-| `SMTP_HOST` | `smtp.gmail.com` |
-| `SMTP_PORT` | `587` |
-| `SMTP_USER` | your Gmail address |
-| `SMTP_PASSWORD` | Gmail app password |
-| `ADMIN_SECRET` | strong random string |
-
-### 3. Connect the custom domain `texascnaacademyapp.com`
-
-In **Render → Settings → Custom Domains**, add:
-- `texascnaacademyapp.com`
-- `www.texascnaacademyapp.com`
-
-Then add these DNS records at your registrar (**Namecheap**):
-
-| Type | Host | Value |
-|------|------|-------|
-| CNAME | `www` | `texas-cna-academy.onrender.com` |
-| CNAME / ALIAS | `@` | `texas-cna-academy.onrender.com` |
-
-> **Namecheap tip:** In the Advanced DNS tab, set the `@` record as an **ALIAS** (URL Redirect
-> or CNAME Flattening) if your registrar supports it, or use an A-record pointing to Render's
-> IP. `www` should always be a CNAME.
-
----
-
-## Environment Variables Reference
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `SMTP_HOST` | No* | SMTP server hostname |
-| `SMTP_PORT` | No* | SMTP port (default: 587) |
-| `SMTP_USER` | No* | SMTP username / email |
-| `SMTP_PASSWORD` | No* | SMTP password or app password |
-| `ADMIN_SECRET` | Yes | Password for the Admin Panel |
-
-\* Email features are silently skipped when SMTP is not configured.
-
----
-
-## Project Structure
-
-```
-streamlit_app.py          # Main entry-point & navigation
-db.py                     # SQLite schema, init, and helper functions
-auth.py                   # Admin authentication
-email_utils.py            # SMTP email helpers
-pages/
-  home.py                 # Welcome / registration page
-  exam_prep.py            # Practice quiz
-  ceu_tracker.py          # CEU logging & progress
-  renewal_check.py        # Renewal readiness dashboard
-  staffing.py             # Staffing compliance log
-  admin.py                # Admin panel
-render.yaml               # Render deployment configuration
-requirements.txt          # Python dependencies
-.streamlit/
-  config.toml             # Streamlit theme & server settings
-  secrets.toml.example    # Template for local secrets
-data/                     # Local dev SQLite database (git-ignored)
-```
+## Notes
+This repository should not replace official legal, regulatory, licensing, accreditation, or testing guidance. Always verify current requirements with the applicable Texas agencies, testing vendors, and program authorities before finalizing or delivering instruction.
