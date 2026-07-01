@@ -1,4 +1,4 @@
-# Texas CNA Academy – TULIP-Link Portal
+# Texas CNA Academy 
 
 Texas CNA Academy is a mobile-friendly training and resource platform for Texas nurse aide students, active CNAs, instructors, DONs, and healthcare facilities. This project supports exam preparation, renewal readiness, CEU tracking, staffing compliance, and access to important Texas CNA-related references and forms.
 
