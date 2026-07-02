@@ -19,9 +19,16 @@ ENV/
 # Streamlit secrets (never commit real secrets)
 .streamlit/secrets.toml
 
+# Environment variables (never commit real secrets)
+.env
+
 # Local database files
 data/*.db
 data/*.sqlite
+
+# Buddy knowledge index (built locally, not committed)
+data/buddy_index.faiss
+data/buddy_chunks.pkl
 
 # OS
 .DS_Store
