@@ -6,6 +6,7 @@ Main entry-point for the Streamlit multi-page application.
 Sections
 --------
 • 🏠 Home          – Welcome / self-registration
+• 🎓 Courses       – NATCEP study roadmap and module content
 • 📚 Exam Prep     – Practice quizzes (NATCEP domains)
 • 📋 CEU Tracker   – Log & track continuing-education hours
 • ✅ Renewal Check – Renewal readiness summary
@@ -38,6 +39,7 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 PAGES = {
     "🏠 Home": "home",
+    "🎓 Courses": "courses",
     "📚 Exam Prep": "exam_prep",
     "📋 CEU Tracker": "ceu_tracker",
     "✅ Renewal Check": "renewal_check",
@@ -63,6 +65,8 @@ page = PAGES[page_label]
 # ---------------------------------------------------------------------------
 if page == "home":
     from pages import home as _page
+elif page == "courses":
+    from pages import courses as _page
 elif page == "exam_prep":
     from pages import exam_prep as _page
 elif page == "ceu_tracker":
