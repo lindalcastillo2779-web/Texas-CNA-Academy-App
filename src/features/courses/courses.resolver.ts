@@ -13,13 +13,34 @@ import { MODULE_CONFIGS, getModuleConfig, isModuleUnlocked } from './module-conf
 import { M01_BUNDLE } from './data/m01-role-of-nurse-aide.bundle';
 import { M02_BUNDLE } from './data/m02-legal-ethical-behavior.bundle';
 import { M03_BUNDLE } from './data/m03-communication-interpersonal.bundle';
+import { M04_BUNDLE } from './data/m04-infection-control.bundle';
+import { M05_BUNDLE } from './data/m05-safety-emergency.bundle';
+import { M06_BUNDLE } from './data/m06-resident-rights.bundle';
+import { M07_BUNDLE } from './data/m07-personal-care.bundle';
+import { M08_BUNDLE } from './data/m08-basic-nursing-skills.bundle';
+import { M09_BUNDLE } from './data/m09-nutrition-hydration.bundle';
+import { M10_BUNDLE } from './data/m10-elimination.bundle';
+import { M11_BUNDLE } from './data/m11-restorative-skills.bundle';
+import { M12_BUNDLE } from './data/m12-psychosocial-care.bundle';
+import { M13_BUNDLE } from './data/m13-spiritual-cultural-care.bundle';
+import { M14_BUNDLE } from './data/m14-prometric-exam-prep.bundle';
 
 // Registry of all available module bundles
 const MODULE_BUNDLE_REGISTRY: Record<string, any> = {
   M01: M01_BUNDLE,
   M02: M02_BUNDLE,
   M03: M03_BUNDLE,
-  // M04-M14 will be added as content bundles are created
+  M04: M04_BUNDLE,
+  M05: M05_BUNDLE,
+  M06: M06_BUNDLE,
+  M07: M07_BUNDLE,
+  M08: M08_BUNDLE,
+  M09: M09_BUNDLE,
+  M10: M10_BUNDLE,
+  M11: M11_BUNDLE,
+  M12: M12_BUNDLE,
+  M13: M13_BUNDLE,
+  M14: M14_BUNDLE,
 };
 
 /**
