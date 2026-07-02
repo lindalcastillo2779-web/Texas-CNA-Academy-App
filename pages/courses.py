@@ -43,27 +43,32 @@ def show() -> None:
         module_paths,
         format_func=lambda p: labels.get(p, p),
     )
-    content = _safe_read_markdown(CURRICULUM_DIR / selected)
+    content, read_error = _read_markdown(CURRICULUM_DIR / selected)
 
+    if read_error:
+        st.error(f"Unable to read the selected module file: {read_error}")
+        return
     if not content:
-        st.error("The selected module file is empty or unreadable.")
+        st.warning("The selected module file is currently empty.")
         return
 
     st.markdown(content)
     st.info("When you complete a module, use 📚 Exam Prep in the sidebar to quiz that topic.")
 
 
-def _safe_read_markdown(path: Path) -> str:
+def _read_markdown(path: Path) -> tuple[str, str | None]:
     try:
-        return path.read_text(encoding="utf-8").strip()
-    except (OSError, UnicodeError):
-        return ""
+        return path.read_text(encoding="utf-8").strip(), None
+    except (OSError, UnicodeError) as exc:
+        return "", str(exc)
 
 
 def _to_label(path: Path) -> str:
-    content = _safe_read_markdown(path)
-    if content:
-        first_line = content.splitlines()[0].strip()
-        if first_line.startswith("#"):
-            return first_line.lstrip("#").strip()
+    try:
+        with path.open("r", encoding="utf-8") as file_obj:
+            first_line = file_obj.readline().strip()
+    except (OSError, UnicodeError):
+        first_line = ""
+    if first_line.startswith("#"):
+        return first_line.lstrip("#").strip()
     return path.stem.replace("_", " ").replace("-", " ").title()
