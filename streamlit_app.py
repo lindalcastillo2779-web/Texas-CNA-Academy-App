@@ -10,6 +10,7 @@ Sections
 • 📋 CEU Tracker   – Log & track continuing-education hours
 • ✅ Renewal Check – Renewal readiness summary
 • 🏥 Staffing      – Facility staffing compliance log
+• 🤖 Buddy         – AI study and compliance chatbot
 • 🔧 Admin         – Admin-only management panel
 """
 
@@ -41,6 +42,7 @@ PAGES = {
     "📋 CEU Tracker": "ceu_tracker",
     "✅ Renewal Check": "renewal_check",
     "🏥 Staffing Log": "staffing",
+    "🤖 Buddy": "buddy",
     "🔧 Admin Panel": "admin",
 }
 
@@ -69,6 +71,8 @@ elif page == "renewal_check":
     from pages import renewal_check as _page
 elif page == "staffing":
     from pages import staffing as _page
+elif page == "buddy":
+    from pages import buddy as _page
 elif page == "admin":
     from pages import admin as _page
 else:
