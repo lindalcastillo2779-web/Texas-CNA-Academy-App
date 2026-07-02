@@ -18,6 +18,7 @@ def show() -> None:
 
         | Feature | Who benefits |
         |---|---|
+        | 🎓 NATCEP course roadmap & module library | Students building step-by-step readiness |
         | 📚 NATCEP exam practice quizzes | Students preparing for certification |
         | 📋 CEU hour tracking & certificates | Active CNAs, renewal candidates |
         | ✅ Renewal readiness dashboard | CNAs & DONs |

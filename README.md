@@ -120,6 +120,7 @@ buddy_service.py          # Buddy chatbot logic and RAG pipeline
 knowledge_loader.py       # Document ingestion, chunking, and FAISS indexing
 pages/
   home.py                 # Welcome and registration page
+  courses.py              # NATCEP course roadmap and curriculum browser
   exam_prep.py            # Practice quiz tools
   ceu_tracker.py          # CEU logging and progress
   renewal_check.py        # Renewal readiness dashboard
