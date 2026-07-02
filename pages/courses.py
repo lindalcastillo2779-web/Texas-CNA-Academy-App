@@ -37,8 +37,12 @@ def show() -> None:
         return
 
     module_paths = [f.relative_to(CURRICULUM_DIR).as_posix() for f in course_files]
-    labels = {p: _to_label(Path(p)) for p in module_paths}
-    selected = st.selectbox("Choose a course module", module_paths, format_func=labels.get)
+    labels = {p: _to_label(CURRICULUM_DIR / p) for p in module_paths}
+    selected = st.selectbox(
+        "Choose a course module",
+        module_paths,
+        format_func=lambda p: labels.get(p, p),
+    )
     content = _safe_read_markdown(CURRICULUM_DIR / selected)
 
     if not content:
@@ -57,5 +61,9 @@ def _safe_read_markdown(path: Path) -> str:
 
 
 def _to_label(path: Path) -> str:
-    title = path.stem.replace("_", " ").replace("-", " ").title()
-    return f"{title} ({path.name})"
+    content = _safe_read_markdown(path)
+    if content:
+        first_line = content.splitlines()[0].strip()
+        if first_line.startswith("#"):
+            return first_line.lstrip("#").strip()
+    return path.stem.replace("_", " ").replace("-", " ").title()
