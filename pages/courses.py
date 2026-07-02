@@ -4,6 +4,8 @@ from pathlib import Path
 
 import streamlit as st
 
+from utils.media import read_markdown_document, render_module_media, render_page_media
+
 CURRICULUM_DIR = Path(__file__).resolve().parents[1] / "knowledge" / "curriculum"
 
 NATCEP_FLOW = [
@@ -17,6 +19,7 @@ NATCEP_FLOW = [
 def show() -> None:
     st.title("🎓 Courses – NATCEP Study Path")
     st.caption("Browse curriculum modules first, then move to quizzes and readiness tools.")
+    render_page_media("courses")
 
     st.subheader("Texas CNA / NATCEP learning flow")
     cols = st.columns(len(NATCEP_FLOW))
@@ -43,11 +46,14 @@ def show() -> None:
         module_paths,
         format_func=lambda p: labels.get(p, p),
     )
-    content, read_failed = _read_markdown(CURRICULUM_DIR / selected)
+    module_path = CURRICULUM_DIR / selected
+    frontmatter, content, read_failed = read_markdown_document(module_path)
 
     if read_failed:
         st.error("Unable to read the selected module file. Please try another module.")
         return
+
+    render_module_media(str(frontmatter.get("module_id") or module_path.stem), frontmatter)
     if not content:
         st.warning("The selected module file is currently empty.")
         return
@@ -57,18 +63,17 @@ def show() -> None:
 
 
 def _read_markdown(path: Path) -> tuple[str, bool]:
-    try:
-        return path.read_text(encoding="utf-8").strip(), False
-    except (OSError, UnicodeError):
-        return "", True
+    _, content, read_failed = read_markdown_document(path)
+    return content, read_failed
 
 
 def _to_label(path: Path) -> str:
-    try:
-        with path.open("r", encoding="utf-8") as file_obj:
-            first_line = file_obj.readline().strip()
-    except (OSError, UnicodeError):
-        first_line = ""
-    if first_line.startswith("#"):
-        return first_line.lstrip("#").strip()
+    frontmatter, content, _ = read_markdown_document(path)
+    title = str(frontmatter.get("title") or "").strip()
+    if title:
+        return title
+    for line in content.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            return stripped.lstrip("#").strip()
     return path.stem.replace("_", " ").replace("-", " ").title()

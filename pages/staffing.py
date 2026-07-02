@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from db import add_staff_record, get_staff_records
+from utils.media import render_page_media
 
 SHIFT_TYPES = ["day", "evening", "night"]
 
@@ -13,6 +14,7 @@ SHIFT_TYPES = ["day", "evening", "night"]
 def show() -> None:
     st.title("🏥 Staffing Compliance Log")
     st.caption("Track CNA shift assignments and compliance for your facility")
+    render_page_media("staffing")
 
     user_id = st.session_state.get("user_id")
     if not user_id:

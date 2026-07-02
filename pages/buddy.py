@@ -5,6 +5,7 @@ import os
 import streamlit as st
 
 import buddy_service
+from utils.media import render_page_media
 
 ROLES   = ["Student", "Instructor", "DON", "Facility"]
 STYLES  = ["concise", "detailed"]
@@ -24,6 +25,7 @@ def show() -> None:
         "Ask Buddy about the curriculum, TULIP, TWC, or Texas HHSC/HHS topics. "
         "Educational guidance only — always verify policy details with official sources."
     )
+    render_page_media("buddy")
 
     # ── Sidebar controls ────────────────────────────────────────────────────
     with st.sidebar:

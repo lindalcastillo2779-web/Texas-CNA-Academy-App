@@ -1,3 +1,15 @@
+---
+module_id: module_03_infection_control
+title: Module 03: Infection Control Foundations
+hero_image: assets/images/lessons/module_03_infection_control.svg
+thumbnail: assets/images/lessons/module_03_infection_control.svg
+video_url:
+caption: Placeholder lesson media for infection prevention, hand hygiene, and PPE sequencing.
+credit: Texas CNA Academy placeholder artwork
+source: Local SVG asset
+video_caption: Add a PPE or hand-hygiene demonstration video here.
+---
+
 # Module 03: Infection Control Foundations
 
 ## Learning objectives

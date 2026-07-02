@@ -129,9 +129,17 @@ pages/
   admin.py                # Admin panel
 knowledge/
   curriculum/             # Curriculum docs (.md / .txt / .pdf)
+  media/                  # Central media registry for Streamlit pages and lessons
   tulip/                  # TULIP guidance docs
   twc/                    # TWC workforce docs
   texas_hhs/              # Texas HHSC/HHS regulatory docs
+assets/
+  images/
+    pages/                # Page hero artwork and thumbnails
+    lessons/              # Module-level visuals and placeholders
+  video/                  # Optional local MP4/WebM clips
+utils/
+  media.py                # Safe registry loading, frontmatter parsing, and rendering helpers
 render.yaml               # Render deployment configuration
 requirements.txt          # Python dependencies
 .env.example              # Environment variable template
@@ -140,6 +148,110 @@ requirements.txt          # Python dependencies
   secrets.toml.example    # Template for local secrets
 data/                     # Local development SQLite database and Buddy index
 ```
+
+## Media architecture
+
+The Streamlit app now uses a shared media system so every page and curriculum lesson can
+show a consistent hero visual and an optional video slot without hardcoding asset paths in
+each page module.
+
+- `knowledge/media/media_registry.json` is the central registry for page keys and module IDs.
+- `utils/media.py` safely loads the registry, resolves local assets or HTTPS URLs, parses
+  simple markdown frontmatter, and renders media with Streamlit-native `st.image()` and
+  `st.video()` calls.
+- `pages/*.py` call `render_page_media(...)` at the top of each page.
+- `pages/courses.py` reads curriculum markdown with optional frontmatter and calls
+  `render_module_media(...)` before showing lesson content.
+
+If a media entry is missing, invalid, or unreadable, the app shows a friendly placeholder
+message instead of crashing.
+
+## Adding page or lesson media
+
+### 1. Add assets
+
+Place optimized files in one of these folders:
+
+- `assets/images/pages/`
+- `assets/images/lessons/`
+- `assets/video/`
+
+Relative paths in the registry or lesson frontmatter should be written from the repository
+root, for example:
+
+- `assets/images/pages/home-hero.webp`
+- `assets/images/lessons/module_04_resident_rights.png`
+- `assets/video/module_04_intro.mp4`
+
+### 2. Register page media
+
+Add or update an entry in `knowledge/media/media_registry.json`:
+
+```json
+"pages": {
+  "home": {
+    "hero_image": "assets/images/pages/home-hero.webp",
+    "thumbnail": "assets/images/pages/home-thumb.webp",
+    "video_url": "assets/video/home-intro.mp4",
+    "caption": "Short welcome visual",
+    "credit": "Photo or design credit",
+    "source": "Owned asset or licensed source",
+    "video_caption": "Optional intro video caption"
+  }
+}
+```
+
+Available page keys in the current Streamlit app are:
+
+- `home`
+- `courses`
+- `exam_prep`
+- `ceu_tracker`
+- `renewal_check`
+- `staffing`
+- `buddy`
+- `admin`
+
+### 3. Register module media
+
+Each curriculum markdown file is matched by its module ID, usually the file stem such as
+`module_01_role_and_scope`.
+
+You can define lesson media in either location:
+
+1. `knowledge/media/media_registry.json`
+2. Markdown frontmatter at the top of the lesson file
+
+Example frontmatter:
+
+```md
+---
+module_id: module_04_resident_rights
+title: Module 04: Residents' Rights
+hero_image: assets/images/lessons/module_04_resident_rights.webp
+thumbnail: assets/images/lessons/module_04_resident_rights-thumb.webp
+video_url: assets/video/module_04_resident_rights.mp4
+caption: Lesson banner for rights and dignity topics.
+credit: Texas CNA Academy
+source: Licensed or owned media
+video_caption: 90-second rights overview clip.
+---
+```
+
+Frontmatter is optional. Existing markdown lessons continue to work without it.
+
+## Recommended media specs and optimization tips
+
+- **Page hero images:** target about `1600 x 900`
+- **Lesson hero images:** target about `1200 x 675`
+- **Preferred image formats:** WebP or optimized PNG/SVG
+- **Short lesson videos:** 30–120 seconds when possible
+- **Local video formats:** MP4 (H.264) or WebM for best compatibility
+- **Performance tips:**
+  - keep hero images compressed before committing
+  - avoid very large local videos in Streamlit Cloud
+  - prefer short clips or external HTTPS-hosted video when appropriate
+  - use the registry defaults so missing media still has a graceful fallback
 
 ## Buddy chatbot setup
 

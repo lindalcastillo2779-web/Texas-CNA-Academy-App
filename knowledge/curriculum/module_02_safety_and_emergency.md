@@ -1,3 +1,15 @@
+---
+module_id: module_02_safety_and_emergency
+title: Module 02: Safety and Emergency Response
+hero_image: assets/images/lessons/module_02_safety_and_emergency.svg
+thumbnail: assets/images/lessons/module_02_safety_and_emergency.svg
+video_url:
+caption: Placeholder lesson media for resident safety scans, transfer basics, and emergency drills.
+credit: Texas CNA Academy placeholder artwork
+source: Local SVG asset
+video_caption: Add a safety walkthrough or emergency-response micro-lesson video here.
+---
+
 # Module 02: Safety and Emergency Response
 
 ## Learning objectives
