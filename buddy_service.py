@@ -163,7 +163,10 @@ def ask_buddy(
             "index_missing": index_missing,
             "error":         str(exc),
         }
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
+        # Catch remaining Exception subclasses (e.g. openai.APIError, network errors).
+        # BaseException subclasses (KeyboardInterrupt, SystemExit) are intentionally
+        # excluded so they propagate normally.
         return {
             "answer":        None,
             "sources":       [],

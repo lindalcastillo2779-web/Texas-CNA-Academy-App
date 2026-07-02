@@ -20,7 +20,11 @@ Training programs wishing to offer a state-approved CNA course must apply to HHS
 NATCEP program approval. Requirements include:
 
 - Qualified instructor (RN with minimum experience requirements)
-- Approved curriculum meeting state hour requirements (minimum 75 total hours: 60 classroom/lab + 16 clinical, with some overlap allowed per state rules — **verify current hours with HHSC**)
+- Approved curriculum meeting state hour requirements. Texas rules require a minimum of
+  75 total program hours; classroom/lab and clinical hours have an overlap allowance
+  (e.g. 60 classroom/lab hours + a minimum of 16 clinical hours, some of which may be
+  counted within the 75-hour total depending on program design). **Always verify the
+  current hour requirements directly with HHSC**, as rules can change.
 - Clinical training site agreement with an approved long-term care facility
 - Program policies and procedures meeting HHSC standards
 
