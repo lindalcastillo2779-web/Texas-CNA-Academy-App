@@ -43,10 +43,10 @@ def show() -> None:
         module_paths,
         format_func=lambda p: labels.get(p, p),
     )
-    content, read_error = _read_markdown(CURRICULUM_DIR / selected)
+    content, read_failed = _read_markdown(CURRICULUM_DIR / selected)
 
-    if read_error:
-        st.error(f"Unable to read the selected module file: {read_error}")
+    if read_failed:
+        st.error("Unable to read the selected module file. Please try another module.")
         return
     if not content:
         st.warning("The selected module file is currently empty.")
@@ -56,11 +56,11 @@ def show() -> None:
     st.info("When you complete a module, use 📚 Exam Prep in the sidebar to quiz that topic.")
 
 
-def _read_markdown(path: Path) -> tuple[str, str | None]:
+def _read_markdown(path: Path) -> tuple[str, bool]:
     try:
-        return path.read_text(encoding="utf-8").strip(), None
-    except (OSError, UnicodeError) as exc:
-        return "", str(exc)
+        return path.read_text(encoding="utf-8").strip(), False
+    except (OSError, UnicodeError):
+        return "", True
 
 
 def _to_label(path: Path) -> str:
