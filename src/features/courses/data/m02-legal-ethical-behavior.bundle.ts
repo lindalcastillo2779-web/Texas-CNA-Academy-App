@@ -158,7 +158,7 @@ export const M02_BUNDLE: CourseModuleBundle = {
           {
             type: 'callout',
             variant: 'faith',
-            text: 'Honoring a resident's wishes at the end of life is one of the most sacred responsibilities you will carry. You are present for their final chapter — handle it with reverence.',
+            text: "Honoring a resident's wishes at the end of life is one of the most sacred responsibilities you will carry. You are present for their final chapter — handle it with reverence.",
           },
           {
             type: 'heading',
@@ -235,7 +235,7 @@ export const M02_BUNDLE: CourseModuleBundle = {
             headers: ['Principle', 'Meaning', 'CNA Application'],
             rows: [
               ['Autonomy', 'Respecting resident choices', 'Let residents choose their clothes, food, schedule (within safety limits)'],
-              ['Beneficence', 'Acting in the resident's best interest', 'Provide care that promotes well-being, comfort, and dignity'],
+              ['Beneficence', "Acting in the resident's best interest", 'Provide care that promotes well-being, comfort, and dignity'],
               ['Nonmaleficence', 'Do no harm', 'Never take shortcuts that could injure or neglect a resident'],
               ['Justice', 'Treating everyone fairly', 'Give equal care regardless of resident behavior, background, or diagnosis'],
               ['Fidelity', 'Being faithful to commitments', 'Follow through on promises; show up on time; do your best work'],
