@@ -20,6 +20,34 @@ type TaskItem = {
   view: AppView;
 };
 
+type LearnerModuleProgress = {
+  moduleId: string;
+  completedLessonIds: string[];
+  totalLessons: number;
+  completedLessons: number;
+  percentComplete: number;
+  lastAccessedAt: string;
+  status: 'completed' | 'in-progress' | 'not-started';
+};
+
+type DemoLearnerState = {
+  completedModuleIds: string[];
+  moduleProgress: Record<string, LearnerModuleProgress>;
+};
+
+type DashboardModule = {
+  moduleId: string;
+  moduleNumber: number;
+  title: string;
+  description: string;
+  estimatedMinutes: number;
+  clinicalSkillsCount: number;
+  primaryDomain: string;
+  status: string;
+  isUnlocked: boolean;
+  progress: LearnerModuleProgress;
+};
+
 const NAV_ITEMS: NavItem[] = [
   { key: 'home', label: 'Home', icon: '⌂' },
   { key: 'courses', label: 'Courses', icon: '▣' },
@@ -28,7 +56,7 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'more', label: 'More', icon: '⋯' },
 ];
 
-const DEMO_LEARNER_STATE = {
+const DEMO_LEARNER_STATE: DemoLearnerState = {
   completedModuleIds: ['M01', 'M02'],
   moduleProgress: {
     M01: {
@@ -152,14 +180,16 @@ function HomeScreen({
   completedModules,
   nextLessonSummary,
   renewalDaysLeft,
+  weakestDomainKey,
 }: {
   onNavigate: (view: AppView) => void;
   courseworkCompletion: number;
   completedModules: number;
   nextLessonSummary: string;
   renewalDaysLeft: number;
+  weakestDomainKey: string;
 }) {
-  const weakestDomain = getDomainLabel('INFECT');
+  const weakestDomain = getDomainLabel(weakestDomainKey as Parameters<typeof getDomainLabel>[0]);
 
   return (
     <div className="screen-stack">
@@ -269,7 +299,7 @@ function CoursesScreen({
   modules,
   nextLessonSummary,
 }: {
-  modules: Array<any>;
+  modules: DashboardModule[];
   nextLessonSummary: string;
 }) {
   return (
@@ -436,7 +466,8 @@ function renderView(view: AppView, args: {
   completedModules: number;
   nextLessonSummary: string;
   renewalDaysLeft: number;
-  modules: Array<any>;
+  weakestDomainKey: string;
+  modules: DashboardModule[];
 }) {
   switch (view) {
     case 'home':
@@ -447,6 +478,7 @@ function renderView(view: AppView, args: {
           completedModules={args.completedModules}
           nextLessonSummary={args.nextLessonSummary}
           renewalDaysLeft={args.renewalDaysLeft}
+          weakestDomainKey={args.weakestDomainKey}
         />
       );
     case 'courses':
@@ -464,27 +496,36 @@ function renderView(view: AppView, args: {
 
 export function IntegratedAppShell() {
   const [currentView, setCurrentView] = useState<AppView>('home');
+  const learnerState = DEMO_LEARNER_STATE as unknown as Parameters<typeof getModulesWithProgress>[0];
 
   const modulesWithProgress = useMemo(
-    () => getModulesWithProgress(DEMO_LEARNER_STATE as never).filter((module: any) => module.status === 'available'),
-    []
+    () => getModulesWithProgress(learnerState).filter((module): module is DashboardModule => module.status === 'available'),
+    [learnerState]
   );
 
+  const weakestDomainKey = useMemo(() => {
+    const weakestModule = [...modulesWithProgress]
+      .filter((module) => module.progress.totalLessons > 0)
+      .sort((left, right) => left.progress.percentComplete - right.progress.percentComplete)[0];
+
+    return weakestModule?.primaryDomain ?? 'INFECT';
+  }, [modulesWithProgress]);
+
   const nextLessonSummary = useMemo(() => {
-    const nextLesson = getNextLesson(DEMO_LEARNER_STATE as never);
+    const nextLesson = getNextLesson(learnerState);
     if (!nextLesson) {
       return 'Prometric Exam Preparation';
     }
 
-    const module = modulesWithProgress.find((item: any) => item.moduleId === nextLesson.moduleId);
-    const lessonNumber = nextLesson.lessonId.split('-')[1]?.replace('L', 'Lesson ') ?? nextLesson.lessonId;
+    const module = modulesWithProgress.find((item) => item.moduleId === nextLesson.moduleId);
+    const lessonLabel = nextLesson.lessonId.split('-')[1]?.replace('L', 'Lesson ') ?? nextLesson.lessonId;
 
-    return `${module?.title ?? nextLesson.moduleId} · ${lessonNumber}`;
-  }, [modulesWithProgress]);
+    return `${module?.title ?? nextLesson.moduleId} · ${lessonLabel}`;
+  }, [learnerState, modulesWithProgress]);
 
   const courseworkCompletion = useMemo(() => {
     const totals = modulesWithProgress.reduce(
-      (acc: { complete: number; total: number }, module: any) => {
+      (acc, module) => {
         acc.complete += module.progress.completedLessons;
         acc.total += module.progress.totalLessons;
         return acc;
@@ -496,7 +537,7 @@ export function IntegratedAppShell() {
   }, [modulesWithProgress]);
 
   const completedModules = useMemo(
-    () => modulesWithProgress.filter((module: any) => module.progress.status === 'completed').length,
+    () => modulesWithProgress.filter((module) => module.progress.status === 'completed').length,
     [modulesWithProgress]
   );
 
@@ -568,6 +609,7 @@ export function IntegratedAppShell() {
           completedModules,
           nextLessonSummary,
           renewalDaysLeft,
+          weakestDomainKey,
           modules: modulesWithProgress,
         })}
       </main>
