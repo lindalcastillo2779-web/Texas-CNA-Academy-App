@@ -146,6 +146,15 @@ const TOOL_CARDS = [
   { title: 'Instructor Views', status: 'Roadmap', copy: 'Give instructors and facilities a tailored dashboard.' },
 ];
 
+function formatLessonLabel(lessonId: string): string {
+  const match = lessonId.match(/^[A-Z0-9]+-L(\d+)$/);
+  if (!match) {
+    return lessonId;
+  }
+
+  return `Lesson ${match[1]}`;
+}
+
 function ProgressBar({ value, tone = 'accent' }: { value: number; tone?: 'accent' | 'success' | 'navy' }) {
   return (
     <div className="progress-meter" aria-hidden="true">
@@ -499,7 +508,7 @@ export function IntegratedAppShell() {
   const learnerState = DEMO_LEARNER_STATE as unknown as Parameters<typeof getModulesWithProgress>[0];
 
   const modulesWithProgress = useMemo(
-    () => getModulesWithProgress(learnerState).filter((module): module is DashboardModule => module.status === 'available'),
+    () => getModulesWithProgress(learnerState).filter((module) => module.status === 'available') as DashboardModule[],
     [learnerState]
   );
 
@@ -518,7 +527,7 @@ export function IntegratedAppShell() {
     }
 
     const module = modulesWithProgress.find((item) => item.moduleId === nextLesson.moduleId);
-    const lessonLabel = nextLesson.lessonId.split('-')[1]?.replace('L', 'Lesson ') ?? nextLesson.lessonId;
+    const lessonLabel = formatLessonLabel(nextLesson.lessonId);
 
     return `${module?.title ?? nextLesson.moduleId} · ${lessonLabel}`;
   }, [learnerState, modulesWithProgress]);
