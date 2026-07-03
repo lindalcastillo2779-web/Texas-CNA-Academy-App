@@ -143,7 +143,7 @@ const TOOL_CARDS = [
   { title: 'Renewal Check', status: 'Live now', copy: 'See readiness, deadlines, and missing steps.' },
   { title: 'Buddy', status: 'Next up', copy: 'Turn chat into study plans, explanations, and reminders.' },
   { title: 'Document Vault', status: 'Recommended', copy: 'Store certificates, completion records, and forms.' },
-  { title: 'Instructor Views', status: 'Roadmap', copy: 'Give instructors and facilities a tailored dashboard.' },
+  { title: 'Instructor + Admin Portals', status: 'Live now', copy: 'Shared role-specific dashboards now use the same unified portal foundation.' },
 ];
 
 function formatLessonLabel(lessonId: string): string {
