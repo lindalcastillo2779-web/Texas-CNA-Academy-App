@@ -3,6 +3,7 @@
 import os
 import sqlite3
 from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 
 # ---------------------------------------------------------------------------
 # Persistent-disk path detection (Render) vs local development fallback
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS users (
     email       TEXT    NOT NULL UNIQUE,
     role        TEXT    NOT NULL DEFAULT 'student',   -- student | cna | don | instructor | facility
     state_id    TEXT,
+    subscription_active INTEGER NOT NULL DEFAULT 0,
     created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -100,7 +102,20 @@ def init_db() -> None:
     """Create tables and seed sample exam questions if the DB is new."""
     with get_conn() as conn:
         conn.executescript(_DDL)
+        _migrate_user_subscription_fields(conn)
         _seed_questions(conn)
+
+
+def _migrate_user_subscription_fields(conn: sqlite3.Connection) -> None:
+    """Ensure legacy databases contain required user subscription fields."""
+    cols = {
+        row[1]
+        for row in conn.execute("PRAGMA table_info(users)").fetchall()
+    }
+    if "subscription_active" not in cols:
+        conn.execute(
+            "ALTER TABLE users ADD COLUMN subscription_active INTEGER NOT NULL DEFAULT 0"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -220,6 +235,67 @@ def get_or_create_user(name: str, email: str, role: str = "student") -> int:
 def get_user_by_email(email: str):
     with get_conn() as conn:
         return conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+
+
+def get_user_by_id(user_id: int) -> sqlite3.Row | None:
+    """Return a single user row by id, or None when not found."""
+    with get_conn() as conn:
+        return conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+
+
+def set_subscription_active(user_id: int, active: bool) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE users SET subscription_active = ? WHERE id = ?",
+            (int(active), user_id),
+        )
+
+
+def get_access_status(user_id: int, trial_days: int = 30) -> dict:
+    """Return access details.
+
+    Keys:
+    - allowed: bool, whether user can access protected sections
+    - subscribed: bool, whether subscription is active
+    - trial_active: bool, whether free trial is still active
+    - days_left: int, number of whole days left in trial
+    - trial_ends_on: ISO date string for trial end, or None
+    """
+    user = get_user_by_id(user_id)
+    if not user:
+        return {
+            "allowed": False,
+            "subscribed": False,
+            "trial_active": False,
+            "days_left": 0,
+            "trial_ends_on": None,
+        }
+
+    created_raw = user["created_at"] or ""
+    created_valid = True
+    try:
+        created_at = datetime.fromisoformat(created_raw)
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+        else:
+            created_at = created_at.astimezone(timezone.utc)
+    except ValueError:
+        created_at = datetime.now(timezone.utc)
+        created_valid = False
+
+    now = datetime.now(timezone.utc)
+    trial_ends = created_at + timedelta(days=trial_days)
+    subscribed = bool(user["subscription_active"])
+    trial_active = created_valid and now <= trial_ends
+    days_left = max((trial_ends.date() - now.date()).days, 0)
+
+    return {
+        "allowed": subscribed or trial_active,
+        "subscribed": subscribed,
+        "trial_active": trial_active,
+        "days_left": days_left,
+        "trial_ends_on": trial_ends.date().isoformat(),
+    }
 
 
 # ---------------------------------------------------------------------------

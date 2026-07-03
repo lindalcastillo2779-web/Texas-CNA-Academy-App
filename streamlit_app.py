@@ -18,7 +18,7 @@ Sections
 
 import streamlit as st
 
-from db import init_db
+from db import get_access_status, init_db
 
 # ---------------------------------------------------------------------------
 # Initialise database on first run
@@ -159,6 +159,7 @@ PAGES = {
     "🤖 Buddy": "buddy",
     "🔧 Admin Panel": "admin",
 }
+PAGE_LABEL_BY_KEY = {key: label for label, key in PAGES.items()}
 
 with st.sidebar:
     st.image(
@@ -168,9 +169,39 @@ with st.sidebar:
     st.title("Texas CNA Academy")
     st.caption("TULIP-Link Portal")
     st.divider()
-    page_label = st.radio("Navigate", list(PAGES.keys()), label_visibility="collapsed")
+    if "sidebar_nav" not in st.session_state:
+        st.session_state["sidebar_nav"] = "🏠 Home"
+    nav_target = st.session_state.pop("nav_target", None)
+    if nav_target in PAGE_LABEL_BY_KEY:
+        st.session_state["sidebar_nav"] = PAGE_LABEL_BY_KEY[nav_target]
+    page_label = st.radio(
+        "Navigate",
+        list(PAGES.keys()),
+        key="sidebar_nav",
+        label_visibility="collapsed",
+    )
 
 page = PAGES[page_label]
+
+if page != "home":
+    user_id = st.session_state.get("user_id")
+    if not user_id:
+        st.warning("Please sign in on the Home page to access app sections.")
+        from pages import home as _page
+
+        _page.show()
+        st.stop()
+
+    access = get_access_status(user_id)
+    if not access["allowed"]:
+        st.warning(
+            "Your 30-day free trial has ended. Please subscribe from the Home page to continue."
+        )
+        st.session_state["nav_target"] = "home"
+        from pages import home as _page
+
+        _page.show()
+        st.stop()
 
 # ---------------------------------------------------------------------------
 # Route to individual page modules
