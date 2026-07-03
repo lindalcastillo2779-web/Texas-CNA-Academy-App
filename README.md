@@ -7,12 +7,58 @@ Texas CNA Academy is a mobile-friendly training and resource platform for Texas 
 This project is designed to support Texas nurse aide education, training readiness, and program organization. It brings together:
 
 - exam-preparation tools for nurse aide students
+- **interactive Clinical Skills Lab** for hands-on skill simulation (Prometric/NATCEP-aligned)
 - renewal and continuing education tracking support
 - staffing and compliance support tools
 - access to important Texas CNA and NATCEP-related forms and references
 - a central location for curriculum, planning, and operational resources
 
 The goal is to provide a practical, organized, and easy-to-use platform that supports both learning and program administration.
+
+## Clinical Skills Lab
+
+The **🧪 Clinical Skills Lab** is an interactive, Prometric- and NATCEP-aligned simulation section where CNA students can practice and self-assess the hands-on skills evaluated on the Texas CNA skills examination.
+
+### Overview
+
+Each scenario walks you through a skill using the same checklist format examiners use at Prometric testing centers. Decision points mirror real exam choices, and scoring reflects actual exam criteria.
+
+### How to use Coach vs Exam mode
+
+| Mode | Best used for | Hints | Feedback timing |
+|------|---------------|-------|-----------------|
+| 🏋️ **Coach Mode** | First-time practice, learning rationale | Full hints + rationale | Immediate after every step |
+| 🎓 **Exam Mode** | Self-assessment, exam-readiness check | None — mirrors real exam | Summary only after completion |
+
+**Recommended workflow:**
+1. Run each scenario in **Coach Mode** first to understand the correct sequence and rationale.
+2. Once comfortable, switch to **Exam Mode** to test yourself under exam-like conditions.
+3. Review the results summary for targeted remediation recommendations.
+
+### What the scores mean
+
+| Score | Weight | Meaning |
+|-------|--------|---------|
+| ✅ Checklist Score | 40 % | Percentage of non-critical technique steps answered correctly |
+| 🚨 Critical-Step Score | 40 % | Percentage of critical steps passed — **must be 100 %** (any miss = automatic Prometric failure) |
+| 💬 Communication Score | 20 % | Communication and professionalism checkpoint completion |
+| 🎯 Overall Score | — | Weighted composite of all three components |
+
+**Passing:** Overall ≥ 75 % AND all critical steps correct.
+
+### Available scenarios
+
+| Scenario | Key skills covered | Prometric skill |
+|----------|--------------------|-----------------|
+| 🧼 Hand Hygiene & PPE | Hand-washing technique, donning/doffing sequence | Handwashing |
+| 🦽 Transfer: Bed ↔ Wheelchair | Environment prep, gait belt, brakes, body mechanics | Transfer from Bed to Wheelchair |
+| 🩺 Vital Signs & Documentation | Temp, pulse, respirations, BP, normal ranges, reporting | Measuring and Recording Vital Signs |
+
+### Where to add new scenarios
+
+1. Create a new JSON file under `knowledge/lab_scenarios/` following the structure of an existing scenario (e.g., `hand_hygiene_ppe.json`). Required fields: `id`, `title`, `description`, `natcep_domains`, `steps` (with `decision_points`), `communication_checkpoints`, `remediation_refs`.
+2. Register the new file in `utils/lab_engine.py` by adding an entry to the `_SCENARIO_FILES` dictionary.
+3. Add the step mappings to `knowledge/lab_scenarios/curriculum_mapping.json` under `scenario_mappings`.
 
 ## How to use this project
 
@@ -122,6 +168,7 @@ pages/
   home.py                 # Welcome and registration page
   courses.py              # NATCEP course roadmap and curriculum browser
   exam_prep.py            # Practice quiz tools
+  clinical_skills_lab.py  # Clinical Skills Lab – interactive CNA skill simulations
   ceu_tracker.py          # CEU logging and progress
   renewal_check.py        # Renewal readiness dashboard
   staffing.py             # Staffing compliance log
@@ -130,6 +177,11 @@ pages/
 knowledge/
   curriculum/             # Curriculum docs (.md / .txt / .pdf)
   media/                  # Central media registry for Streamlit pages and lessons
+  lab_scenarios/          # Clinical Skills Lab scenario definitions
+    hand_hygiene_ppe.json               # Hand Hygiene & PPE scenario
+    transfer_bed_wheelchair.json        # Transfer: Bed ↔ Wheelchair scenario
+    vital_signs_documentation.json      # Vital Signs & Documentation scenario
+    curriculum_mapping.json             # NATCEP/Prometric standards mapping
   tulip/                  # TULIP guidance docs
   twc/                    # TWC workforce docs
   texas_hhs/              # Texas HHSC/HHS regulatory docs
@@ -140,6 +192,7 @@ assets/
   video/                  # Optional local MP4/WebM clips
 utils/
   media.py                # Safe registry loading, frontmatter parsing, and rendering helpers
+  lab_engine.py           # Clinical Skills Lab engine: scenario loading, scoring, feedback
 render.yaml               # Render deployment configuration
 requirements.txt          # Python dependencies
 .env.example              # Environment variable template
@@ -206,6 +259,7 @@ Available page keys in the current Streamlit app are:
 - `home`
 - `courses`
 - `exam_prep`
+- `clinical_skills_lab`
 - `ceu_tracker`
 - `renewal_check`
 - `staffing`

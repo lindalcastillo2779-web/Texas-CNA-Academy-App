@@ -1,0 +1,359 @@
+{
+  "id": "vital_signs_documentation",
+  "title": "Vital Signs & Documentation",
+  "description": "Practice measuring and recording vital signs (temperature, pulse, respirations, blood pressure) as evaluated on the Prometric CNA skills checklist. This scenario covers correct technique, normal ranges, reporting abnormals, and accurate documentation aligned with NATCEP standards.",
+  "natcep_domains": ["Basic Nursing Skills", "Communication and Documentation"],
+  "estimated_minutes": 12,
+  "steps": [
+    {
+      "id": "step_01",
+      "title": "Prepare and identify the resident",
+      "instruction": "You are about to take a resident's vital signs. What are the FIRST two things you must do?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_01a",
+          "question": "What must happen before measuring any vital sign?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Perform hand hygiene AND verify resident identity using at least two identifiers (name and date of birth or ID band)",
+              "correct": true,
+              "feedback": "Correct! Hand hygiene prevents transmission of infection, and verifying resident identity prevents errors. Both are critical steps — either missed can result in automatic failure on the Prometric exam.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Gather your equipment and start measuring immediately",
+              "correct": false,
+              "feedback": "Incorrect. Skipping hand hygiene and identity verification before providing care is an infection control and patient safety violation.",
+              "rationale": "Hand hygiene and identity check must precede any resident care intervention, including vital sign measurement."
+            },
+            {
+              "id": "C",
+              "text": "Ask the resident their name and proceed",
+              "correct": false,
+              "feedback": "Incomplete. Asking the name is only one identifier. Two identifiers (name + date of birth or wristband) are required to positively confirm identity and prevent errors.",
+              "rationale": "Two-identifier verification is a fundamental patient safety standard required by The Joint Commission and reflected in CNA exam skills checklists."
+            },
+            {
+              "id": "D",
+              "text": "Check the room number on the door to confirm the right resident",
+              "correct": false,
+              "feedback": "Incorrect. Room numbers alone are not a reliable patient identifier. Residents may move rooms, and bed assignments can change. Always verify with the resident directly using two identifiers.",
+              "rationale": "Room-number-only identification is considered a high-risk practice. Use name and a second identifier (DOB or wristband)."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_vital_signs"
+        }
+      ]
+    },
+    {
+      "id": "step_02",
+      "title": "Measure oral temperature",
+      "instruction": "You are measuring oral temperature using an electronic thermometer. What is the correct technique?",
+      "critical": false,
+      "decision_points": [
+        {
+          "id": "dp_02a",
+          "question": "Which describes correct oral temperature measurement?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Use a probe cover, place thermometer under the tongue in the sublingual pocket, have the resident close their lips, wait for the beep, read and record the temperature",
+              "correct": true,
+              "feedback": "Correct! The sublingual pocket (under the tongue to the side of the frenulum) provides the most accurate oral reading. The probe cover prevents cross-contamination. Waiting for the device signal ensures an accurate result.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Place the thermometer under the tongue anywhere, remove after 30 seconds",
+              "correct": false,
+              "feedback": "Incorrect. Placement location matters — the sublingual pocket is most accurate. Timing by seconds rather than the device signal can lead to an inaccurate reading.",
+              "rationale": "Electronic thermometers signal when the reading is stable. Removing early can give a falsely low result. Correct placement in the sublingual pocket is required for accuracy."
+            },
+            {
+              "id": "C",
+              "text": "No probe cover is needed for electronic thermometers — they self-sanitize",
+              "correct": false,
+              "feedback": "Incorrect. A probe cover is ALWAYS required for oral thermometers to prevent cross-contamination between residents. Electronic thermometers do not self-sanitize.",
+              "rationale": "Probe covers are a standard infection control measure. Failure to use one is an infection control violation."
+            },
+            {
+              "id": "D",
+              "text": "Measure temperature with the resident talking to confirm correct placement",
+              "correct": false,
+              "feedback": "Incorrect. The resident must keep their lips closed and remain still. Talking disrupts placement and introduces ambient air, causing an inaccurately low reading.",
+              "rationale": "Mouth closure is required to maintain sublingual pocket temperature. Speaking introduces room-temperature air and invalidates the measurement."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_vital_signs"
+        }
+      ]
+    },
+    {
+      "id": "step_03",
+      "title": "Measure pulse rate",
+      "instruction": "After temperature, you need to measure the resident's radial pulse. What is the correct technique?",
+      "critical": false,
+      "decision_points": [
+        {
+          "id": "dp_03a",
+          "question": "How do you correctly measure a radial pulse?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Use the index and middle fingers (not the thumb) over the radial artery at the wrist, count for a full 60 seconds, note rate AND rhythm AND strength",
+              "correct": true,
+              "feedback": "Correct! Using two fingers (not the thumb, which has its own pulse) on the radial artery at the wrist, counting for a full 60 seconds, and noting rate, rhythm, and strength meets the CNA exam standard.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Use your thumb to feel the pulse at the wrist, count for 15 seconds and multiply by 4",
+              "correct": false,
+              "feedback": "Incorrect. The thumb has its own pulsation and can produce an inaccurate count. For initial or abnormal rhythms, count for a full 60 seconds. The 15×4 shortcut is less accurate and not used on the CNA exam.",
+              "rationale": "The thumb's digital artery can be confused with the resident's pulse. Counting for only 15 seconds misses irregular rhythms. Full 60-second counting is the exam standard."
+            },
+            {
+              "id": "C",
+              "text": "Press firmly with four fingers until the pulse disappears, then release and count",
+              "correct": false,
+              "feedback": "Incorrect. Pressing until the pulse disappears occludes blood flow. Correct technique uses light to moderate pressure to feel the artery without compressing it.",
+              "rationale": "Excess pressure obliterates the pulse. The correct technique is firm but gentle palpation to detect each beat clearly."
+            },
+            {
+              "id": "D",
+              "text": "Use a pulse oximeter only — it gives the pulse rate automatically",
+              "correct": false,
+              "feedback": "Incorrect. On the CNA skills exam, manual radial pulse assessment is required. A pulse oximeter reading alone does not demonstrate the manual palpation technique the examiner observes.",
+              "rationale": "The CNA skills exam requires demonstration of manual pulse assessment. Relying solely on equipment does not satisfy the skill objective."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_vital_signs"
+        }
+      ]
+    },
+    {
+      "id": "step_04",
+      "title": "Count respirations",
+      "instruction": "After pulse, you must count respirations. What is the correct technique — and why is the timing important?",
+      "critical": false,
+      "decision_points": [
+        {
+          "id": "dp_04a",
+          "question": "How do you correctly count respirations?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Without telling the resident, observe chest rise and fall for a full 60 seconds (or 30 seconds × 2) while pretending to still count the pulse",
+              "correct": true,
+              "feedback": "Correct! Counting respirations without alerting the resident prevents voluntary change in breathing rate. One complete breath = one rise AND one fall of the chest. The exam requires a full 60-second count (or equivalent).",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Tell the resident to breathe normally and count breaths for 15 seconds",
+              "correct": false,
+              "feedback": "Incorrect. Telling a resident you are counting their breathing causes most people to alter their breathing rate. The 15-second count is not sufficient for the CNA exam standard.",
+              "rationale": "Patients consciously or unconsciously change their breathing when told it is being counted. Count without announcing it for an accurate baseline."
+            },
+            {
+              "id": "C",
+              "text": "Ask the resident to count their own breaths to 20",
+              "correct": false,
+              "feedback": "Incorrect. Self-counting by the resident is not a valid clinical assessment method and does not meet the CNA skill standard.",
+              "rationale": "Respiration rate must be assessed by the CNA through direct observation — self-reporting by the resident is not an accepted clinical measurement."
+            },
+            {
+              "id": "D",
+              "text": "Count only inhalations (chest rises) for 30 seconds and multiply by 2",
+              "correct": false,
+              "feedback": "Partially incorrect. One respiration = one inhale + one exhale (both the rise and the fall). Counting only inhalations doubles the actual respiration count.",
+              "rationale": "A respiration is a complete breathing cycle (in + out). Counting only inhalations would give an inflated count."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_vital_signs"
+        }
+      ]
+    },
+    {
+      "id": "step_05",
+      "title": "Measure blood pressure",
+      "instruction": "You are measuring blood pressure with a manual sphygmomanometer. Which technique is correct?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_05a",
+          "question": "What is the correct manual blood pressure technique?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Position resident arm at heart level, apply cuff 1–2 inches above antecubital space, palpate radial artery, inflate 30 mmHg above loss of pulse, place stethoscope over brachial artery, deflate slowly (2–3 mmHg/sec), record first sound (systolic) and last sound (diastolic)",
+              "correct": true,
+              "feedback": "Correct! This complete technique — arm at heart level, correct cuff placement, palpatory estimate before auscultation, correct stethoscope position, slow deflation, and reading both systolic and diastolic — is required for the CNA skills exam.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Apply cuff anywhere on the arm, inflate to 200 mmHg, deflate quickly",
+              "correct": false,
+              "feedback": "Incorrect. Cuff placement 1–2 inches above the antecubital space is required. Inflating to a random high pressure is unnecessary and uncomfortable. Rapid deflation causes an inaccurate reading.",
+              "rationale": "Cuff position, inflation level, and deflation rate all directly affect reading accuracy. Each of these steps has a specific standard for a reason."
+            },
+            {
+              "id": "C",
+              "text": "Record only the systolic pressure (first sound) — diastolic is less important",
+              "correct": false,
+              "feedback": "Incorrect. Both systolic and diastolic blood pressures must be measured and recorded. Both values are required on the CNA skills exam and in clinical documentation.",
+              "rationale": "Diastolic pressure reflects arterial pressure at rest between heartbeats. Both values together are needed to assess hypertension or hypotension."
+            },
+            {
+              "id": "D",
+              "text": "Re-inflate the cuff immediately if you miss a reading to try again",
+              "correct": false,
+              "feedback": "Incorrect. Re-inflating without waiting at least 1–2 minutes can cause venous congestion and produce a falsely elevated reading. If you miss the reading, deflate completely and wait before retaking.",
+              "rationale": "Immediate re-inflation traps venous blood in the arm, which can artificially raise the measured pressure. Always wait and allow full deflation before repeating."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_vital_signs"
+        }
+      ]
+    },
+    {
+      "id": "step_06",
+      "title": "Recognize normal ranges and report abnormal findings",
+      "instruction": "After taking all vital signs, you note: Temp 99.8°F, Pulse 98 bpm, Respirations 22/min, BP 148/94. What should you do?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_06a",
+          "question": "Are these vital signs within normal ranges, and what action is required?",
+          "options": [
+            {
+              "id": "A",
+              "text": "All values are outside or at the upper limit of normal ranges — report ALL findings to the charge nurse promptly and document the time reported",
+              "correct": true,
+              "feedback": "Correct! Temp 99.8°F (normal 97–99°F), Pulse 98 (upper limit; normal 60–100), Respirations 22 (above normal 12–20), BP 148/94 (elevated; normal <120/80, hypertension ≥140/90) — all warrant prompt reporting. The CNA's role is to measure, observe, document, and REPORT abnormals to the licensed nurse.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "The values are slightly elevated but not serious — just document and continue",
+              "correct": false,
+              "feedback": "Incorrect. Abnormal vital signs — even mild elevations — must be reported to the supervising nurse. The CNA does not make independent clinical decisions about significance.",
+              "rationale": "The CNA's scope of practice includes measurement, documentation, and REPORTING. Clinical interpretation and management decisions belong to the licensed nurse."
+            },
+            {
+              "id": "C",
+              "text": "Retake all the measurements before reporting anything",
+              "correct": false,
+              "feedback": "Partially incorrect. While a single outlier may warrant rechecking, a consistent pattern of abnormals across all four vitals should be reported promptly. Delaying to repeat measurements can delay needed intervention.",
+              "rationale": "When multiple abnormals are present simultaneously, prompt reporting is the priority. Do not delay reporting to repeat all measurements."
+            },
+            {
+              "id": "D",
+              "text": "Administer water and encourage rest to normalize the readings before reporting",
+              "correct": false,
+              "feedback": "Incorrect. Administering interventions is outside the CNA scope of practice. CNAs do not intervene clinically — they measure, document, and report to the licensed nurse.",
+              "rationale": "The CNA's scope is to observe and report, not to independently treat or intervene. Administering interventions without nursing direction is a scope-of-practice violation."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_vital_signs"
+        }
+      ]
+    },
+    {
+      "id": "step_07",
+      "title": "Document vital signs accurately",
+      "instruction": "You are documenting the vital signs. What are the documentation requirements?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_07a",
+          "question": "What must your documentation include?",
+          "options": [
+            {
+              "id": "A",
+              "text": "All four vital sign values with units, date and time of measurement, your name/title, and a note if abnormal values were reported to the nurse",
+              "correct": true,
+              "feedback": "Correct! Complete documentation includes all values with units, date/time, your signature and title, and a notation that abnormals were reported. Incomplete documentation is a legal and exam standard issue.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Just the numbers — the nurse will add the details later",
+              "correct": false,
+              "feedback": "Incorrect. Documentation must be complete at the time of entry. Missing date, time, and signature makes documentation legally and clinically invalid.",
+              "rationale": "Incomplete documentation is both a safety risk and a legal liability. CNA documentation must be contemporaneous, complete, and signed."
+            },
+            {
+              "id": "C",
+              "text": "Document vitals from memory at the end of the shift to save time",
+              "correct": false,
+              "feedback": "Incorrect. Documentation must be done as soon as possible after measurement — not hours later from memory. Delayed documentation creates inaccuracy and a safety risk.",
+              "rationale": "Timely documentation is a fundamental nursing standard. Memory-based end-of-shift charting is prone to error and legally indefensible."
+            },
+            {
+              "id": "D",
+              "text": "Only document values that are abnormal to keep notes brief",
+              "correct": false,
+              "feedback": "Incorrect. All vital signs must be documented regardless of whether they are normal or abnormal. Partial documentation creates an incomplete clinical record.",
+              "rationale": "The complete vital sign record is needed for trend analysis and legal documentation. Selective recording is incomplete and unacceptable."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_documentation"
+        }
+      ]
+    }
+  ],
+  "communication_checkpoints": [
+    {
+      "id": "comm_01",
+      "prompt": "Did you explain each vital sign measurement to the resident before performing it (e.g., 'I am going to take your temperature now')?",
+      "options": [
+        {"id": "Y", "text": "Yes – I explained each step before performing it", "correct": true},
+        {"id": "N", "text": "No – I performed each measurement without explanation", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "Excellent. Explaining each step to the resident demonstrates person-centered care and is scored on the CNA exam.",
+      "feedback_fail": "Always explain what you are about to do before touching the resident or applying equipment. This is a professionalism requirement."
+    },
+    {
+      "id": "comm_02",
+      "prompt": "After completing vital signs, did you tell the resident their results (in simple terms) and ensure their comfort?",
+      "options": [
+        {"id": "Y", "text": "Yes – I provided general feedback and checked comfort", "correct": true},
+        {"id": "N", "text": "No – I documented and left without informing the resident", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "Good. Informing the resident and ensuring comfort after care is a person-centered care standard.",
+      "feedback_fail": "Always inform the resident that you have finished and ensure their comfort before leaving. This is part of the CNA communication standard."
+    }
+  ],
+  "remediation_refs": {
+    "module_vital_signs": {
+      "label": "Vital Signs: Measurement and Normal Ranges",
+      "module": "Module 06",
+      "topic": "Temperature, Pulse, Respirations, and Blood Pressure",
+      "exam_domain": "Basic Nursing Skills",
+      "prometric_skill": "Measuring and Recording Vital Signs"
+    },
+    "module_documentation": {
+      "label": "Clinical Documentation Standards",
+      "module": "Module 03",
+      "topic": "Accurate Reporting and Documentation",
+      "exam_domain": "Communication and Documentation",
+      "prometric_skill": "Reporting Abnormals and Documentation"
+    }
+  }
+}

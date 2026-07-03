@@ -1,0 +1,264 @@
+{
+  "id": "hand_hygiene_ppe",
+  "title": "Hand Hygiene & PPE Donning/Doffing",
+  "description": "Practice the correct sequence for hand hygiene and personal protective equipment (PPE) use as evaluated on the Prometric CNA skills checklist. This scenario covers the critical steps that examiners score, including timing, technique, and proper disposal.",
+  "natcep_domains": ["Infection Control", "Safety"],
+  "estimated_minutes": 8,
+  "steps": [
+    {
+      "id": "step_01",
+      "title": "Identify the need for hand hygiene",
+      "instruction": "You are about to enter a resident's room to provide care. What is the FIRST thing you must do?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_01a",
+          "question": "What do you do before entering the resident's room?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Perform hand hygiene (wash hands or use alcohol-based sanitizer)",
+              "correct": true,
+              "feedback": "Correct. Hand hygiene before resident contact is a critical safety step required by the CNA skills exam. Failure to perform hand hygiene at the beginning of a skill results in automatic skill failure on the Prometric exam.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Put on gloves first, then enter the room",
+              "correct": false,
+              "feedback": "Incorrect. Donning gloves without first performing hand hygiene does not meet CNA skill standards. Gloves are not a substitute for hand washing.",
+              "rationale": "Hand hygiene must occur BEFORE donning PPE. The CDC hand hygiene guidelines and Prometric skills checklist both require clean hands as the first step."
+            },
+            {
+              "id": "C",
+              "text": "Knock and enter the room, then wash hands at the sink inside",
+              "correct": false,
+              "feedback": "Incorrect. Hand hygiene is required before contact, not after entering. This sequence does not satisfy the exam skill standard.",
+              "rationale": "The correct sequence is: hand hygiene → don PPE → enter and provide care. Performing hand hygiene after entering misses the pre-contact requirement."
+            },
+            {
+              "id": "D",
+              "text": "Check the care plan before doing anything else",
+              "correct": false,
+              "feedback": "Incorrect. While reviewing the care plan is important for planning, hand hygiene must occur before contact with any resident or their environment.",
+              "rationale": "Hand hygiene is required immediately before any direct patient contact under standard precautions."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_02",
+      "title": "Perform proper hand hygiene technique",
+      "instruction": "You are at the sink performing hand hygiene. Which technique meets the CNA exam standard?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_02a",
+          "question": "Which describes the correct hand-washing technique?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Wet hands, apply soap, scrub all surfaces including between fingers and wrists for at least 20 seconds, rinse, dry with paper towel, use towel to turn off faucet",
+              "correct": true,
+              "feedback": "Correct! This is the complete, exam-ready hand-washing technique. All surfaces must be scrubbed for at least 20 seconds, and the faucet must be turned off with the towel to avoid recontamination.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Wet hands, apply soap, scrub palms for 10 seconds, rinse, dry",
+              "correct": false,
+              "feedback": "Incorrect. The minimum scrub time is 20 seconds and must include all hand surfaces (backs, between fingers, wrists). Scrubbing only palms does not meet the standard.",
+              "rationale": "The CDC and CNA skills checklist require thorough scrubbing of all hand surfaces for a minimum of 20 seconds. Partial or brief washing is considered incomplete."
+            },
+            {
+              "id": "C",
+              "text": "Apply hand sanitizer, rub until dry – this is sufficient for all situations",
+              "correct": false,
+              "feedback": "Incorrect. Alcohol-based hand sanitizer is NOT acceptable when hands are visibly soiled, after using the bathroom, or after removing contaminated gloves. Soap and water are required in those situations.",
+              "rationale": "Per CDC guidelines, soap and water are required when hands are visibly soiled or after contact with potentially contaminated surfaces. Hand sanitizer is for quick hand decontamination when hands are not visibly soiled."
+            },
+            {
+              "id": "D",
+              "text": "Wash with soap and water for 5 seconds using only fingertips",
+              "correct": false,
+              "feedback": "Incorrect. Five seconds and fingertips-only is insufficient. Proper technique requires at least 20 seconds and covers all surfaces.",
+              "rationale": "Inadequate duration and coverage means harmful pathogens may remain on the hands, putting residents at risk."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_03",
+      "title": "Select and don appropriate PPE",
+      "instruction": "You are preparing to provide perineal care for a resident. Which PPE is required, and in what ORDER should it be donned?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_03a",
+          "question": "For perineal care, which PPE should you don, and in what order?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Gown first, then mask (if needed), then gloves last",
+              "correct": true,
+              "feedback": "Correct! The correct donning order for PPE is: gown → mask/eye protection (if needed) → gloves. Gloves always go on last so that they can overlap the gown cuffs and protect the wrists.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Gloves first, then gown",
+              "correct": false,
+              "feedback": "Incorrect. Donning gloves before the gown leaves the wrists exposed. Gloves must go on last to overlap the gown cuffs.",
+              "rationale": "The CDC sequence for donning PPE is: gown → mask → goggles/face shield → gloves. This order minimizes contamination risk to the face and clothing."
+            },
+            {
+              "id": "C",
+              "text": "Only gloves are needed for perineal care",
+              "correct": false,
+              "feedback": "Incorrect. Perineal care involves contact with body fluids, so a gown is also required to protect clothing and skin.",
+              "rationale": "Standard precautions require a gown when there is risk of clothing contamination from body fluids. Perineal care always carries that risk."
+            },
+            {
+              "id": "D",
+              "text": "Mask first, then gown, then gloves",
+              "correct": false,
+              "feedback": "Partially incorrect. While a mask may be worn before a gown in some protocols, the standard CDC order is gown before mask. This answer sequence is not the accepted standard.",
+              "rationale": "Follow the standard CDC donning sequence to ensure consistent protection and meet exam expectations."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_04",
+      "title": "Doff PPE safely",
+      "instruction": "You have completed care. You need to remove your PPE. In what order should PPE be removed (doffed)?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_04a",
+          "question": "What is the correct order for removing (doffing) PPE?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Gloves first (fold inside out), then gown (roll away from body), then mask last – dispose of each in proper waste container",
+              "correct": true,
+              "feedback": "Correct! Gloves are the most contaminated PPE item and come off first, folded inside-out. The gown is rolled away from the body to contain contamination. Masks come off last because they protect the face during removal of other items.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Mask first, then gown, then gloves",
+              "correct": false,
+              "feedback": "Incorrect. Removing the mask first exposes your face to contamination still present on the gown and gloves. Gloves (the most contaminated item) must come off first.",
+              "rationale": "The doffing sequence minimizes self-contamination. Contaminated surfaces (gloves, outer gown) are removed before the mask to protect the mucous membranes."
+            },
+            {
+              "id": "C",
+              "text": "Gown first by pulling over the head, then gloves, then mask",
+              "correct": false,
+              "feedback": "Incorrect. Pulling a gown over the head risks spreading contamination to the face and hair. The gown should be rolled away from the body and off the arms.",
+              "rationale": "Rolling the gown inward and downward (away from the body) keeps the contaminated outer surface contained during removal."
+            },
+            {
+              "id": "D",
+              "text": "Remove all PPE at once and drop in the trash",
+              "correct": false,
+              "feedback": "Incorrect. Removing all PPE at once significantly increases the risk of self-contamination. Each item must be removed in sequence and disposed of properly.",
+              "rationale": "Each piece of PPE must be removed carefully and in sequence. Hasty or simultaneous removal creates a high risk of transferring pathogens to clean skin or clothing."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_05",
+      "title": "Perform hand hygiene after PPE removal",
+      "instruction": "You have removed all your PPE. What must you do immediately after?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_05a",
+          "question": "What is required immediately after removing all PPE?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Perform hand hygiene again (wash hands or use hand sanitizer)",
+              "correct": true,
+              "feedback": "Correct. Hand hygiene after PPE removal is a mandatory critical step. Even a perfect doffing technique does not guarantee that hands remained uncontaminated. Exam failure results if this step is skipped.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Proceed to document the care provided",
+              "correct": false,
+              "feedback": "Incorrect. Documenting before performing hand hygiene after PPE removal can spread contamination to surfaces (keyboard, chart). Hand hygiene must happen first.",
+              "rationale": "Post-PPE hand hygiene is required before touching any clean surface. Skipping this step violates standard precautions and is a critical exam failure point."
+            },
+            {
+              "id": "C",
+              "text": "Put on a new pair of gloves for protection",
+              "correct": false,
+              "feedback": "Incorrect. Gloves are not a substitute for hand hygiene. New gloves on unclean hands can transfer contamination and are not an acceptable replacement for washing.",
+              "rationale": "Hand hygiene must occur on bare hands. Gloves protect clean hands; they cannot clean contaminated hands."
+            },
+            {
+              "id": "D",
+              "text": "Go to the next resident's room",
+              "correct": false,
+              "feedback": "Incorrect. Moving to the next resident without hand hygiene after PPE removal is a direct infection control violation and would cause exam failure.",
+              "rationale": "Between every resident contact and after every PPE removal, hand hygiene is mandatory under standard precautions."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    }
+  ],
+  "communication_checkpoints": [
+    {
+      "id": "comm_01",
+      "prompt": "Before you begin the hand hygiene demonstration, you should introduce yourself and explain what you are about to do. Did you greet the resident and explain the procedure?",
+      "options": [
+        {"id": "Y", "text": "Yes – I greeted the resident and explained I was about to perform hand hygiene and provide care", "correct": true},
+        {"id": "N", "text": "No – I proceeded without greeting or explanation", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "Good. Greeting the resident and explaining the procedure is part of the communication/professionalism score on the CNA exam.",
+      "feedback_fail": "Remember to always greet the resident, state your name, and explain the procedure before beginning. This earns communication points on the exam."
+    },
+    {
+      "id": "comm_02",
+      "prompt": "After completing the skill, did you ensure the resident's comfort and ask if they needed anything else?",
+      "options": [
+        {"id": "Y", "text": "Yes – I ensured comfort and asked if they needed anything", "correct": true},
+        {"id": "N", "text": "No – I left without checking on the resident", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "Excellent. Ensuring comfort before leaving is a standard professionalism checkpoint on the CNA exam.",
+      "feedback_fail": "Always ensure the resident's comfort and ask if they need anything before leaving. This is scored on the CNA exam."
+    }
+  ],
+  "remediation_refs": {
+    "module_infection_control": {
+      "label": "Infection Control & Standard Precautions",
+      "module": "Module 05",
+      "topic": "Hand Hygiene, PPE, and Standard Precautions",
+      "exam_domain": "Infection Control",
+      "prometric_skill": "Handwashing"
+    }
+  }
+}

@@ -1,0 +1,264 @@
+{
+  "id": "transfer_bed_wheelchair",
+  "title": "Transfer: Bed ↔ Wheelchair",
+  "description": "Practice the safe transfer procedure between bed and wheelchair as evaluated on the Prometric CNA skills checklist. This scenario covers critical safety steps: locking brakes, footrest management, gait belt use, body mechanics, and resident communication.",
+  "natcep_domains": ["Safety", "Restorative Care", "Basic Nursing Skills"],
+  "estimated_minutes": 10,
+  "steps": [
+    {
+      "id": "step_01",
+      "title": "Gather equipment and prepare environment",
+      "instruction": "You are about to transfer a resident from bed to wheelchair. What must you do to prepare the environment BEFORE moving the resident?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_01a",
+          "question": "Which preparation steps are required before beginning the transfer?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Perform hand hygiene, position and lock the wheelchair at a 45° angle to the bed, raise the bed to a safe working height, lower the near-side bedrail",
+              "correct": true,
+              "feedback": "Correct! Proper environment preparation prevents falls and injury. The wheelchair must be locked and angled, the bed at a safe height, and the near-side bedrail down before repositioning the resident.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Ask the resident to move to the edge of the bed on their own, then position the wheelchair",
+              "correct": false,
+              "feedback": "Incorrect. The environment (wheelchair, bed height, bedrails) must be prepared and verified safe BEFORE the resident moves. Having the resident move first without a locked, positioned wheelchair creates a fall risk.",
+              "rationale": "Falls are one of the most common and serious adverse events in healthcare settings. Pre-transfer safety setup is a non-negotiable critical step on the CNA exam."
+            },
+            {
+              "id": "C",
+              "text": "Lower both bedrails, then transfer the resident",
+              "correct": false,
+              "feedback": "Incorrect. Only the near side rail (the working side) should be lowered. The far side rail remains up as a safety barrier.",
+              "rationale": "The far bedrail acts as a safety barrier to prevent the resident from rolling or falling to the opposite side during repositioning."
+            },
+            {
+              "id": "D",
+              "text": "Wheel the wheelchair to the far side of the bed, lock it, and begin transfer",
+              "correct": false,
+              "feedback": "Incorrect. The wheelchair should be positioned on the resident's stronger side (or as directed by the care plan) at a 45° angle to the bed — not the far side. Positioning on the far side greatly increases transfer distance and fall risk.",
+              "rationale": "The 45-degree angle minimizes the pivot distance during the transfer, reducing fall risk and physical strain."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_02",
+      "title": "Apply the gait belt",
+      "instruction": "The resident is seated on the edge of the bed with feet flat on the floor. What should you do next?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_02a",
+          "question": "How should the gait belt be applied?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Apply gait belt snugly over clothing at the waist — two fingers should fit under the belt — with the buckle at the front or side (not spine)",
+              "correct": true,
+              "feedback": "Correct! The gait belt must be applied snugly (two-finger check) over clothing, buckle positioned away from the spine for comfort and safety. This is a critical step on the CNA exam; missing it or applying it incorrectly results in point deduction.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Apply gait belt under the resident's clothing directly on skin for a better grip",
+              "correct": false,
+              "feedback": "Incorrect. The gait belt is always applied OVER clothing. Placing it on bare skin can cause skin tears, abrasions, and discomfort.",
+              "rationale": "Standard practice and exam standards require gait belt application over clothing to protect the resident's skin."
+            },
+            {
+              "id": "C",
+              "text": "The gait belt is optional if the resident can stand with minimal assistance",
+              "correct": false,
+              "feedback": "Incorrect. On the CNA exam, if the skill involves transfer assistance, a gait belt must be used whenever indicated. Skipping it is a major deduction.",
+              "rationale": "Gait belts significantly reduce fall risk and protect both the resident and the aide. Their use is required by exam skills checklists."
+            },
+            {
+              "id": "D",
+              "text": "Apply gait belt very loosely so the resident can breathe comfortably",
+              "correct": false,
+              "feedback": "Incorrect. A loose gait belt can slip up or off during transfer, eliminating its safety benefit. Snug (two-finger test) is the correct standard.",
+              "rationale": "The two-finger test ensures the belt is firm enough to provide support but not so tight as to cause respiratory discomfort."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_03",
+      "title": "Verify wheelchair is locked and footrests are managed",
+      "instruction": "Before asking the resident to stand, which wheelchair checks must be completed?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_03a",
+          "question": "What must you verify about the wheelchair before initiating the stand?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Both wheelchair wheels are locked and footrests are swung away or removed",
+              "correct": true,
+              "feedback": "Correct! Locked brakes prevent the wheelchair from rolling during the transfer. Footrests must be moved out of the way so the resident does not step on them, which could cause a fall.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "The footrests should remain in place so the resident can step onto them immediately",
+              "correct": false,
+              "feedback": "Incorrect. Footrests left in position during a transfer are a tripping hazard. They must be swung away or removed before the resident stands.",
+              "rationale": "Footrests in the transfer path are a significant fall risk. Removing or moving them is a critical exam step."
+            },
+            {
+              "id": "C",
+              "text": "Only the rear wheel needs to be locked; the front wheels rotate freely",
+              "correct": false,
+              "feedback": "Incorrect. Both rear wheel brakes must be engaged for the wheelchair to remain stable during transfer. Locking only one side allows the chair to pivot and creates a fall risk.",
+              "rationale": "A wheelchair with only one brake engaged can rotate unexpectedly, destabilizing the resident mid-transfer."
+            },
+            {
+              "id": "D",
+              "text": "Wheelchair locks are not necessary if you are holding the gait belt",
+              "correct": false,
+              "feedback": "Incorrect. Even with gait belt control, an unlocked wheelchair can slide or rotate. Wheel locks are mandatory for safe transfers.",
+              "rationale": "Holding the gait belt controls the resident, not the wheelchair. Both safety measures are required simultaneously."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_04",
+      "title": "Use correct body mechanics during the transfer",
+      "instruction": "You are assisting the resident to stand and pivot to the wheelchair. Which body mechanics are correct?",
+      "critical": false,
+      "decision_points": [
+        {
+          "id": "dp_04a",
+          "question": "Which body mechanics should you use during the pivot transfer?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stand close to the resident, bend at knees not waist, keep back straight, use a wide base of support, pivot feet — do not twist the spine",
+              "correct": true,
+              "feedback": "Correct! Proper body mechanics protect you from injury during transfers. Bending at the knees, keeping the back straight, and pivoting feet (not twisting) are key principles. The CNA exam observes and scores body mechanics.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Bend at the waist and lift with your back to get leverage",
+              "correct": false,
+              "feedback": "Incorrect. Bending at the waist and lifting with the back causes musculoskeletal injury. This is the leading cause of workplace injuries for CNAs.",
+              "rationale": "Proper body mechanics (knees bent, back straight, core engaged) distribute the load safely. Lifting with the back places dangerous stress on lumbar vertebrae."
+            },
+            {
+              "id": "C",
+              "text": "Stand far from the resident and extend your arms fully for reach",
+              "correct": false,
+              "feedback": "Incorrect. Standing far away and extending arms increases leverage on your spine and reduces control. Keep the resident close to your center of gravity.",
+              "rationale": "Keeping the load close to the body reduces the mechanical torque on the spine and improves transfer control."
+            },
+            {
+              "id": "D",
+              "text": "Twist your torso to guide the resident into the wheelchair",
+              "correct": false,
+              "feedback": "Incorrect. Twisting the spine under load is a primary cause of back injury. Always pivot the feet to turn; never twist the torso.",
+              "rationale": "Spinal rotation combined with a load dramatically increases injury risk. Pivot by moving the feet to face the new direction."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_05",
+      "title": "Position resident in wheelchair and ensure safety",
+      "instruction": "The resident is now seated in the wheelchair. What steps complete the safe transfer?",
+      "critical": true,
+      "decision_points": [
+        {
+          "id": "dp_05a",
+          "question": "What must you do after seating the resident in the wheelchair?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Replace footrests and position resident's feet on them, ensure resident is positioned back in the seat, remove gait belt, check for comfort, perform hand hygiene",
+              "correct": true,
+              "feedback": "Correct! Completing the transfer means ensuring the resident is safely positioned with feet supported, the gait belt removed, and comfort checked. Hand hygiene follows every resident contact.",
+              "rationale": null
+            },
+            {
+              "id": "B",
+              "text": "Wheel the resident away immediately once seated",
+              "correct": false,
+              "feedback": "Incorrect. Before moving, you must replace footrests, position feet, and ensure the resident is fully seated (not perched on the edge). Leaving the gait belt on is also incorrect.",
+              "rationale": "Incomplete post-transfer steps leave the resident at risk of sliding or falling. Each step in the completion sequence is required."
+            },
+            {
+              "id": "C",
+              "text": "Leave the gait belt on for use during return transfer",
+              "correct": false,
+              "feedback": "Incorrect. Gait belts should not be left on residents between transfers. They must be removed after each use for comfort and skin integrity.",
+              "rationale": "Leaving a gait belt on between activities can cause pressure, skin breakdown, and discomfort. It is removed after every transfer."
+            },
+            {
+              "id": "D",
+              "text": "Let the resident manage their feet and footrests independently",
+              "correct": false,
+              "feedback": "Incorrect. The CNA is responsible for ensuring safe positioning after a transfer. Delegating footrest replacement to a resident who required transfer assistance is unsafe.",
+              "rationale": "The aide must complete all post-transfer safety steps to ensure the resident is properly secured before leaving or moving the chair."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    }
+  ],
+  "communication_checkpoints": [
+    {
+      "id": "comm_01",
+      "prompt": "Before beginning the transfer, did you explain the procedure to the resident, gain their cooperation, and ask if they were ready?",
+      "options": [
+        {"id": "Y", "text": "Yes – I explained the procedure, asked about their stronger side, and confirmed readiness", "correct": true},
+        {"id": "N", "text": "No – I began the transfer without explaining or asking", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "Excellent. Explaining the procedure and gaining the resident's cooperation is a professionalism and safety checkpoint.",
+      "feedback_fail": "Always explain the procedure and confirm the resident's readiness before initiating a transfer. This is both respectful and required on the CNA exam."
+    },
+    {
+      "id": "comm_02",
+      "prompt": "After the transfer, did you provide verbal encouragement and ask if the resident was comfortable?",
+      "options": [
+        {"id": "Y", "text": "Yes – I provided encouragement and checked for comfort", "correct": true},
+        {"id": "N", "text": "No – I completed the transfer without further communication", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "Good. Providing positive reinforcement and checking comfort after a transfer is part of person-centered care.",
+      "feedback_fail": "Remember to provide verbal encouragement and check resident comfort after completing a transfer."
+    }
+  ],
+  "remediation_refs": {
+    "module_safety_transfers": {
+      "label": "Safe Transfers and Mobility Assistance",
+      "module": "Module 07",
+      "topic": "Transfer Techniques, Gait Belt Use, and Body Mechanics",
+      "exam_domain": "Safety and Emergency",
+      "prometric_skill": "Transfer from Bed to Wheelchair"
+    }
+  }
+}
