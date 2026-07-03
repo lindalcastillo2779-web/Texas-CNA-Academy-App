@@ -158,6 +158,7 @@ PAGES = {
     "✅ Renewal Check": "renewal_check",
     "🏥 Staffing Log": "staffing",
     "🤖 Buddy": "buddy",
+    "📎 Verified Resources": "resources",
     "🔧 Admin Panel": "admin",
 }
 PAGE_LABEL_BY_KEY = {key: label for label, key in PAGES.items()}
@@ -184,7 +185,7 @@ with st.sidebar:
 
 page = PAGES[page_label]
 
-if page != "home":
+if page != "home" and page != "resources":
     user_id = st.session_state.get("user_id")
     if not user_id:
         st.warning("Please sign in on the Home page to access app sections.")
@@ -225,6 +226,8 @@ elif page == "staffing":
     from pages import staffing as _page
 elif page == "buddy":
     from pages import buddy as _page
+elif page == "resources":
+    from pages import resources as _page
 elif page == "admin":
     from pages import admin as _page
 else:

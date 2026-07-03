@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verified Resources | Texas CNA Academy</title>
+    <meta name="description" content="Official verified resources for Texas CNAs — Texas HHSC, TULIP, Texas Workforce Commission, and Texas Board of Nursing.">
+    <link rel="canonical" href="https://texascnaacademyapp.com/resources.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-warm: #F5EDE0;
+            --navy: #0B1D35;
+            --gold: #9E6C00;
+            --gold-vivid: #C8971A;
+            --gold-light: #F0E4C8;
+            --red: #5A0C1A;
+            --red-hover: #400813;
+            --muted-green: #2D6A4F;
+            --text-navy: #0B1D35;
+            --text-body: #1C2B3A;
+            --text-muted: #4A5568;
+            --border-light: #D4C3A8;
+            --card-bg: #FEFBF5;
+            --section-alt: #EDE5D4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-warm);
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        .header {
+            background-color: var(--navy);
+            color: white;
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid var(--gold);
+        }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--gold-vivid);
+            text-decoration: none;
+            letter-spacing: 0.01em;
+        }
+        .header-back {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .header-back:hover { color: var(--gold-vivid); }
+
+        /* Page Hero */
+        .page-hero {
+            background: var(--navy);
+            color: white;
+            padding: 64px 0 56px;
+            text-align: center;
+            position: relative;
+        }
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold) 0%, var(--red) 50%, var(--gold) 100%);
+        }
+        .page-hero h1 { color: white; font-size: clamp(2rem, 5vw, 2.75rem); margin-bottom: 14px; }
+        .page-hero p { font-size: 1.05rem; opacity: 0.88; max-width: 640px; margin: 0 auto; line-height: 1.75; }
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(158,108,0,0.2);
+            color: var(--gold-vivid);
+            border: 1px solid rgba(200,151,26,0.45);
+            padding: 5px 16px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        /* Resources Grid */
+        .resources-section { padding: 72px 0; }
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+            margin-top: 48px;
+        }
+        .resource-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            border-top: 4px solid var(--gold);
+            padding: 36px 28px;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .resource-card:hover {
+            box-shadow: 0 8px 28px rgba(11,29,53,0.14);
+            transform: translateY(-3px);
+        }
+        .resource-icon {
+            font-size: 2.4rem;
+            margin-bottom: 16px;
+        }
+        .resource-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--navy);
+        }
+        .resource-card p {
+            font-size: 0.93rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+            flex: 1;
+            margin-bottom: 24px;
+        }
+        .resource-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--red);
+            font-weight: 700;
+            font-size: 0.93rem;
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+        }
+        .resource-link:hover { color: var(--red-hover); text-decoration: underline; }
+        .resource-link::after { content: '→'; font-size: 1rem; }
+
+        /* Info Banner */
+        .info-banner {
+            background: linear-gradient(135deg, var(--navy) 0%, #152C4A 100%);
+            color: white;
+            padding: 48px 0;
+            margin-top: 16px;
+        }
+        .info-banner .container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .info-banner-icon { font-size: 2.5rem; flex-shrink: 0; }
+        .info-banner-text h3 { color: white; margin-bottom: 8px; font-size: 1.25rem; }
+        .info-banner-text p { font-size: 0.95rem; color: rgba(255,255,255,0.8); line-height: 1.7; max-width: 800px; }
+
+        /* Footer */
+        .footer {
+            background-color: var(--navy);
+            color: rgba(255,255,255,0.72);
+            padding: 48px 0 28px;
+            font-size: 0.9rem;
+            border-top: 3px solid var(--gold);
+        }
+        .footer .container { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 36px; }
+        .footer-col { min-width: 200px; }
+        .footer h4 { color: white; font-family: 'Playfair Display', Georgia, serif; font-size: 1rem; font-weight: 700; margin-bottom: 14px; letter-spacing: 0.01em; }
+        .footer a { color: rgba(255,255,255,0.65); display: block; margin-bottom: 8px; transition: color 0.2s; font-size: 0.88rem; }
+        .footer a:hover { color: var(--gold); }
+        .footer .disclaimer { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 0.78rem; text-align: center; }
+        @media (max-width: 768px) {
+            .footer .container { flex-direction: column; }
+            .resources-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="/" class="logo">Texas CNA Academy</a>
+            <a href="/" class="header-back">&#8592; Back to Home</a>
+        </div>
+    </header>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <div class="verified-badge">&#10003; Verified Official Resources</div>
+            <h1>Resources</h1>
+            <p>Official Texas state agency resources for nurse aide students, active CNAs, instructors, and healthcare facilities. All links connect directly to verified government and regulatory sites.</p>
+        </div>
+    </section>
+
+    <!-- Resources Grid -->
+    <section class="resources-section">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 0;">
+                <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 680px; margin: 0 auto;">
+                    The following resources are provided by official Texas state agencies and are essential references for nurse aides, students, and healthcare professionals working in Texas.
+                </p>
+            </div>
+            <div class="resources-grid">
+
+                <!-- Texas HHSC -->
+                <div class="resource-card">
+                    <div class="resource-icon">&#127968;</div>
+                    <h3>Texas Health and Human Services</h3>
+                    <p>The Texas Health and Human Services Commission (HHSC) oversees the Nurse Aide Registry, long-term care facility regulations, CNA certification, and healthcare provider compliance in Texas.</p>
+                    <a href="https://www.hhs.texas.gov/" class="resource-link" target="_blank" rel="noopener noreferrer">Visit Texas HHS</a>
+                </div>
+
+                <!-- TULIP -->
+                <div class="resource-card">
+                    <div class="resource-icon">&#127981;</div>
+                    <h3>TULIP — Nurse Aide Registry</h3>
+                    <p>The Texas Unified Licensure Information Portal (TULIP) is the official state system for verifying nurse aide certifications, checking registry status, and managing nurse aide records in Texas.</p>
+                    <a href="https://vo.licensing.hpc.texas.gov/datamart/main.do" class="resource-link" target="_blank" rel="noopener noreferrer">Access TULIP Registry</a>
+                </div>
+
+                <!-- Texas Workforce Commission -->
+                <div class="resource-card">
+                    <div class="resource-icon">&#128188;</div>
+                    <h3>Texas Workforce Commission</h3>
+                    <p>The Texas Workforce Commission (TWC) supports workforce development, healthcare career resources, job placement services, and continuing education funding opportunities for CNAs and healthcare workers.</p>
+                    <a href="https://www.twc.texas.gov/" class="resource-link" target="_blank" rel="noopener noreferrer">Visit Texas TWC</a>
+                </div>
+
+                <!-- Texas Board of Nursing -->
+                <div class="resource-card">
+                    <div class="resource-icon">&#128203;</div>
+                    <h3>Texas Board of Nursing</h3>
+                    <p>The Texas Board of Nursing (BON) regulates the nursing profession in Texas, including licensure, continuing education requirements, and disciplinary standards for registered nurses, LVNs, and nurse aides.</p>
+                    <a href="https://www.bon.texas.gov/" class="resource-link" target="_blank" rel="noopener noreferrer">Visit Texas BON</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Banner -->
+    <div class="info-banner">
+        <div class="container">
+            <div class="info-banner-icon">&#128204;</div>
+            <div class="info-banner-text">
+                <h3>Why These Resources Matter</h3>
+                <p>As a Texas nurse aide, staying connected to official regulatory agencies ensures you remain compliant, informed, and career-ready. These agencies set the standards for CNA certification, renewal, and professional practice across the state of Texas.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-col">
+                <h4>Texas CNA Academy</h4>
+                <p style="font-size: 0.85rem; margin-bottom: 8px; color: rgba(255,255,255,0.65);">Texas Nurse Aide Training and Exam Prep</p>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.65);">Abilene, TX</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="/">Home</a>
+                <a href="signup.html">Sign Up</a>
+                <a href="dashboard.html">Student Portal</a>
+                <a href="staff-dashboard.html">Instructor Portal</a>
+                <a href="admin-dashboard.html">Admin Portal</a>
+                <a href="resources.html">Verified Resources</a>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.65);">Email: support@texascnaacademyapp.com</p>
+            </div>
+        </div>
+        <div class="disclaimer">
+            <p style="margin-bottom: 8px;">&copy; 2026 Texas CNA Academy. All rights reserved.</p>
+            <p style="font-size: 0.75rem; color: rgba(255,255,255,0.45);">This website is an educational resource and is not affiliated with or endorsed by any Texas state agency. All external links are provided for informational purposes only.</p>
+        </div>
+    </footer>
+</body>
+</html>

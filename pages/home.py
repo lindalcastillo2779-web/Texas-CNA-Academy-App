@@ -19,6 +19,7 @@ DESTINATIONS = [
     ("✅ Renewal Check", "renewal_check"),
     ("🏥 Staffing Log", "staffing"),
     ("🤖 Buddy", "buddy"),
+    ("📎 Verified Resources", "resources"),
 ]
 
 
