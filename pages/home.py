@@ -13,6 +13,7 @@ SUBSCRIPTION_URL = os.getenv("SUBSCRIPTION_URL", "https://texascnaacademyapp.com
 DESTINATIONS = [
     ("🎓 Courses", "courses"),
     ("📚 Exam Prep", "exam_prep"),
+    ("📊 My Progress", "progress"),
     ("🧪 Clinical Skills Lab", "clinical_skills_lab"),
     ("📋 CEU Tracker", "ceu_tracker"),
     ("✅ Renewal Check", "renewal_check"),

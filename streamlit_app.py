@@ -152,6 +152,7 @@ PAGES = {
     "🏠 Home": "home",
     "🎓 Courses": "courses",
     "📚 Exam Prep": "exam_prep",
+    "📊 My Progress": "progress",
     "🧪 Clinical Skills Lab": "clinical_skills_lab",
     "📋 CEU Tracker": "ceu_tracker",
     "✅ Renewal Check": "renewal_check",
@@ -212,6 +213,8 @@ elif page == "courses":
     from pages import courses as _page
 elif page == "exam_prep":
     from pages import exam_prep as _page
+elif page == "progress":
+    from pages import progress as _page
 elif page == "clinical_skills_lab":
     from pages import clinical_skills_lab as _page
 elif page == "ceu_tracker":

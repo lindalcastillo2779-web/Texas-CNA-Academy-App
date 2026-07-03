@@ -374,6 +374,56 @@ def get_quiz_history(user_id: int) -> list:
         return [dict(r) for r in rows]
 
 
+def get_quiz_stats_by_domain(user_id: int) -> list[dict]:
+    """Return per-domain quiz stats for a user.
+
+    Each dict has keys: domain, attempts, avg_pct, best_pct, total_questions.
+    """
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT
+                domain,
+                COUNT(*) AS attempts,
+                ROUND(AVG(CAST(score AS REAL) / CAST(total AS REAL) * 100), 1) AS avg_pct,
+                ROUND(MAX(CAST(score AS REAL) / CAST(total AS REAL) * 100), 1) AS best_pct,
+                SUM(total) AS total_questions
+            FROM quiz_attempts
+            WHERE user_id = ? AND domain IS NOT NULL AND total > 0
+            GROUP BY domain
+            ORDER BY avg_pct DESC
+            """,
+            (user_id,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_quiz_trend(user_id: int, limit: int = 30) -> list[dict]:
+    """Return the last *limit* quiz attempts with their percentage score and date.
+
+    Results are in chronological order (oldest first) so they can be plotted
+    as a left-to-right trend line.  Each dict has keys: taken_at (ISO str),
+    pct (float), domain (str).
+    """
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT taken_at, domain,
+                   ROUND(CAST(score AS REAL) / CAST(total AS REAL) * 100, 1) AS pct
+            FROM (
+                SELECT taken_at, domain, score, total
+                FROM quiz_attempts
+                WHERE user_id = ? AND total > 0
+                ORDER BY taken_at DESC
+                LIMIT ?
+            )
+            ORDER BY taken_at ASC
+            """,
+            (user_id, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 # ---------------------------------------------------------------------------
 # Staffing helpers
 # ---------------------------------------------------------------------------
