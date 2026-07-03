@@ -159,6 +159,7 @@ PAGES = {
     "🤖 Buddy": "buddy",
     "🔧 Admin Panel": "admin",
 }
+PAGE_LABEL_BY_KEY = {key: label for label, key in PAGES.items()}
 
 with st.sidebar:
     st.image(
@@ -171,11 +172,8 @@ with st.sidebar:
     if "sidebar_nav" not in st.session_state:
         st.session_state["sidebar_nav"] = "🏠 Home"
     nav_target = st.session_state.pop("nav_target", None)
-    if nav_target in PAGES.values():
-        for label, key in PAGES.items():
-            if key == nav_target:
-                st.session_state["sidebar_nav"] = label
-                break
+    if nav_target in PAGE_LABEL_BY_KEY:
+        st.session_state["sidebar_nav"] = PAGE_LABEL_BY_KEY[nav_target]
     page_label = st.radio(
         "Navigate",
         list(PAGES.keys()),

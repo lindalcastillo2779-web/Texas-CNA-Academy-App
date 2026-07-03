@@ -32,12 +32,14 @@ def show() -> None:
             ).fetchall()]
         if users:
             st.dataframe(pd.DataFrame(users), use_container_width=True, hide_index=True)
+            user_label_by_id = {
+                u["id"]: f"{u['name']} ({u['email']})"
+                for u in users
+            }
             selected_user_id = st.selectbox(
                 "Select user for subscription update",
                 options=[u["id"] for u in users],
-                format_func=lambda uid: next(
-                    f"{u['name']} ({u['email']})" for u in users if u["id"] == uid
-                ),
+                format_func=lambda uid: user_label_by_id[uid],
             )
             selected_user = next((u for u in users if u["id"] == selected_user_id), None)
             if selected_user:

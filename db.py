@@ -237,7 +237,8 @@ def get_user_by_email(email: str):
         return conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
 
 
-def get_user_by_id(user_id: int):
+def get_user_by_id(user_id: int) -> sqlite3.Row | None:
+    """Return a single user row by id, or None when not found."""
     with get_conn() as conn:
         return conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
 
@@ -271,6 +272,7 @@ def get_access_status(user_id: int, trial_days: int = 30) -> dict:
         }
 
     created_raw = user["created_at"] or ""
+    created_valid = True
     try:
         created_at = datetime.fromisoformat(created_raw)
         if created_at.tzinfo is None:
@@ -279,11 +281,12 @@ def get_access_status(user_id: int, trial_days: int = 30) -> dict:
             created_at = created_at.astimezone(timezone.utc)
     except ValueError:
         created_at = datetime.now(timezone.utc)
+        created_valid = False
 
     now = datetime.now(timezone.utc)
     trial_ends = created_at + timedelta(days=trial_days)
     subscribed = bool(user["subscription_active"])
-    trial_active = now <= trial_ends
+    trial_active = created_valid and now <= trial_ends
     days_left = max((trial_ends.date() - now.date()).days, 0)
 
     return {
