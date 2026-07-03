@@ -27,10 +27,29 @@ def show() -> None:
         st.subheader("Registered Users")
         with db.get_conn() as conn:
             users = [dict(r) for r in conn.execute(
-                "SELECT id, name, email, role, state_id, created_at FROM users ORDER BY created_at DESC"
+                """SELECT id, name, email, role, state_id, subscription_active, created_at
+                   FROM users ORDER BY created_at DESC"""
             ).fetchall()]
         if users:
             st.dataframe(pd.DataFrame(users), use_container_width=True, hide_index=True)
+            selected_user_id = st.selectbox(
+                "Select user for subscription update",
+                options=[u["id"] for u in users],
+                format_func=lambda uid: next(
+                    f"{u['name']} ({u['email']})" for u in users if u["id"] == uid
+                ),
+            )
+            selected_user = next((u for u in users if u["id"] == selected_user_id), None)
+            if selected_user:
+                is_active = st.checkbox(
+                    "Subscription active",
+                    value=bool(selected_user["subscription_active"]),
+                    key=f"sub_active_{selected_user_id}",
+                )
+                if st.button("Save subscription status", key="save_subscription_status"):
+                    db.set_subscription_active(selected_user_id, is_active)
+                    st.success("Subscription status updated.")
+                    st.rerun()
         else:
             st.info("No users registered yet.")
 
