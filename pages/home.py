@@ -11,20 +11,20 @@ from utils.media import render_page_media
 ROLES = ["student", "cna", "don", "instructor", "facility"]
 SUBSCRIPTION_URL = os.getenv("SUBSCRIPTION_URL", "https://texascnaacademyapp.com/signup.html")
 DESTINATIONS = [
-    ("🎓 Courses", "courses"),
-    ("📚 Exam Prep", "exam_prep"),
-    ("📊 My Progress", "progress"),
-    ("🧪 Clinical Skills Lab", "clinical_skills_lab"),
-    ("📋 CEU Tracker", "ceu_tracker"),
-    ("✅ Renewal Check", "renewal_check"),
-    ("🏥 Staffing Log", "staffing"),
-    ("🤖 Buddy", "buddy"),
-    ("📎 Verified Resources", "resources"),
+    ("Courses", "courses"),
+    ("Exam Prep", "exam_prep"),
+    ("My Progress", "progress"),
+    ("Clinical Skills Lab", "clinical_skills_lab"),
+    ("CEU Tracker", "ceu_tracker"),
+    ("Renewal Check", "renewal_check"),
+    ("Staffing Log", "staffing"),
+    ("Buddy", "buddy"),
+    ("Verified Resources", "resources"),
 ]
 
 
 def show() -> None:
-    st.title("🌸 Welcome to Texas CNA Academy")
+    st.title("Welcome to Texas CNA Academy")
     st.subheader("TULIP-Link Portal")
     render_page_media("home")
 
@@ -34,11 +34,11 @@ def show() -> None:
 
         | Feature | Who benefits |
         |---|---|
-        | 🎓 NATCEP course roadmap & module library | Students building step-by-step readiness |
-        | 📚 NATCEP exam practice quizzes | Students preparing for certification |
-        | 📋 CEU hour tracking & certificates | Active CNAs, renewal candidates |
-        | ✅ Renewal readiness dashboard | CNAs & DONs |
-        | 🏥 Staffing compliance log | Facilities, DONs |
+        | NATCEP course roadmap & module library | Students building step-by-step readiness |
+        | NATCEP exam practice quizzes | Students preparing for certification |
+        | CEU hour tracking & certificates | Active CNAs, renewal candidates |
+        | Renewal readiness dashboard | CNAs & DONs |
+        | Staffing compliance log | Facilities, DONs |
 
         You can use the quick links below or the **sidebar** to navigate between sections.
         """
@@ -60,13 +60,13 @@ def show() -> None:
         st.session_state["user_name"] = ""
 
     if st.session_state["user_id"]:
-        st.success(f"✅ Signed in as **{st.session_state['user_name']}**")
+        st.success(f"Signed in as **{st.session_state['user_name']}**")
         access = get_access_status(st.session_state["user_id"])
         if access["subscribed"]:
-            st.info("✅ Subscription is active.")
+            st.info("Subscription is active.")
         elif access["trial_active"]:
             st.info(
-                f"🎁 Free trial active: {access['days_left']} day(s) left "
+                f"Free trial active: {access['days_left']} day(s) left "
                 f"(ends {access['trial_ends_on']})."
             )
         else:
@@ -118,5 +118,5 @@ def show() -> None:
                     st.session_state["user_name"] = r_name.strip()
                     send_welcome_email(r_name.strip(), r_email.strip().lower())
                     st.success(f"Account created! Welcome, {r_name}.")
-                    st.info("🎁 You now have a 30-day free trial before subscription is required.")
+                    st.info("You now have a 30-day free trial before subscription is required.")
                     st.rerun()
