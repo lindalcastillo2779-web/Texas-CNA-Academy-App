@@ -847,7 +847,7 @@
                     &#127891; Course Modules <span class="tab-count" aria-hidden="true">10</span>
                 </button>
                 <button class="preview-tab-btn" role="tab" aria-selected="false" aria-controls="panel-skills" id="tab-skills" data-panel="skills">
-                    &#129514; Clinical Skills Lab <span class="tab-count" aria-hidden="true">3+</span>
+                    &#129514; Clinical Skills Lab <span class="tab-count" aria-hidden="true">6</span>
                 </button>
                 <button class="preview-tab-btn" role="tab" aria-selected="false" aria-controls="panel-flashcards" id="tab-flashcards" data-panel="flashcards">
                     &#128218; Flashcards <span class="tab-count" aria-hidden="true">6</span>
@@ -1646,7 +1646,8 @@
                 function goTo(index) {
                     var pages = pageCount();
                     current = Math.max(0, Math.min(index, pages - 1));
-                    var cardWidth  = cards[0] ? (cards[0].offsetWidth + 20) : 0; // 20 = gap
+                    var gap        = parseInt(getComputedStyle(track).gap) || 20;
+                    var cardWidth  = cards[0] ? (cards[0].offsetWidth + gap) : 0;
                     track.style.transform = 'translateX(-' + (current * cardWidth) + 'px)';
                     prevBtn.disabled = current === 0;
                     nextBtn.disabled = current >= pages - 1;
@@ -1656,14 +1657,22 @@
                 prevBtn.addEventListener('click', function() { goTo(current - 1); });
                 nextBtn.addEventListener('click', function() { goTo(current + 1); });
 
-                // Rebuild on resize
+                // Rebuild on resize only when column count changes
+                var lastVisible = visibleCount();
                 var resizeTimer;
                 window.addEventListener('resize', function() {
                     clearTimeout(resizeTimer);
                     resizeTimer = setTimeout(function() {
-                        current = 0;
-                        buildDots();
-                        goTo(0);
+                        var newVisible = visibleCount();
+                        if (newVisible !== lastVisible) {
+                            lastVisible = newVisible;
+                            current = 0;
+                            buildDots();
+                            goTo(0);
+                        } else {
+                            // Column count unchanged: reposition without resetting slide
+                            goTo(current);
+                        }
                     }, 120);
                 });
 
