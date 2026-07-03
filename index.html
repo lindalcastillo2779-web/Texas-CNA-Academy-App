@@ -243,6 +243,114 @@
         .footer a:hover { color: var(--gold); }
         .footer .disclaimer { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 0.78rem; }
         @media (max-width: 768px) { .footer .container { flex-direction: column; } }
+
+        /* Mission Statement */
+        .mission-section {
+            background: linear-gradient(145deg, var(--navy) 0%, #152C4A 60%, #3B0B14 100%);
+            color: white;
+            padding: 88px 0;
+            text-align: center;
+            position: relative;
+        }
+        .mission-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold) 0%, var(--red) 50%, var(--gold) 100%);
+        }
+        .mission-section h2 { color: white; margin-bottom: 24px; font-size: clamp(1.875rem, 4vw, 2.75rem); }
+        .mission-tagline {
+            display: inline-block;
+            background: rgba(158,108,0,0.2);
+            color: var(--gold);
+            border: 1px solid rgba(158,108,0,0.45);
+            padding: 6px 18px;
+            border-radius: 3px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .mission-text {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            max-width: 760px;
+            margin: 0 auto;
+            color: rgba(255,255,255,0.88);
+        }
+
+        /* Core Values */
+        .values-section { padding: 72px 0; background-color: var(--bg-warm); }
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
+        .value-card {
+            background: var(--card-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+            border-top: 3px solid var(--gold);
+            padding: 32px 24px;
+            text-align: center;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .value-card:hover { box-shadow: 0 6px 24px rgba(11,29,53,0.12); transform: translateY(-3px); }
+        .value-icon { font-size: 2.25rem; margin-bottom: 16px; }
+        .value-card h3 { font-size: 1.1rem; margin-bottom: 10px; color: var(--navy); }
+        .value-card p { font-size: 0.92rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+        /* Testimonials */
+        .testimonials-section { padding: 72px 0; background-color: var(--section-alt); }
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 28px;
+            margin-top: 48px;
+        }
+        .testimonial-card {
+            background: var(--card-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+            padding: 32px 28px;
+            position: relative;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .testimonial-card:hover { box-shadow: 0 6px 24px rgba(11,29,53,0.12); transform: translateY(-2px); }
+        .testimonial-quote {
+            font-size: 3rem;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 12px;
+            font-family: Georgia, serif;
+        }
+        .testimonial-text {
+            font-size: 0.97rem;
+            color: var(--text-body);
+            line-height: 1.75;
+            margin-bottom: 24px;
+            font-style: italic;
+        }
+        .testimonial-author { display: flex; align-items: center; gap: 14px; }
+        .testimonial-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy), var(--red));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .testimonial-name { font-weight: 700; font-size: 0.95rem; color: var(--navy); }
+        .testimonial-role { font-size: 0.83rem; color: var(--text-muted); margin-top: 2px; }
+        .stars { color: var(--gold); font-size: 0.95rem; letter-spacing: 0.04em; margin-bottom: 12px; }
     </style>
 </head>
 <body>
@@ -251,17 +359,21 @@
         <div class="container">
             <a href="/" class="logo">Texas CNA <span>Academy</span></a>
             <nav class="nav">
+                <a href="#mission">About</a>
                 <a href="#programs">Programs</a>
                 <a href="#renewal">Renewal</a>
                 <a href="#resources">Resources</a>
+                <a href="#testimonials">Testimonials</a>
                 <a href="signup.html" class="btn btn-primary">Sign Up</a>
             </nav>
             <div class="mobile-toggle" onclick="document.querySelector('.mobile-nav').classList.toggle('open')">&#9776;</div>
         </div>
         <nav class="mobile-nav">
+            <a href="#mission">About</a>
             <a href="#programs">Programs</a>
             <a href="#renewal">Renewal</a>
             <a href="#resources">Resources</a>
+            <a href="#testimonials">Testimonials</a>
             <a href="signup.html">Sign Up</a>
         </nav>
     </header>
@@ -298,6 +410,57 @@
                 <div class="trust-item" style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 1.2rem;">&#128204;</span>
                     <span style="font-size: 0.95rem; color: var(--text-body);">Texas-Based</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Statement Section -->
+    <section id="mission" class="mission-section">
+        <div class="container">
+            <div class="mission-tagline">Our Mission</div>
+            <h2>Empowering Texas Nurse Aides<br>to Deliver Exceptional Care</h2>
+            <p class="mission-text">At Texas CNA Academy, our mission is to equip every nurse aide student, active CNA, and healthcare professional with the knowledge, skills, and confidence they need to serve patients with compassion and excellence. We are committed to accessible, Texas-focused education that meets students where they are — and supports them every step of the way, from initial certification to lifelong professional growth.</p>
+        </div>
+    </section>
+
+    <!-- Core Values Section -->
+    <section id="values" class="values-section">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-title">Our Core Values</h2>
+                <p class="section-desc">Everything we build and teach is grounded in these principles.</p>
+            </div>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon"><span role="img" aria-label="Heart icon representing compassion">&#10084;&#65039;</span></div>
+                    <h3>Compassion</h3>
+                    <p>We believe exceptional patient care starts with empathy. We cultivate a culture of genuine kindness in every lesson, resource, and interaction.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><span role="img" aria-label="Target icon representing excellence">&#127919;</span></div>
+                    <h3>Excellence</h3>
+                    <p>We hold ourselves to the highest standards in curriculum quality, exam alignment, and student outcomes — because Texas patients deserve nothing less.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><span role="img" aria-label="Handshake icon representing accessibility">&#129309;</span></div>
+                    <h3>Accessibility</h3>
+                    <p>Quality CNA education should be available to every Texan. We design our platform to be affordable, mobile-friendly, and easy to use for all learners.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><span role="img" aria-label="Book icon representing integrity">&#128218;</span></div>
+                    <h3>Integrity</h3>
+                    <p>We operate transparently and honestly. Our content is accurate, our practices are ethical, and we always put our students' best interests first.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><span role="img" aria-label="Star icon representing growth">&#127775;</span></div>
+                    <h3>Growth</h3>
+                    <p>Learning doesn't stop at certification. We support continuous professional development so CNAs can grow throughout every stage of their careers.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><span role="img" aria-label="House icon representing community">&#127968;</span></div>
+                    <h3>Community</h3>
+                    <p>We are proudly Texas-based and Texas-focused. We understand the communities our students serve and tailor everything to meet local standards and needs.</p>
                 </div>
             </div>
         </div>
@@ -417,6 +580,90 @@
                     <h3 style="margin-bottom: 10px;">Help &amp; Support</h3>
                     <p style="font-size: 0.93rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.65;">Need help? Contact us for assistance with your account, exam questions, or technical support.</p>
                     <a href="mailto:support@texascnaacademyapp.com" class="path-link">Contact Support &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials-section">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-title">What Our Students Say</h2>
+                <p class="section-desc">Real stories from nurse aides and students who've trained with Texas CNA Academy.</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="testimonial-quote">&ldquo;</div>
+                    <p class="testimonial-text">Texas CNA Academy made studying for my certification exam so much easier. The practice questions were spot-on with the actual exam and the mobile-friendly platform let me study from anywhere. I passed on my first try!</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">MR</div>
+                        <div>
+                            <div class="testimonial-name">Maria R.</div>
+                            <div class="testimonial-role">Certified Nurse Aide &mdash; Abilene, TX</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="testimonial-quote">&ldquo;</div>
+                    <p class="testimonial-text">As an instructor, I needed a platform that kept all my students organized and on track. The instructor portal is incredibly intuitive. I can monitor progress, flag struggling students, and manage coursework — all in one place.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JT</div>
+                        <div>
+                            <div class="testimonial-name">James T.</div>
+                            <div class="testimonial-role">CNA Program Instructor &mdash; Lubbock, TX</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="testimonial-quote">&ldquo;</div>
+                    <p class="testimonial-text">Managing staff certifications for our facility used to be a nightmare. Now we get automatic renewal alerts and a compliance dashboard that keeps us ahead of every deadline. It has saved us countless hours.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">SL</div>
+                        <div>
+                            <div class="testimonial-name">Sandra L.</div>
+                            <div class="testimonial-role">Healthcare Facility Administrator &mdash; Dallas, TX</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="testimonial-quote">&ldquo;</div>
+                    <p class="testimonial-text">I was so nervous about my renewal after being out of work for two years. The renewal support resources helped me understand exactly what I needed to do, and the study materials refreshed everything quickly. Highly recommend!</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">DM</div>
+                        <div>
+                            <div class="testimonial-name">Diana M.</div>
+                            <div class="testimonial-role">Active CNA &mdash; San Antonio, TX</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="testimonial-quote">&ldquo;</div>
+                    <p class="testimonial-text">I was working full-time while studying for my CNA exam. Being able to study on my phone during breaks made all the difference. The bite-sized lessons and clear explanations helped me stay confident throughout the process.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">KW</div>
+                        <div>
+                            <div class="testimonial-name">Kevin W.</div>
+                            <div class="testimonial-role">CNA Student &mdash; Houston, TX</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="testimonial-quote">&ldquo;</div>
+                    <p class="testimonial-text">The AI study buddy feature helped me understand complex topics in plain language. It was like having a tutor available at midnight when I needed it most. This platform truly understands what CNA students need.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">AC</div>
+                        <div>
+                            <div class="testimonial-name">Adriana C.</div>
+                            <div class="testimonial-role">Certified Nurse Aide &mdash; Austin, TX</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
