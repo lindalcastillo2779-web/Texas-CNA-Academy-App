@@ -1,3 +1,15 @@
+---
+module_id: module_01_role_and_scope
+title: Module 01: Role of the Nurse Aide
+hero_image: assets/images/lessons/module_01_role_and_scope.svg
+thumbnail: assets/images/lessons/module_01_role_and_scope.svg
+video_url:
+caption: Placeholder lesson media for nurse aide scope, reporting, and resident-rights communication.
+credit: Texas CNA Academy placeholder artwork
+source: Local SVG asset
+video_caption: Add a short CNA scope-of-practice or communication demo video here.
+---
+
 # Module 01: Role of the Nurse Aide
 
 ## Learning objectives

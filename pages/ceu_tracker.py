@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from db import add_ceu_record, get_ceu_records, total_ceu_hours
+from utils.media import render_page_media
 
 # Texas CNA renewal: 24 CEU hours per 2-year cycle
 RENEWAL_HOURS_REQUIRED = 24.0
@@ -14,6 +15,7 @@ RENEWAL_HOURS_REQUIRED = 24.0
 def show() -> None:
     st.title("📋 CEU Tracker")
     st.caption("Track your continuing-education hours toward CNA renewal")
+    render_page_media("ceu_tracker")
 
     user_id = st.session_state.get("user_id")
     if not user_id:

@@ -5,10 +5,12 @@ import streamlit as st
 
 import db
 from auth import require_admin
+from utils.media import render_page_media
 
 
 def show() -> None:
     st.title("🔧 Admin Panel")
+    render_page_media("admin")
 
     if not require_admin():
         st.info("Enter your admin password in the **sidebar** to access this panel.")

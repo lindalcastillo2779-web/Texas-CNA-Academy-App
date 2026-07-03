@@ -1,0 +1,86 @@
+{
+  "defaults": {
+    "pages": {
+      "hero_image": "assets/images/pages/default-page-hero.svg",
+      "thumbnail": "assets/images/pages/default-page-hero.svg",
+      "video_url": null,
+      "caption": "Default Streamlit page hero placeholder for Texas CNA Academy.",
+      "credit": "Texas CNA Academy placeholder artwork",
+      "source": "Local SVG asset",
+      "video_caption": "Optional intro video can be added with a local MP4 or secure HTTPS URL."
+    },
+    "modules": {
+      "hero_image": "assets/images/lessons/default-module-hero.svg",
+      "thumbnail": "assets/images/lessons/default-module-hero.svg",
+      "video_url": null,
+      "caption": "Default curriculum media placeholder for lessons and module content.",
+      "credit": "Texas CNA Academy placeholder artwork",
+      "source": "Local SVG asset",
+      "video_caption": "Add a short training clip or hosted lesson video when available."
+    }
+  },
+  "pages": {
+    "home": {
+      "hero_image": "assets/images/pages/home-hero.svg",
+      "caption": "Welcome hero placeholder for the Texas CNA Academy sign-in and registration page.",
+      "video_caption": "Add a short welcome overview video for new students and staff."
+    },
+    "courses": {
+      "hero_image": "assets/images/pages/courses-hero.svg",
+      "caption": "Course roadmap hero placeholder for the NATCEP-aligned curriculum browser.",
+      "video_caption": "Add a course orientation or module navigation walkthrough here."
+    },
+    "exam_prep": {
+      "hero_image": "assets/images/pages/exam-prep-hero.svg",
+      "caption": "Exam Prep hero placeholder for practice quiz and readiness review content.",
+      "video_caption": "Add a short quiz strategy or test-taking confidence video here."
+    },
+    "ceu_tracker": {
+      "hero_image": "assets/images/pages/ceu-tracker-hero.svg",
+      "caption": "CEU Tracker hero placeholder for continuing education logging and progress tracking.",
+      "video_caption": "Add a quick walkthrough for logging CEU hours and certificates."
+    },
+    "renewal_check": {
+      "hero_image": "assets/images/pages/renewal-check-hero.svg",
+      "caption": "Renewal Check hero placeholder for readiness dashboards and renewal planning.",
+      "video_caption": "Add a quick renewal readiness checklist or timeline video here."
+    },
+    "staffing": {
+      "hero_image": "assets/images/pages/staffing-hero.svg",
+      "caption": "Staffing Log hero placeholder for shift coverage and compliance workflows.",
+      "video_caption": "Add a short staffing workflow or compliance reminder video here."
+    },
+    "buddy": {
+      "hero_image": "assets/images/pages/buddy-hero.svg",
+      "caption": "Buddy hero placeholder for AI-guided CNA study and compliance coaching.",
+      "video_caption": "Add a quick Buddy usage demo or prompt inspiration video here."
+    },
+    "admin": {
+      "hero_image": "assets/images/pages/admin-hero.svg",
+      "caption": "Admin Panel hero placeholder for secure program oversight and reporting.",
+      "video_caption": "Add a brief administrator orientation or reporting demo here."
+    }
+  },
+  "modules": {
+    "overview": {
+      "hero_image": "assets/images/lessons/overview.svg",
+      "caption": "Curriculum overview placeholder visual for the Texas NATCEP program roadmap.",
+      "video_caption": "Add a brief orientation video that explains how to use the curriculum library."
+    },
+    "module_01_role_and_scope": {
+      "hero_image": "assets/images/lessons/module_01_role_and_scope.svg",
+      "caption": "Placeholder lesson banner for role, scope of practice, and communication topics.",
+      "video_caption": "Suggested slot for a short role-and-responsibilities micro-lesson."
+    },
+    "module_02_safety_and_emergency": {
+      "hero_image": "assets/images/lessons/module_02_safety_and_emergency.svg",
+      "caption": "Placeholder lesson banner for transfer safety, hazards, and emergency response.",
+      "video_caption": "Suggested slot for a safety drill or emergency response micro-lesson."
+    },
+    "module_03_infection_control": {
+      "hero_image": "assets/images/lessons/module_03_infection_control.svg",
+      "caption": "Placeholder lesson banner for hand hygiene, PPE, and infection prevention.",
+      "video_caption": "Suggested slot for a hand hygiene or PPE demonstration video."
+    }
+  }
+}

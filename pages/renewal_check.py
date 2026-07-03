@@ -6,6 +6,7 @@ import streamlit as st
 
 from db import get_ceu_records, total_ceu_hours
 from email_utils import send_ceu_reminder
+from utils.media import render_page_media
 
 RENEWAL_HOURS_REQUIRED = 24.0
 RENEWAL_CYCLE_YEARS    = 2
@@ -14,6 +15,7 @@ RENEWAL_CYCLE_YEARS    = 2
 def show() -> None:
     st.title("✅ Renewal Readiness Check")
     st.caption("Texas CNA 2-year renewal overview")
+    render_page_media("renewal_check")
 
     user_id   = st.session_state.get("user_id")
     user_name = st.session_state.get("user_name", "")

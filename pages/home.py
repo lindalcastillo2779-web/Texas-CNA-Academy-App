@@ -4,6 +4,7 @@ import streamlit as st
 
 from db import get_or_create_user, get_user_by_email
 from email_utils import send_welcome_email
+from utils.media import render_page_media
 
 ROLES = ["student", "cna", "don", "instructor", "facility"]
 
@@ -11,6 +12,7 @@ ROLES = ["student", "cna", "don", "instructor", "facility"]
 def show() -> None:
     st.title("🌸 Welcome to Texas CNA Academy")
     st.subheader("TULIP-Link Portal")
+    render_page_media("home")
 
     st.markdown(
         """

@@ -3,6 +3,7 @@
 import streamlit as st
 
 from db import get_domains, get_questions_by_domain, save_quiz_attempt
+from utils.media import render_page_media
 
 LETTERS = ["A", "B", "C", "D"]
 
@@ -10,6 +11,7 @@ LETTERS = ["A", "B", "C", "D"]
 def show() -> None:
     st.title("📚 Exam Prep – Practice Quiz")
     st.caption("NATCEP-aligned practice questions")
+    render_page_media("exam_prep")
 
     domains = ["All Domains"] + get_domains()
     selected_domain = st.selectbox("Select a domain", domains)
