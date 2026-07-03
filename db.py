@@ -3,7 +3,7 @@
 import os
 import sqlite3
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # ---------------------------------------------------------------------------
 # Persistent-disk path detection (Render) vs local development fallback
@@ -251,7 +251,15 @@ def set_subscription_active(user_id: int, active: bool) -> None:
 
 
 def get_access_status(user_id: int, trial_days: int = 30) -> dict:
-    """Return trial/subscription access details for a user."""
+    """Return access details.
+
+    Keys:
+    - allowed: bool, whether user can access protected sections
+    - subscribed: bool, whether subscription is active
+    - trial_active: bool, whether free trial is still active
+    - days_left: int, number of whole days left in trial
+    - trial_ends_on: ISO date string for trial end, or None
+    """
     user = get_user_by_id(user_id)
     if not user:
         return {
@@ -265,10 +273,14 @@ def get_access_status(user_id: int, trial_days: int = 30) -> dict:
     created_raw = user["created_at"] or ""
     try:
         created_at = datetime.fromisoformat(created_raw)
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+        else:
+            created_at = created_at.astimezone(timezone.utc)
     except ValueError:
-        created_at = datetime.utcnow()
+        created_at = datetime.now(timezone.utc)
 
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     trial_ends = created_at + timedelta(days=trial_days)
     subscribed = bool(user["subscription_active"])
     trial_active = now <= trial_ends
