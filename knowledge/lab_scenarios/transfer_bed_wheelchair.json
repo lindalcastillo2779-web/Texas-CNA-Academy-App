@@ -1,0 +1,418 @@
+{
+  "id": "transfer_bed_wheelchair",
+  "title": "Safe Transfer: Bed ↔ Wheelchair",
+  "description": "Practice the complete bed-to-wheelchair transfer as evaluated on the Prometric CNA skills exam. This simulation is set in a Texas rehabilitation facility under HHSC 2024 NATCEP standards. It covers environment preparation, gait belt application, wheelchair safety, body mechanics, resident communication, and post-transfer completion — all aligned to Texas Form 5497-NATCEP skill criteria.",
+  "natcep_domains": ["Safety and Emergency", "Basic Restorative Services", "Communication", "Infection Control"],
+  "estimated_minutes": 12,
+  "texas_2024_alignment": {
+    "tac_reference": "Texas Administrative Code Title 26, Part 1, Chapter 95 – NATCEP Standards (2024)",
+    "natcep_curriculum_section": "Section V: Safety and Emergency Procedures; Section IX: Basic Restorative Services",
+    "natcep_minimum_hours": "4 classroom hours + 4 lab hours on safe transfers",
+    "prometric_skill_title": "Transfer from Bed to Wheelchair",
+    "prometric_skill_always_tested": false,
+    "pearson_vue_domain": "Safety and Emergency Procedures",
+    "tulip_relevance": "Falls and injuries during transfers are reportable adverse events under Texas HHSC. CNAs must report all falls and near-misses to the charge nurse immediately. TULIP may be involved if a pattern of falls suggests neglect.",
+    "hhsc_form_reference": "Texas Form 5497-NATCEP – Skills Competency, Transfer Skills Section",
+    "osha_reference": "OSHA Safe Patient Handling and Mobility Guidelines (2014)",
+    "hhsc_falls_prevention": "Texas HHSC requires all SNFs to have a falls-prevention program; transfer safety is a core component"
+  },
+  "scene_briefing": {
+    "facility": "Lone Star Rehabilitation and Nursing Center, Dallas, Texas",
+    "resident_name": "Mr. James Washington",
+    "resident_age": 82,
+    "room": "Room 207A",
+    "primary_diagnosis": "CVA (ischemic stroke) 6 weeks ago with residual left-sided weakness, hypertension, mild cognitive impairment",
+    "fall_risk": "HIGH — Fall Risk wristband and bed alarm in place",
+    "care_plan_notes": "Requires stand-by to moderate assist for transfers. Transfer to wheelchair for all meals and therapy. Use gait belt at all times for transfers. Approach from the RIGHT side (stronger side). Allow Mr. Washington to assist as much as safely possible — restorative approach.",
+    "your_role": "You are the assigned CNA for the 7 AM–3 PM shift. The charge RN has reviewed Mr. Washington's transfer needs with you and reminded you that his fall risk is HIGH. PT has documented: 'Bear weight with supervision, stand-pivot transfer to wheelchair with gait belt — CNA to assist.'",
+    "scene_description": "You enter Mr. Washington's room at 7:45 AM to assist him to the dining room for breakfast. His manual wheelchair is parked in the corner, unlocked, with footrests down. His bed is in the low position. He is awake and sitting up in bed, smiling. His call light and personal items are within reach. The bed alarm is connected. You note the HIGH FALL RISK wristband on his left wrist.",
+    "learning_objectives": [
+      "Demonstrate complete pre-transfer safety setup: bed height, wheelchair positioning, locks, footrests",
+      "Apply gait belt correctly: over clothing, snug 2-finger check, buckle placement",
+      "Execute stand-pivot transfer using proper body mechanics",
+      "Apply Texas HHSC 2024 restorative care principles: encourage participation, preserve dignity",
+      "Complete post-transfer positioning and safety verification",
+      "Identify when to report a fall risk change to the charge nurse"
+    ]
+  },
+  "pre_simulation_knowledge_check": [
+    {
+      "id": "pkc_01",
+      "question": "Mr. Washington had a stroke with LEFT-sided weakness. According to Texas HHSC NATCEP 2024 restorative care principles and Prometric skills criteria, on which side should the wheelchair be positioned for a stand-pivot transfer?",
+      "options": [
+        {"id": "A", "text": "Left side (affected/weaker side) — so the stronger leg can push toward the chair"},
+        {"id": "B", "text": "The stronger (RIGHT) side — so the resident pivots toward their stronger leg and has maximum stability"},
+        {"id": "C", "text": "Either side is acceptable; the gait belt compensates for any positioning difference"},
+        {"id": "D", "text": "Directly in front of the bed so the resident stands and sits simultaneously"}
+      ],
+      "correct_option": "B",
+      "explanation": "Transfer the resident TOWARD their stronger side whenever possible. With left-sided weakness (CVA), the wheelchair is placed on the RIGHT side. The resident pivots using their stronger right leg, which provides maximum stability and control during the stand and pivot. The care plan for Mr. Washington explicitly specifies 'approach from the RIGHT side.' This is a standard principle in Texas HHSC NATCEP 2024 restorative care.",
+      "texas_standard": "Texas HHSC NATCEP 2024, Section IX – Basic Restorative Services; Prometric Transfer Skills Checklist"
+    },
+    {
+      "id": "pkc_02",
+      "question": "Which of the following CORRECTLY describes when a gait belt is contraindicated and should NOT be used?",
+      "options": [
+        {"id": "A", "text": "When the resident has a history of falls — the gait belt might restrict their movement"},
+        {"id": "B", "text": "When the resident has abdominal aortic aneurysm (AAA), recent abdominal/thoracic surgery, colostomy, feeding tube at the abdomen, or severe respiratory disease at the waist — per facility policy and physician order"},
+        {"id": "C", "text": "When the resident weighs over 200 pounds — a mechanical lift should always be used instead"},
+        {"id": "D", "text": "Gait belts are never contraindicated; they are required for all transfers in Texas nursing facilities"}
+      ],
+      "correct_option": "B",
+      "explanation": "Gait belts are contraindicated for residents with conditions at or near the waist that could be injured by belt pressure: abdominal aortic aneurysm (AAA), recent abdominal/thoracic surgery, colostomy, gastrostomy/feeding tube at the abdomen, severe respiratory disease, or broken/fractured ribs. These contraindications are in the Texas HHSC NATCEP 2024 curriculum and reflected in facility policies. Weight alone is not the deciding factor — a mechanical lift policy is based on facility assessment, not a specific weight limit.",
+      "texas_standard": "Texas HHSC NATCEP 2024, Section V – Safety Procedures; facility gait belt policy guidelines"
+    },
+    {
+      "id": "pkc_03",
+      "question": "Texas HHSC and OSHA guidelines require CNAs to use proper body mechanics during transfers. Which of the following BEST describes correct body mechanics for a stand-pivot transfer?",
+      "options": [
+        {"id": "A", "text": "Stand close to the resident, keep your back straight, bend at the knees (not waist), maintain a wide base of support, move your FEET to pivot — never twist the spine"},
+        {"id": "B", "text": "Stand at arm's length for leverage, bend at the waist to reach the gait belt, rotate your torso to direct the resident"},
+        {"id": "C", "text": "Use a narrow stance for stability, keep knees straight to protect them, pivot at the hips"},
+        {"id": "D", "text": "Body mechanics only matter for lifting heavy residents; for lighter residents, any technique is acceptable"}
+      ],
+      "correct_option": "A",
+      "explanation": "Correct body mechanics for transfers: (1) Keep the resident/load close to your center of gravity, (2) back straight — never bend at the waist, (3) knees bent to absorb the load, (4) wide base of support for stability, (5) pivot by moving feet — never twist/rotate the spine under load. Musculoskeletal injuries from improper body mechanics are the leading cause of work-related injury for CNAs in Texas. OSHA and HHSC 2024 emphasize these principles for all transfers regardless of resident size.",
+      "texas_standard": "Texas HHSC NATCEP 2024, Section V; OSHA Safe Patient Handling Guidelines (2014)"
+    }
+  ],
+  "steps": [
+    {
+      "id": "step_01",
+      "title": "Perform hand hygiene and review transfer plan",
+      "instruction": "You have just entered Mr. Washington's room. Before beginning the transfer, what must you do first?",
+      "critical": true,
+      "knowledge_fact": "🗺️ **Texas NATCEP 2024 Fact:** Every care episode begins with hand hygiene — including transfers. The Prometric exam requires hand hygiene at the start of every skills demonstration. Additionally, reviewing the care plan before transfers ensures you use the correct assist level and positioning — preventing injury to both the resident and yourself.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** Examiners mark the start of the skill when you approach the resident's environment. Hand hygiene must be performed before any contact with the resident or their bed/equipment.",
+      "decision_points": [
+        {
+          "id": "dp_01a",
+          "question": "What are your first two actions upon entering Mr. Washington's room?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Perform hand hygiene AND verbally verify the transfer plan with Mr. Washington (which side, level of assist, destination)",
+              "correct": true,
+              "feedback": "✅ Correct! Hand hygiene is the universal first step for every skill. Verbally reviewing the transfer plan with the resident ensures safety, gains cooperation, and fulfills the communication requirement.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Immediately position the wheelchair and prepare the environment before anything else",
+              "correct": false,
+              "feedback": "❌ Incorrect. Hand hygiene must come first — before touching any resident equipment or the resident themselves. Environment setup comes after hand hygiene.",
+              "rationale": "Any surface in the resident's room — including the wheelchair — may carry organisms. Touching equipment before hand hygiene can contaminate your hands and then the resident.",
+              "consequence": "Skipping hand hygiene before touching shared equipment violates infection control standards and is a critical exam failure point."
+            },
+            {
+              "id": "C",
+              "text": "Greet Mr. Washington and immediately assist him to sit up on the edge of the bed",
+              "correct": false,
+              "feedback": "❌ Incorrect. Moving the resident without first performing hand hygiene, preparing the environment, and applying the gait belt is unsafe and violates the required sequence.",
+              "rationale": "The transfer sequence must follow a specific safe order: hand hygiene → environment prep → gait belt → resident positioning → stand-pivot. Skipping preparation steps creates fall risk.",
+              "consequence": null
+            },
+            {
+              "id": "D",
+              "text": "Apply gloves immediately since you will be touching the resident",
+              "correct": false,
+              "feedback": "❌ Incorrect. Gloves are not required for routine transfers without body fluid exposure. More importantly, gloves must be preceded by hand hygiene — and for a transfer with no anticipated body-fluid contact, bare hands with prior hand hygiene is the appropriate technique.",
+              "rationale": "Standard precautions do not require gloves for all resident contact — only when blood or body fluids are anticipated. Applying gloves without prior hand hygiene is a technique error.",
+              "consequence": null
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_02",
+      "title": "Prepare the environment: wheelchair position, bed height, and bedrails",
+      "instruction": "Your hands are clean. You are now preparing the environment for the transfer. Mr. Washington's wheelchair is in the corner — unlocked, footrests in place. The bed is in the low position. What must you do to prepare the environment?",
+      "critical": true,
+      "knowledge_fact": "🏥 **Texas HHSC / OSHA Fact:** Falls during transfers are the most common serious adverse event in Texas skilled nursing facilities. The HHSC requires all SNFs to have a falls-prevention program. Pre-transfer environment preparation — locking the chair, adjusting bed height, clearing the path — is the single most effective falls-prevention intervention for stand-pivot transfers.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** Examiners look for: (1) wheelchair placed on the resident's STRONGER side at a 45° angle, (2) BOTH wheel locks engaged, (3) footrests swung away or removed, (4) bed at a height where the resident's feet can rest flat on the floor when seated on the edge, (5) only the NEAR-side bedrail lowered.",
+      "decision_points": [
+        {
+          "id": "dp_02a",
+          "question": "Which environment preparation steps are required before asking Mr. Washington to move toward the edge of the bed?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Position wheelchair on the RIGHT side (stronger) at a 45° angle to the bed → lock BOTH wheels → swing footrests away → raise bed to a height where Mr. Washington's feet rest flat on the floor when seated on the edge → lower only the near-side bedrail",
+              "correct": true,
+              "feedback": "✅ Correct! Every element is critical for fall prevention: right-side positioning (toward stronger limb), 45° angle (minimizes pivot distance), both wheels locked (no chair movement), footrests cleared (no tripping hazard), correct bed height (feet flat = stability), near rail only lowered (far rail remains as safety barrier).",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Place wheelchair on the LEFT side (weaker side) so that his stronger right leg can push across to the chair",
+              "correct": false,
+              "feedback": "❌ Incorrect. The wheelchair is placed on the STRONGER side (right for Mr. Washington), not the weaker side. The resident pivots TOWARD their stronger limb, which provides the most stable pivot. Positioning on the weak side requires the resident to pivot away from their stable limb.",
+              "rationale": "Pivoting toward the stronger side provides maximum weight-bearing stability during the critical stand-and-pivot phase. This is a basic principle of safe transfer technique in the HHSC NATCEP curriculum.",
+              "consequence": "Placing the chair on the weak side increases fall risk during the pivot because the resident must bear full weight on their weaker limb at the moment of greatest instability."
+            },
+            {
+              "id": "C",
+              "text": "Position wheelchair at the foot of the bed, lock both wheels, footrests up, bed in lowest position",
+              "correct": false,
+              "feedback": "❌ Incorrect. Positioning at the foot of the bed instead of the side significantly increases the pivot distance, creating more instability. The bed in the lowest position may cause the resident's feet not to rest flat on the floor when seated on the edge.",
+              "rationale": "The 45° angle to the side of the bed minimizes the pivot arc. Positioning at the foot creates a near-90° pivot that requires more balance and is much riskier, particularly for a high-fall-risk resident.",
+              "consequence": null
+            },
+            {
+              "id": "D",
+              "text": "Lower BOTH bedrails and have Mr. Washington scoot to the edge on his own",
+              "correct": false,
+              "feedback": "❌ Incorrect. The far-side bedrail must remain UP as a safety barrier. Lowering both rails removes the barrier and could result in Mr. Washington rolling off the far side. Additionally, a resident with high fall risk and left-sided weakness should not be asked to scoot independently without guidance.",
+              "rationale": "The far-side bedrail serves as a safety barrier during repositioning. It must remain up until the resident is safely in the transfer position.",
+              "consequence": "Lowering both rails removes the fall-prevention barrier. For a high-fall-risk resident like Mr. Washington, this significantly increases the risk of a far-side bed fall during repositioning."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_03",
+      "title": "Explain the procedure and assist Mr. Washington to a sitting position",
+      "instruction": "The environment is prepared. Mr. Washington is still lying in bed. Before applying the gait belt, what must you do?",
+      "critical": false,
+      "knowledge_fact": "🤝 **Restorative Care Principle (HHSC 2024):** The Texas NATCEP 2024 curriculum emphasizes a restorative care approach: encourage residents to do as much as they safely can. This preserves function, promotes dignity, and reduces the resident's dependence on staff. For transfers, this means explaining the process, counting together, and allowing the resident to contribute to the movement.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The examiner scores resident communication throughout the skill. A minimum requirement is: (1) explaining what you are about to do, (2) asking for the resident's cooperation, (3) verbal cueing during the actual transfer ('On the count of three, we will stand together...').",
+      "decision_points": [
+        {
+          "id": "dp_03a",
+          "question": "The environment is ready. How do you proceed with Mr. Washington before applying the gait belt?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Explain the transfer step-by-step, ask if he has any pain or concerns, assist him to a seated position at the edge of the bed with feet flat on the floor, allow a brief sitting-balance pause before proceeding",
+              "correct": true,
+              "feedback": "✅ Correct! Explaining the procedure, checking for pain, and allowing a sitting-balance pause respects dignity, promotes safety, and is part of the communication score. A seated balance pause also reduces orthostatic hypotension risk — important for Mr. Washington who has hypertension.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Apply the gait belt while he is still lying down, then assist him to sit up",
+              "correct": false,
+              "feedback": "❌ Incorrect. The gait belt is applied when the resident is in a SITTING position on the edge of the bed. Applying it while the resident is lying down makes proper placement and snug fitting very difficult and may cause the belt to twist or misposition.",
+              "rationale": "The gait belt is positioned at the waist. Applying it while the resident is supine often results in the belt being placed too high or too low, and the position cannot be verified until the resident is seated.",
+              "consequence": null
+            },
+            {
+              "id": "C",
+              "text": "Assist him to standing immediately from the lying position to minimize the number of movements",
+              "correct": false,
+              "feedback": "❌ Incorrect. A resident should NEVER be assisted from lying to standing in one movement. The correct sequence is: lying → sitting at edge of bed → allow sitting balance → standing. Skipping the seated phase increases orthostatic hypotension risk (especially with hypertension medication) and fall risk.",
+              "rationale": "The seated-balance pause allows the cardiovascular system to adjust to the positional change, reducing dizziness from orthostatic hypotension. This is especially important for elderly residents with hypertension.",
+              "consequence": "Moving from lying to standing without a seated pause can cause sudden blood pressure drop (orthostatic hypotension), dizziness, and fall — a serious adverse event for a high-fall-risk resident."
+            },
+            {
+              "id": "D",
+              "text": "Ask Mr. Washington to get himself to the edge of the bed while you get the gait belt from the supply cart",
+              "correct": false,
+              "feedback": "❌ Incorrect. Leaving a high-fall-risk resident to reposition independently while you are absent is a safety violation. Mr. Washington has documented left-sided weakness and high fall risk — he requires assistance and direct supervision throughout.",
+              "rationale": "A high-fall-risk resident must never be left without direct supervision during any transfer-related movement. Absence during this phase violates the care plan and safety standards.",
+              "consequence": "If Mr. Washington attempts to reposition independently without supervision and falls, this constitutes a preventable fall — a reportable adverse event under Texas HHSC regulations."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_04",
+      "title": "Apply gait belt correctly",
+      "instruction": "Mr. Washington is seated on the edge of the bed, feet flat on the floor. You now need to apply the gait belt. What are the requirements for correct application?",
+      "critical": true,
+      "knowledge_fact": "🩺 **Prometric / HHSC 2024 Fact:** The gait belt is a required piece of safety equipment for all assisted transfers in Texas nursing facilities. Research shows that gait belt use reduces transfer-related injuries to both residents and CNAs by approximately 30%. The Texas HHSC 2024 curriculum specifies: over clothing, waist level, buckle not at spine, 2-finger snug test.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** This is one of the most commonly failed steps on the transfer skill exam. Examiners specifically check: (1) belt is applied OVER clothing (not bare skin), (2) belt is at WAIST level (not chest or hips), (3) buckle is NOT at the spine, (4) the 2-finger test is performed and passes, (5) the CNA grasps the belt (not the resident's arm or clothing) for the transfer.",
+      "decision_points": [
+        {
+          "id": "dp_04a",
+          "question": "Mr. Washington is seated at the bed edge. How do you correctly apply the gait belt?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Apply belt over clothing at waist level → thread buckle and secure → position buckle at the front or side (NOT the spine) → perform the 2-finger test (snug but 2 fingers slide under) → grip belt from below (underhand) for transfer",
+              "correct": true,
+              "feedback": "✅ Correct! Over clothing (protects skin), waist level (maximum control), buckle away from spine (comfort and safety), 2-finger test (confirms snugness), underhand grip (allows upward lift force). This is the complete Prometric-evaluated gait belt application.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Apply belt directly on skin under the shirt for better grip",
+              "correct": false,
+              "feedback": "❌ Incorrect. The gait belt ALWAYS goes over clothing. Applying it on bare skin can cause skin tears, pressure injuries, abrasions, and discomfort — particularly on elderly residents with fragile skin.",
+              "rationale": "Elderly residents often have thin, fragile skin. Direct contact of the belt material on bare skin during transfer, combined with friction and pressure, is a well-documented cause of skin tears in long-term care.",
+              "consequence": "Applying the gait belt on bare skin during a transfer with a resident who has fragile skin (common in 82-year-olds) risks skin tears and pressure injuries — reportable adverse events under HHSC."
+            },
+            {
+              "id": "C",
+              "text": "Apply belt loosely around the chest for better control of the upper body during the transfer",
+              "correct": false,
+              "feedback": "❌ Two errors: (1) The belt must be at WAIST level, not chest — chest placement restricts breathing and applies incorrect force geometry. (2) The belt must be snug (2-finger test), not loose — a loose belt can slide up or off during transfer.",
+              "rationale": "The gait belt at the waist provides the optimal mechanical control point for an upward-and-forward transfer motion. Chest placement applies force in the wrong direction and risks respiratory compromise.",
+              "consequence": "A chest-level belt can restrict breathing, particularly in a resident with hypertension or cardiac history. A loose belt provides no safety benefit and may slide off mid-transfer."
+            },
+            {
+              "id": "D",
+              "text": "Skip the gait belt since Mr. Washington can bear some weight — it will slow down the transfer",
+              "correct": false,
+              "feedback": "❌ Incorrect. The care plan explicitly requires a gait belt for ALL transfers for Mr. Washington. Skipping the gait belt is a critical safety violation. On the Prometric exam, omitting the gait belt when it is required is an automatic deduction.",
+              "rationale": "Even a resident who can partially bear weight needs a gait belt. A gait belt provides the CNA with a controlled grip point and allows them to respond if the resident loses balance during the stand.",
+              "consequence": "Transferring without a gait belt when it is required by the care plan is an immediate citation deficiency under Texas HHSC survey standards and a critical exam failure."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_05",
+      "title": "Execute the stand-pivot transfer with correct body mechanics",
+      "instruction": "The gait belt is applied, wheelchair is locked at 45° on the right side, footrests are cleared. You are ready to assist Mr. Washington to stand and pivot. Describe the correct technique.",
+      "critical": true,
+      "knowledge_fact": "💪 **Body Mechanics (HHSC 2024 / OSHA):** Musculoskeletal injuries from patient handling are the #1 occupational injury for CNAs in Texas. Correct body mechanics during the stand-pivot phase — knees bent, back straight, no spinal twist, feet moving to pivot — is required practice under Texas HHSC 2024 curriculum AND evaluated by Prometric examiners.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The examiner watches the ENTIRE transfer motion. Key deductions: (1) bending at the waist instead of knees, (2) twisting the spine to pivot, (3) standing far from the resident instead of close, (4) using the resident's arm, shoulder, or clothing as the grip point instead of the gait belt, (5) not counting out loud before initiating the stand.",
+      "decision_points": [
+        {
+          "id": "dp_05a",
+          "question": "You are ready to initiate the stand. What is the correct transfer technique?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Block Mr. Washington's knees with yours → grip gait belt underhand at sides → count aloud 'On 3 we stand — 1, 2, 3' → straighten knees (not waist) to assist the stand → pivot by stepping feet → lower into chair → ensure seated fully back before releasing",
+              "correct": true,
+              "feedback": "✅ Correct! Knee-blocking provides stability, underhand gait belt grip allows upward force, counting aloud gains cooperation, knee-straightening (not waist-bending) protects your back, foot-stepping pivots without spinal twist, and confirming full seating before releasing prevents falls into the chair.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Place your hands under Mr. Washington's arms and lift him to standing",
+              "correct": false,
+              "feedback": "❌ Incorrect. Lifting under the armpits is a common CNA injury cause — it stresses your shoulders/back and can cause shoulder joint injury in the resident (shoulder dislocation is a known complication). Always use the gait belt, not the axillary area.",
+              "rationale": "Axillary lifting applies direct upward force on the shoulder joints, which can cause rotator cuff tears or subluxation in residents with weakened joints. The gait belt distributes force at the waist, which is the safer control point.",
+              "consequence": "Lifting a stroke patient under the arms on the affected side risks shoulder subluxation — a painful and serious complication that constitutes a transfer injury, a reportable event under HHSC."
+            },
+            {
+              "id": "C",
+              "text": "Stand behind Mr. Washington to push him upright from the back",
+              "correct": false,
+              "feedback": "❌ Incorrect. Standing behind the resident during a stand-pivot transfer provides poor control and does not allow you to see the resident's face for signs of distress. The correct position is in FRONT and slightly to the side of the resident.",
+              "rationale": "Facing the resident during the stand phase allows you to observe for dizziness, pain, or loss of balance — critical safety information that a behind-the-resident position completely obscures.",
+              "consequence": null
+            },
+            {
+              "id": "D",
+              "text": "Bend your back to reach the gait belt, straighten your back to lift, then twist to pivot toward the wheelchair",
+              "correct": false,
+              "feedback": "❌ This technique describes the exact body mechanics that cause back injuries. Bending at the waist and twisting under load are the primary causes of lumbar disc injury in healthcare workers.",
+              "rationale": "The combination of forward trunk flexion (waist bend) with spinal rotation under a compressive load creates dangerous stress on the lumbar discs. This is how most serious CNA back injuries occur.",
+              "consequence": "This technique is a documented cause of herniated lumbar discs in CNAs. It is also an automatic deduction on the Prometric exam."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    },
+    {
+      "id": "step_06",
+      "title": "Post-transfer safety completion and documentation",
+      "instruction": "Mr. Washington is now seated in the wheelchair. What steps must you complete before leaving him or moving him from the room?",
+      "critical": true,
+      "knowledge_fact": "📋 **Texas HHSC 2024 / Prometric Completion Requirements:** Post-transfer completion is a graded section of the Prometric transfer skill. Incomplete post-transfer steps — forgotten footrests, retained gait belt, no comfort check — result in point deductions. Additionally, any transfer must be documented: time, level of assist, resident tolerance, and any significant findings.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** Post-transfer completion is often where students lose unnecessary points. Checklist: (1) footrests repositioned with feet properly placed, (2) gait belt REMOVED (cannot be left on between transfers), (3) seat the resident fully back in the chair, (4) resident comfort check and verbal acknowledgment, (5) hand hygiene.",
+      "decision_points": [
+        {
+          "id": "dp_06a",
+          "question": "Mr. Washington is seated in the wheelchair. What is the required post-transfer completion sequence?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Reposition and lock footrests with feet properly placed → ensure Mr. Washington is seated fully back in the chair → REMOVE the gait belt → check for comfort and safety → provide positive verbal reinforcement → perform hand hygiene",
+              "correct": true,
+              "feedback": "✅ Correct! Footrests must be replaced and feet positioned (fall and injury prevention), the resident seated fully back (prevents sliding), gait belt removed (comfort and skin integrity between transfers), comfort check (resident dignity and safety), and hand hygiene (infection control). The Prometric examiner evaluates all of these steps.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Leave the gait belt on — he may need it when he returns to bed later",
+              "correct": false,
+              "feedback": "❌ Incorrect. Gait belts must be REMOVED after every transfer. Leaving a gait belt on a seated resident causes abdominal pressure, potential respiratory discomfort, and skin pressure over time. It is also a Prometric exam deduction.",
+              "rationale": "Gait belts are a transfer assist device, not a seating restraint. Leaving them on between transfers is an inappropriate use that can cause harm to the resident.",
+              "consequence": "A gait belt left on a seated resident with hypertension and post-stroke reduced sensation can cause undetected pressure injury or abdominal discomfort."
+            },
+            {
+              "id": "C",
+              "text": "Wheel Mr. Washington to the dining room immediately — completing transfer details can wait",
+              "correct": false,
+              "feedback": "❌ Incorrect. The post-transfer completion steps must occur BEFORE moving the wheelchair. Footrests must be in place before transport; gait belt must be removed; resident must be confirmed safely and comfortably positioned.",
+              "rationale": "Moving a resident in the wheelchair before the post-transfer steps are complete creates risk: footrests left out of position can catch on door frames, and an improperly seated resident may slide forward during transport.",
+              "consequence": "Transporting without replacing footrests can result in the resident's feet dragging on the floor during transport — a documented cause of falls out of wheelchairs."
+            },
+            {
+              "id": "D",
+              "text": "Let Mr. Washington adjust his own footrests and position himself since he can assist",
+              "correct": false,
+              "feedback": "❌ Incorrect. A high-fall-risk resident with left-sided weakness should not be expected to independently manage footrests and self-positioning after a transfer. The CNA is responsible for completing the safety checklist.",
+              "rationale": "While the restorative care approach encourages resident participation, post-transfer safety checks are the CNA's professional responsibility. This is particularly true for a high-fall-risk resident.",
+              "consequence": null
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_safety_transfers"
+        }
+      ]
+    }
+  ],
+  "communication_checkpoints": [
+    {
+      "id": "comm_01",
+      "prompt": "Before beginning the transfer, did you: (1) explain each step of the procedure to Mr. Washington in clear language, (2) ask about his pain level, (3) identify his strong side, and (4) count aloud before initiating the stand?",
+      "options": [
+        {"id": "Y", "text": "Yes — I fully explained, asked about pain, identified the strong side, and used a verbal count-in before standing", "correct": true},
+        {"id": "N", "text": "No — I began the transfer with minimal or incomplete communication", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "✅ Excellent. Explaining the procedure, assessing pain, and using a verbal count-in are communication requirements on the Prometric exam AND restorative care best practices under Texas HHSC NATCEP 2024.",
+      "feedback_fail": "📌 Always explain what you are going to do at each step, check for pain before initiating any movement, identify the resident's stronger side, and count aloud ('On 3 we stand — 1, 2, 3') before initiating a stand. These are communication score points and fall prevention practices."
+    },
+    {
+      "id": "comm_02",
+      "prompt": "After the transfer, did you: (1) tell Mr. Washington he did a great job, (2) ask if he was comfortable, (3) confirm he knew how to use the call light, and (4) document the transfer in the notes?",
+      "options": [
+        {"id": "Y", "text": "Yes — I provided positive feedback, checked comfort, confirmed call-light access, and noted the transfer", "correct": true},
+        {"id": "N", "text": "No — I completed the physical transfer without the post-care communication and documentation check", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "✅ Excellent. Post-transfer communication, comfort verification, and documentation are all components of the CNA exam professionalism score and Texas HHSC care standards.",
+      "feedback_fail": "📌 Post-transfer: always provide verbal encouragement (restorative care principle), check comfort, confirm call-light access, and document: time, level of assist, and resident tolerance. Any fall or near-fall must be reported to the charge nurse immediately per Texas HHSC requirements."
+    }
+  ],
+  "remediation_refs": {
+    "module_safety_transfers": {
+      "label": "Safe Transfers and Patient Handling — Gait Belt, Body Mechanics, and Environment Preparation",
+      "module": "Module 07",
+      "topic": "Transfer Techniques, Gait Belt Application, and Fall Prevention",
+      "exam_domain": "Safety and Emergency Procedures",
+      "prometric_skill": "Transfer from Bed to Wheelchair (Prometric Skills Pool #3)",
+      "hhsc_reference": "Texas HHSC NATCEP 2024, Section V – Safety; Section IX – Restorative Care",
+      "tac_reference": "TAC Title 26, Chapter 95.9(a)(5) – Safety and Emergency Procedures"
+    }
+  }
+}

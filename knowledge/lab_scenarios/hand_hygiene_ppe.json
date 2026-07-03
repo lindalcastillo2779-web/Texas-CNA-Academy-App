@@ -1,0 +1,416 @@
+{
+  "id": "hand_hygiene_ppe",
+  "title": "Hand Hygiene & PPE Donning/Doffing",
+  "description": "Practice the complete hand hygiene and PPE sequence as evaluated on the Prometric CNA skills exam. This simulation is set in a Texas skilled nursing facility under HHSC 2024 NATCEP standards and includes contact-precaution care, correct donning/doffing sequences, and mandatory post-care hand hygiene.",
+  "natcep_domains": ["Infection Control", "Safety", "Professional Role"],
+  "estimated_minutes": 10,
+  "texas_2024_alignment": {
+    "tac_reference": "Texas Administrative Code Title 26, Part 1, Chapter 95 – NATCEP Standards (2024)",
+    "natcep_curriculum_section": "Section IV: Infection Prevention and Control",
+    "natcep_minimum_hours": "8 classroom hours + 2 lab hours",
+    "prometric_skill_title": "Handwashing",
+    "prometric_skill_always_tested": true,
+    "pearson_vue_domain": "Infection Control",
+    "tulip_relevance": "CNAs must understand standard precautions and report potential infection-control breaches to the charge nurse. Under Texas law, CNAs are mandatory reporters for conditions that threaten resident health.",
+    "hhsc_form_reference": "Texas Form 5497-NATCEP – Skills Competency Section",
+    "cdc_guideline": "CDC Guideline for Hand Hygiene in Health-Care Settings (2002, updated 2019)"
+  },
+  "scene_briefing": {
+    "facility": "Magnolia Gardens Skilled Nursing Facility, San Antonio, Texas",
+    "resident_name": "Mrs. Rosa Hernandez",
+    "resident_age": 78,
+    "room": "Room 112B",
+    "primary_diagnosis": "Type 2 Diabetes, Stage III Pressure Injury (right heel), UTI",
+    "isolation_status": "Contact Precautions (MRSA-positive wound culture)",
+    "care_plan_notes": "Provide morning wound assessment and perineal care. Resident speaks Spanish and English. Requires full assistance with ADLs. Encourage participation.",
+    "your_role": "You are a CNA student completing your clinical rotation. The charge RN has assigned you to provide morning care for Mrs. Hernandez and has reviewed the precaution requirements with you.",
+    "scene_description": "You arrive at Room 112B. A yellow 'CONTACT PRECAUTIONS' sign is posted on the door. Inside you see a PPE station with a gown, gloves, and mask. The hand-hygiene dispenser is mounted just outside the door. Mrs. Hernandez is in bed, awake, and watching television. She smiles when she sees you.",
+    "learning_objectives": [
+      "Demonstrate correct hand-hygiene timing: before and after every resident contact",
+      "Apply WHO 5 Moments for Hand Hygiene in a clinical scenario",
+      "Select appropriate PPE for contact-precaution care",
+      "Follow CDC-recommended donning and doffing sequences",
+      "Understand that handwashing is the #1 critical step on the Prometric CNA exam"
+    ]
+  },
+  "pre_simulation_knowledge_check": [
+    {
+      "id": "pkc_01",
+      "question": "According to Texas HHSC NATCEP 2024 standards and the CDC, which of the following situations requires soap-and-water handwashing INSTEAD of alcohol-based hand sanitizer?",
+      "options": [
+        {"id": "A", "text": "After removing gloves following routine care of a resident with no skin breakdown"},
+        {"id": "B", "text": "When hands are visibly soiled, after contact with a resident with C. difficile, or after using the restroom"},
+        {"id": "C", "text": "Before entering a resident's room that has no isolation precautions"},
+        {"id": "D", "text": "After documenting in the paper chart at the nursing station"}
+      ],
+      "correct_option": "B",
+      "explanation": "Alcohol-based hand sanitizer is effective for most situations, but soap and water MUST be used when: hands are visibly soiled or contaminated with blood/body fluids; after contact with a resident with C. difficile or norovirus; after using the restroom. HHSC NATCEP Section IV and the CDC Hand Hygiene Guidelines both specify these exceptions.",
+      "texas_standard": "Texas HHSC NATCEP 2024, Section IV – Infection Control; CDC Hand Hygiene Guideline (2019)"
+    },
+    {
+      "id": "pkc_02",
+      "question": "Mrs. Hernandez is on Contact Precautions for MRSA. Which PPE is required BEFORE entering her room?",
+      "options": [
+        {"id": "A", "text": "Gloves only – MRSA is not airborne, so a mask is not needed"},
+        {"id": "B", "text": "Gown and gloves at minimum; mask if splashing of body fluids is anticipated"},
+        {"id": "C", "text": "Full PPE including N95 respirator – MRSA can spread by airborne droplets"},
+        {"id": "D", "text": "No PPE required if you wash your hands before entering"}
+      ],
+      "correct_option": "B",
+      "explanation": "Contact Precautions require a gown and gloves before entering the room. MRSA is transmitted by direct and indirect contact, not by the airborne route, so an N95 is not required. A standard surgical mask is added only when splashing of body fluids is likely. Gloves alone are insufficient for contact-precaution rooms.",
+      "texas_standard": "Texas HHSC NATCEP 2024, Section IV; CDC 2007 Isolation Precautions Guideline"
+    },
+    {
+      "id": "pkc_03",
+      "question": "What are the WHO 5 Moments for Hand Hygiene that apply to CNA practice in a Texas nursing facility?",
+      "options": [
+        {"id": "A", "text": "Before breakfast, after lunch, before dinner, after dinner, at end of shift"},
+        {"id": "B", "text": "Before touching the resident, before clean/aseptic procedures, after body fluid exposure, after touching the resident, after touching the resident's surroundings"},
+        {"id": "C", "text": "When entering the facility, when leaving the facility, before meals, after restroom, before patient contact"},
+        {"id": "D", "text": "Only before direct resident contact and after removing gloves"}
+      ],
+      "correct_option": "B",
+      "explanation": "The WHO 5 Moments for Hand Hygiene are: (1) Before touching the patient, (2) Before clean/aseptic procedures, (3) After body fluid exposure risk, (4) After touching the patient, (5) After touching patient surroundings. These 5 moments are integrated into the Texas HHSC NATCEP 2024 infection control curriculum and tested on the Prometric written exam.",
+      "texas_standard": "WHO Guidelines on Hand Hygiene; Texas HHSC NATCEP 2024, Section IV"
+    }
+  ],
+  "steps": [
+    {
+      "id": "step_01",
+      "title": "Perform hand hygiene before resident contact",
+      "instruction": "You have just arrived at Room 112B. The Contact Precautions sign is on the door. You have your supplies ready. What is the FIRST action you must perform?",
+      "critical": true,
+      "knowledge_fact": "🔬 **Texas NATCEP Fact:** The Prometric CNA skills exam ALWAYS begins with a handwashing evaluation. It is the only skill tested on every single exam. Failure to perform hand hygiene at the start of ANY skill is an automatic exam failure — no exceptions.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The examiner's checklist begins the moment you approach the sink or hand-sanitizer station. They are watching for: (1) wetting hands before applying soap, (2) scrubbing all surfaces, (3) minimum 20-second scrub, (4) rinsing direction (fingertips down), (5) using paper towel to turn off faucet.",
+      "decision_points": [
+        {
+          "id": "dp_01a",
+          "question": "You are outside Room 112B. The hand-hygiene dispenser is on the wall. What do you do FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Perform hand hygiene using the dispenser or sink before entering the room or touching any surface",
+              "correct": true,
+              "feedback": "✅ Correct! Hand hygiene before resident contact is the #1 critical step on the Prometric exam and in Texas NATCEP standards. You are protecting Mrs. Hernandez from any organisms you may have picked up from previous tasks or surfaces.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Don your gown first so your hands stay clean, then perform hand hygiene",
+              "correct": false,
+              "feedback": "❌ Incorrect. PPE is donned AFTER hand hygiene, not before. Your hands may already carry microorganisms that could contaminate the gown during donning.",
+              "rationale": "The correct sequence is always: hand hygiene → don PPE → provide care. Hand hygiene must occur on bare hands before any PPE is applied.",
+              "consequence": "If you don the gown without first washing your hands, you may transfer organisms from your hands to the outer surface of the gown — the same surface that will then be near the resident during care."
+            },
+            {
+              "id": "C",
+              "text": "Knock, enter the room, greet Mrs. Hernandez, then wash your hands at the sink inside",
+              "correct": false,
+              "feedback": "❌ Incorrect. Hand hygiene must occur BEFORE entering the room and touching any surfaces, including the door handle. This is especially critical with contact precautions.",
+              "rationale": "In a contact-precaution room, any surface — including the door handle — may be colonized with MRSA. Entering without first decontaminating your hands can spread organisms to and from the room.",
+              "consequence": "Entering the room before hand hygiene risks spreading MRSA from the room's surfaces to other residents. This is a direct infection control breach and exam failure point."
+            },
+            {
+              "id": "D",
+              "text": "Review Mrs. Hernandez's care plan at the nursing station, then go to her room",
+              "correct": false,
+              "feedback": "❌ Incorrect. While reviewing the care plan is good practice, it should have occurred before you approached the room. Hand hygiene is required before resident contact regardless of your prior activities.",
+              "rationale": "Hand hygiene timing is non-negotiable: it must happen immediately before any resident contact. Administrative activities like chart review do not replace this requirement.",
+              "consequence": null
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_02",
+      "title": "Perform correct handwashing technique (20-second scrub)",
+      "instruction": "You are at the sink performing soap-and-water hand hygiene. Describe the complete, correct technique.",
+      "critical": true,
+      "knowledge_fact": "💧 **CDC / HHSC 2024 Fact:** Proper hand-washing technique removes 99.9% of transient microorganisms. The 20-second minimum is based on research showing that shorter scrub times leave significant residual contamination. Singing 'Happy Birthday' twice takes approximately 20 seconds — this is a common teaching tool in Texas NATCEP programs.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** Examiners check for: (1) wetting hands BEFORE applying soap, (2) applying soap to palm and lathering all surfaces (palms, backs, between fingers, thumbs, wrists, fingertips), (3) 20-second minimum, (4) rinsing from wrist down to fingertips — never upward, (5) drying with clean paper towel, (6) using paper towel to turn off the faucet to avoid re-contamination.",
+      "decision_points": [
+        {
+          "id": "dp_02a",
+          "question": "Which hand-washing technique fully meets the Prometric CNA exam standard?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Wet hands → apply soap → scrub ALL surfaces (palms, backs, between fingers, thumbs, wrists, fingertips) for ≥20 seconds → rinse from wrists down → dry with paper towel → use towel to turn off faucet",
+              "correct": true,
+              "feedback": "✅ Correct! Every element matters: direction of water flow (wrist to fingertips), coverage of all surfaces, minimum 20 seconds, paper towel for faucet. This is the complete technique evaluated by Prometric examiners in Texas.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Apply hand sanitizer and rub until dry — this always works the same as soap and water",
+              "correct": false,
+              "feedback": "❌ Incorrect. You are caring for a MRSA-positive wound — this qualifies as a situation involving potential body-fluid contact. Soap and water are required before gloving for wound care. Alcohol sanitizer does not eliminate MRSA spores as reliably as soap and water in wound-care scenarios.",
+              "rationale": "Texas HHSC NATCEP Section IV specifies that soap-and-water handwashing is required before direct wound care, after potential exposure to infectious material, and whenever hands are visibly soiled. Sanitizer is acceptable for routine non-soiled contact but not as a universal replacement.",
+              "consequence": "Relying on hand sanitizer alone before wound care on a MRSA-positive resident risks incomplete decontamination and potential cross-contamination of the wound."
+            },
+            {
+              "id": "C",
+              "text": "Wet hands → apply soap → scrub palms only for 10 seconds → rinse → dry",
+              "correct": false,
+              "feedback": "❌ Incorrect. Two problems: (1) minimum 20 seconds required — 10 seconds leaves significant microbial contamination; (2) only scrubbing palms misses the backs of hands, between fingers, thumbs, and wrists where organisms accumulate.",
+              "rationale": "Research used to establish the 20-second standard demonstrates that incomplete scrub duration and coverage leave residual pathogens, particularly around the nail beds and between fingers.",
+              "consequence": "Incomplete hand hygiene before gloved wound care on a MRSA-positive resident can lead to organism transfer to the wound, worsening the infection and creating a HHSC reportable adverse event."
+            },
+            {
+              "id": "D",
+              "text": "Wet hands → apply soap → scrub for 20 seconds → rinse upward toward elbows → dry → turn faucet off with bare hand",
+              "correct": false,
+              "feedback": "❌ Two errors: (1) Rinsing upward toward elbows re-contaminates the clean hands by running contaminated water back over the wrists. Rinse from wrist down to fingertips. (2) Turning the faucet off with a bare hand re-contaminates clean hands — use the paper towel.",
+              "rationale": "The direction of rinsing matters: water should flow from the cleanest area (wrists) toward the most contaminated area (fingertips) and off. Reversing this flow defeats the purpose of handwashing.",
+              "consequence": null
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_03",
+      "title": "Select correct PPE for contact-precaution care",
+      "instruction": "Your hands are clean and dry. You are about to don PPE before entering Mrs. Hernandez's contact-precaution room for wound assessment and perineal care. Which PPE is required?",
+      "critical": true,
+      "knowledge_fact": "🧤 **Texas NATCEP 2024 Fact:** Contact Precautions require gown + gloves for ALL contact with the resident or their environment. A mask is added only when there is a risk of splashing. For wound assessment involving drainage, adding a mask is best practice even if not strictly required by contact precaution alone. Texas HHSC survey teams cite inadequate PPE selection as a top deficiency finding in long-term care facilities.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The examiner evaluates PPE selection for appropriateness to the described care scenario. Selecting insufficient PPE for the described situation is scored as a safety deficiency.",
+      "decision_points": [
+        {
+          "id": "dp_03a",
+          "question": "For Mrs. Hernandez's contact-precaution wound assessment and perineal care, which PPE do you select?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Gown + gloves (required for contact precautions); add mask/eye protection because wound drainage splashing is possible during perineal care",
+              "correct": true,
+              "feedback": "✅ Correct! Gown and gloves are required for contact precautions. Adding a mask for perineal care involving potential splashing is the correct clinical judgment. This demonstrates both compliance and critical thinking.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Gloves only — contact precautions don't require a gown for every contact",
+              "correct": false,
+              "feedback": "❌ Incorrect. Contact Precautions require a gown AND gloves for all contact with the resident or their care environment. Gloves alone are insufficient and violate the facility isolation protocol.",
+              "rationale": "CDC Contact Precautions (2007 Guideline, updated) specify gown + gloves as the minimum PPE for direct contact with the resident or their environment. A gown prevents contamination of your uniform, which could then carry MRSA to other residents.",
+              "consequence": "Wearing only gloves during contact-precaution care exposes your clothing to MRSA, which can then be carried to other residents — a direct HHSC survey deficiency."
+            },
+            {
+              "id": "C",
+              "text": "Full PPE including N95 respirator — MRSA can be inhaled through nasal passages",
+              "correct": false,
+              "feedback": "❌ Incorrect. MRSA is transmitted by CONTACT (direct and indirect), not by the airborne or droplet route. An N95 respirator is required for airborne precautions (e.g., TB, measles, varicella), not contact precautions. Using unnecessary PPE wastes resources and does not improve safety.",
+              "rationale": "PPE selection must match the transmission route of the pathogen. MRSA transmission is contact-based; an N95 provides no additional protection and is not indicated for contact precautions.",
+              "consequence": null
+            },
+            {
+              "id": "D",
+              "text": "No PPE needed if you are just greeting the resident and briefly assessing the wound from a distance",
+              "correct": false,
+              "feedback": "❌ Incorrect. Any entry into a contact-precaution room for direct care requires gown and gloves, regardless of how brief the interaction. The isolation sign on the door requires compliance for every entry involving resident contact.",
+              "rationale": "MRSA can be present on surfaces throughout the room and on the resident's skin. Brief contact does not reduce transmission risk if proper PPE is not worn.",
+              "consequence": "Even brief wound assessment without PPE in a MRSA-positive room can result in hand contamination and transmission to other residents."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_04",
+      "title": "Don PPE in the correct CDC-recommended order",
+      "instruction": "You have selected your gown, gloves, and mask. In what order should you put them on?",
+      "critical": true,
+      "knowledge_fact": "📋 **CDC Donning Sequence (HHSC 2024 Required):** Gown → Mask/Respirator → Eye Protection/Face Shield → Gloves. The gown goes first because it is the largest piece and must be secured before adding smaller items. Gloves go LAST so they can overlap the gown cuffs and cover the wrists — a common exam failure point.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The examiner verifies donning sequence specifically. A key detail: gloves must OVERLAP the gown cuffs at the wrist. Students who put on gloves without pulling them up to cover the cuff are marked down even if the sequence is otherwise correct.",
+      "decision_points": [
+        {
+          "id": "dp_04a",
+          "question": "You are holding your gown, mask, and gloves. What is the correct donning order?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Gown first (tie at neck and waist) → mask (secure over nose/mouth) → gloves last (pull cuffs over gown sleeves)",
+              "correct": true,
+              "feedback": "✅ Correct! Gown → mask → gloves. Gloves must overlap the gown cuffs to eliminate the wrist gap. This is the CDC-recommended donning sequence adopted in the Texas HHSC NATCEP 2024 curriculum.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Gloves first → gown → mask",
+              "correct": false,
+              "feedback": "❌ Incorrect. Gloves must go on LAST. Putting gloves on before the gown leaves the wrists exposed under the gown cuffs and contaminates the glove surface when the gown is pulled on over them.",
+              "rationale": "Gloves are worn last so they can be pulled up over the gown cuffs, creating an unbroken barrier from wrists to fingertips.",
+              "consequence": "Donning gloves before the gown creates an unprotected wrist gap that allows direct skin contact with contaminated surfaces during care."
+            },
+            {
+              "id": "C",
+              "text": "Mask → gown → gloves",
+              "correct": false,
+              "feedback": "❌ Partially incorrect. While a mask may be put on before the gown in some emergency contexts, the standard CDC and HHSC sequence begins with the gown because it covers the largest surface area and sets the foundation for the other PPE.",
+              "rationale": "The CDC's recommended donning sequence (gown first) is designed to minimize contamination of subsequently applied PPE. Deviation from this sequence during the Prometric exam results in a deduction.",
+              "consequence": null
+            },
+            {
+              "id": "D",
+              "text": "The order doesn't matter as long as all PPE is worn before entering the room",
+              "correct": false,
+              "feedback": "❌ Incorrect. The donning sequence is not arbitrary — each step in the CDC sequence is designed to prevent contamination of subsequently applied PPE. Order matters on the Prometric exam and in clinical practice.",
+              "rationale": "If the gown is applied after gloves, the glove surfaces are contaminated by the outer surface of the gown during gown application.",
+              "consequence": null
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_05",
+      "title": "Doff PPE safely using correct removal sequence",
+      "instruction": "You have completed Mrs. Hernandez's care. Her wound has been assessed and perineal care is done. You are about to remove your PPE at the doorway before leaving the room. Which doffing sequence is correct?",
+      "critical": true,
+      "knowledge_fact": "🗑️ **CDC Doffing Sequence (HHSC 2024):** The doffing order is the reverse of donning — but the logic is based on contamination level, not simply reversing: Gloves (most contaminated) → Gown (roll away from body, inside out) → Hand hygiene → Mask/Eye protection → Final hand hygiene. The gown outer surface is contaminated, so rolling it inward contains the contamination.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** Examiners watch the doffing technique closely. Key observations: (1) gloves removed by peeling inside-out without touching outer surfaces, (2) gown rolled inward and away from the body (never pulled over the head), (3) mask strings/ties removed from behind without touching the front of the mask.",
+      "decision_points": [
+        {
+          "id": "dp_05a",
+          "question": "You are standing at the doorway of Mrs. Hernandez's room ready to doff. What is the correct sequence?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Remove gloves first (peel inside-out, ball first glove inside second) → remove and roll gown away from body (touching only inside surfaces) → discard → perform hand hygiene → remove mask from behind → perform final hand hygiene",
+              "correct": true,
+              "feedback": "✅ Correct! Gloves first (most contaminated), gown rolled inward to contain MRSA, hand hygiene between PPE removal steps, mask last (protects your face from contaminated hands), final hand hygiene. This is the complete CDC / HHSC 2024 doffing sequence.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Remove mask first (to breathe easier) → then gown → then gloves",
+              "correct": false,
+              "feedback": "❌ Incorrect. Removing the mask first exposes your face and nose/mouth to any organisms on your contaminated gown and gloves during their removal. Gloves — the most contaminated item — must always come off first.",
+              "rationale": "The mask is removed LAST (after other PPE) because it protects the mucous membranes of the face from any organisms that might be disturbed during removal of the more-contaminated gown and gloves.",
+              "consequence": "Removing the mask before gloves/gown risks inhaling or ingesting MRSA particles disturbed during the removal of contaminated items."
+            },
+            {
+              "id": "C",
+              "text": "Pull the gown off over your head, then remove gloves, then mask",
+              "correct": false,
+              "feedback": "❌ Incorrect. Pulling a gown over your head sweeps the contaminated outer surface across your face, hair, and neck — directly contaminating areas you will then touch. Gowns must be rolled away from the body, not lifted over the head.",
+              "rationale": "The gown is rolled downward and away from the body so the contaminated outer surface folds inward, containing the organisms. Lifting it upward is a textbook self-contamination technique.",
+              "consequence": "Pulling the gown over your head while wearing it could spread MRSA to your face, hair, and clothing, creating a transmission risk to yourself, your family, and other residents."
+            },
+            {
+              "id": "D",
+              "text": "Remove all PPE simultaneously to save time, drop in trash, then wash hands once",
+              "correct": false,
+              "feedback": "❌ Incorrect. Simultaneous PPE removal significantly increases self-contamination risk. Each item must be removed carefully and in sequence. A single hand-hygiene step after all items are removed is insufficient.",
+              "rationale": "Sequential doffing exists to prevent each contaminated item from contaminating the next step. Rushing removes this protection entirely.",
+              "consequence": "Rushing PPE removal is one of the top causes of healthcare worker self-contamination with MRSA and other contact-precaution pathogens."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    },
+    {
+      "id": "step_06",
+      "title": "Perform hand hygiene after PPE removal (final critical step)",
+      "instruction": "You have removed all PPE and disposed of it properly. You are now outside Mrs. Hernandez's room. What is the mandatory next action?",
+      "critical": true,
+      "knowledge_fact": "🙌 **Prometric Exam Fact:** Hand hygiene after PPE removal is tested as an independent critical step — it is NOT considered part of the PPE doffing skill. Examiners specifically wait to see if you perform this step. Even if you executed perfect doffing, skipping post-PPE hand hygiene is an automatic deduction.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The examiner's checklist has a specific line item for 'Hand hygiene performed after removing PPE.' They are watching for you to perform hand hygiene with either soap-and-water or hand sanitizer BEFORE touching any clean surface (door handle, chart, phone).",
+      "decision_points": [
+        {
+          "id": "dp_06a",
+          "question": "All PPE has been removed and properly disposed of. What do you do immediately?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Perform hand hygiene (soap and water or hand sanitizer on bare hands) before touching anything else",
+              "correct": true,
+              "feedback": "✅ Correct! Hand hygiene after every PPE removal is a mandatory critical step. Even perfect doffing may not have kept your hands entirely uncontaminated. This step closes the loop on infection prevention and is explicitly on the Prometric skills checklist.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Put on fresh gloves for protection before touching anything",
+              "correct": false,
+              "feedback": "❌ Incorrect. Clean gloves on potentially contaminated bare hands does not substitute for hand hygiene. You must perform hand hygiene on bare hands first.",
+              "rationale": "Gloves protect clean hands. They do not clean contaminated hands. Putting gloves on without hand hygiene traps contamination and can transfer it through any glove defect.",
+              "consequence": "Gloves on unclean hands contaminate the inside of the glove and provide false security. Any glove tear or puncture then transfers the contamination directly."
+            },
+            {
+              "id": "C",
+              "text": "Document the care you provided at the nearest computer terminal",
+              "correct": false,
+              "feedback": "❌ Incorrect. Touching shared equipment like keyboards or computer terminals before hand hygiene spreads organisms from your hands to surfaces used by multiple staff, creating an indirect transmission pathway.",
+              "rationale": "Computer keyboards and touchscreens in nursing facilities are known high-contamination surfaces. Hand hygiene must precede any surface contact after PPE removal.",
+              "consequence": "Studies show that nursing station computer keyboards frequently harbor MRSA. Touching them without prior hand hygiene is a documented transmission route in long-term care facilities."
+            },
+            {
+              "id": "D",
+              "text": "Proceed directly to the next resident — you were wearing gloves and a gown throughout",
+              "correct": false,
+              "feedback": "❌ Incorrect. Proceeding to the next resident without post-PPE hand hygiene violates the WHO 5 Moments for Hand Hygiene and is an automatic deduction on the Prometric exam. PPE is not a substitute for hand hygiene.",
+              "rationale": "Hand hygiene is required after contact regardless of PPE use. This requirement exists because PPE can have defects, was applied before some contact occurred, or may have been contaminated during removal.",
+              "consequence": "Moving directly to another resident without hand hygiene is a direct route for MRSA transmission between residents, making you the vector — a serious patient safety event."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_infection_control"
+        }
+      ]
+    }
+  ],
+  "communication_checkpoints": [
+    {
+      "id": "comm_01",
+      "prompt": "Before entering Mrs. Hernandez's room and beginning any care, did you knock, introduce yourself, state your purpose, and ask permission to proceed?",
+      "options": [
+        {"id": "Y", "text": "Yes — I knocked, introduced myself, explained I was there for morning care, and asked if she was ready", "correct": true},
+        {"id": "N", "text": "No — I entered and began care without full introduction or asking permission", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "✅ Excellent. Knocking, introducing yourself, and gaining permission demonstrates respect for Residents' Rights (Texas HHSC NATCEP Section X) and is a scored professionalism checkpoint on the CNA exam.",
+      "feedback_fail": "📌 Always knock and receive an answer before entering, introduce yourself by name and role, explain the purpose of your visit, and ask if the resident is ready to receive care. This is a Residents' Rights requirement under Texas law and a professionalism score point."
+    },
+    {
+      "id": "comm_02",
+      "prompt": "After completing care and before leaving the room, did you: (1) ask Mrs. Hernandez if she needed anything, (2) ensure she was comfortable, (3) place the call light within reach, and (4) leave the room neat and safe?",
+      "options": [
+        {"id": "Y", "text": "Yes — I checked comfort, ensured the call light was reachable, tidied the room, and said goodbye", "correct": true},
+        {"id": "N", "text": "No — I completed the care tasks and left without the full post-care check", "correct": false}
+      ],
+      "correct_option": "Y",
+      "points": 5,
+      "feedback_pass": "✅ Excellent. Ensuring call-light access, comfort, and room safety at the end of care are Residents' Rights requirements and professionalism checkpoints on the CNA skills exam.",
+      "feedback_fail": "📌 The call light within reach, resident comfort check, and room tidiness at the end of every care episode are required on the Prometric CNA exam. These items appear on the examiner's checklist."
+    }
+  ],
+  "remediation_refs": {
+    "module_infection_control": {
+      "label": "Infection Prevention and Control — Standard & Transmission-Based Precautions",
+      "module": "Module 05",
+      "topic": "Hand Hygiene, PPE Donning/Doffing, CDC Isolation Guidelines",
+      "exam_domain": "Infection Control",
+      "prometric_skill": "Handwashing (always tested) + Donning & Removing PPE",
+      "hhsc_reference": "Texas HHSC NATCEP 2024, Section IV — Infection Control",
+      "tac_reference": "TAC Title 26, Chapter 95.9(a)(4)"
+    }
+  }
+}
