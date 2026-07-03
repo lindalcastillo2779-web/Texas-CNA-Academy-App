@@ -1,14 +1,26 @@
-"""Clinical Skills Lab – interactive CNA skill simulations aligned to Prometric/Pearson exam standards."""
+"""Clinical Skills Lab – Prometric/NATCEP-aligned interactive CNA skill simulations.
+
+Aligned to:
+  • Texas HHSC NATCEP Curriculum 2024 (TAC Title 26, Chapter 95)
+  • Prometric CNA Skills Evaluation Checklist (Texas pool, 22 skills)
+  • TULIP (Texas Unified Licensure Information Portal) reporting standards
+  • 2023 AHA/ACC Blood Pressure Guidelines incorporated in HHSC 2024 curriculum
+"""
 
 from __future__ import annotations
 
+import pandas as pd
 import streamlit as st
 
 from utils.lab_engine import (
     build_next_steps_text,
+    compute_pre_check_score,
     compute_scores,
     evaluate_comm_answer,
+    evaluate_pre_check_answer,
     evaluate_step_answer,
+    get_pre_check_questions,
+    has_pre_knowledge_check,
     init_lab_session,
     list_scenarios,
     load_curriculum_mapping,
@@ -20,23 +32,20 @@ from utils.lab_engine import (
 # Constants
 # ---------------------------------------------------------------------------
 MODE_COACH = "coach"
-MODE_EXAM = "exam"
+MODE_EXAM  = "exam"
 
-MODE_LABELS = {
-    MODE_COACH: "🏋️ Coach Mode",
-    MODE_EXAM: "🎓 Exam Mode",
-}
+_MODE_EMOJI   = {MODE_COACH: "🏋️", MODE_EXAM: "🎓"}
+_MODE_LABEL   = {MODE_COACH: "🏋️ Coach Mode", MODE_EXAM: "🎓 Exam Mode"}
+_MODE_COLOR   = {MODE_COACH: "#1a6b3c", MODE_EXAM: "#8b1a1a"}
 
-MODE_DESCRIPTIONS = {
-    MODE_COACH: (
-        "**Coach Mode** provides hints, immediate feedback after each step, and full rationale "
-        "for incorrect answers. Use this mode to learn the skill and understand *why* each step matters."
-    ),
-    MODE_EXAM: (
-        "**Exam Mode** mirrors the Prometric skills exam format: limited hints, no rationale during the "
-        "attempt, and strict scoring. Feedback and remediation are shown only in the final summary. "
-        "Use this mode when you feel ready to test yourself."
-    ),
+_DOMAIN_LABELS = {
+    "IC":  "🦠 Infection Control",
+    "SE":  "🛡️ Safety & Emergency",
+    "BNS": "🩺 Basic Nursing Skills",
+    "CD":  "📝 Communication & Documentation",
+    "PR":  "👔 Professional Role",
+    "RC":  "🔄 Restorative Care",
+    "RR":  "⚖️ Residents' Rights",
 }
 
 
@@ -44,117 +53,152 @@ MODE_DESCRIPTIONS = {
 # Main entry point
 # ---------------------------------------------------------------------------
 
+
 def show() -> None:
     st.title("🧪 Clinical Skills Lab")
-    st.caption("Prometric & NATCEP-aligned interactive skill simulations for CNA exam preparation")
+    st.caption(
+        "Interactive CNA skill simulations — aligned to **Prometric, Pearson VUE, "
+        "Texas HHSC NATCEP 2024**, and **TULIP** standards"
+    )
 
-    _render_intro()
+    _render_intro_expander()
+    st.divider()
 
-    # Session state namespace guard
-    if "lab_complete" not in st.session_state:
-        st.session_state["lab_complete"] = False
+    phase = st.session_state.get("lab_phase", "selection")
 
-    # If a simulation is active, route to the runner or results view
-    if st.session_state.get("lab_scenario_id") and not _is_at_start():
-        if st.session_state.get("lab_complete"):
-            _render_results()
-        else:
-            _render_simulation()
-        return
-
-    # Otherwise show the selection screen
-    _render_selection_screen()
+    if phase == "selection":
+        _render_selection_screen()
+    elif phase == "briefing":
+        _render_scene_briefing()
+    elif phase == "pre_check":
+        _render_pre_knowledge_check()
+    elif phase == "simulation":
+        _render_simulation()
+    elif phase == "complete":
+        _render_results()
+    else:
+        _render_selection_screen()
 
 
 # ---------------------------------------------------------------------------
-# Intro / overview
+# How-to expander
 # ---------------------------------------------------------------------------
 
-def _render_intro() -> None:
-    with st.expander("ℹ️ How to use the Clinical Skills Lab", expanded=False):
-        st.markdown(
-            """
+
+def _render_intro_expander() -> None:
+    with st.expander("ℹ️ How to use the Clinical Skills Lab — click to expand", expanded=False):
+        st.markdown("""
 ### What is the Clinical Skills Lab?
 
-The Clinical Skills Lab gives you **interactive, step-by-step simulations** of the hands-on skills
-evaluated on the **Prometric CNA skills examination** (required by Texas HHSC/NATCEP). Each
-scenario walks you through a skill using the same checklist format examiners use.
+Scenario-based, step-by-step skill simulations that match the **Prometric CNA skills exam format**
+used in Texas. Each scenario places you in a real Texas nursing-facility setting with a fictional
+resident and walks you through the exact checklist a Prometric examiner follows.
 
-### Practice modes
+### Two practice modes
 
-| Mode | Hints | Feedback timing | Best used for |
-|------|-------|-----------------|---------------|
-| 🏋️ **Coach Mode** | ✅ Full hints and rationale | Immediate after each step | First-time practice, understanding why each step matters |
-| 🎓 **Exam Mode** | ❌ Limited — mirrors real exam | Summary only after completion | Self-assessment, exam readiness check |
+| Mode | When to use | Hints | Feedback |
+|------|-------------|-------|----------|
+| 🏋️ **Coach Mode** | First-time practice, learning rationale | ✅ Theory facts + rationale | Immediate after every step |
+| 🎓 **Exam Mode** | Self-assessment, exam-readiness check | ❌ None — mirrors real exam | Summary only after completion |
 
-### Scoring breakdown
+**Workflow:** Coach Mode first → understand every step → switch to Exam Mode to test readiness.
 
-| Component | Weight | What it measures |
-|-----------|--------|-----------------|
-| ✅ Checklist score | 40 % | Correct technique steps (non-critical) |
-| 🚨 Critical-step score | 40 % | Critical safety/infection-control steps — **any miss = major exam deduction** |
-| 💬 Communication score | 20 % | Resident communication and professionalism checkpoints |
+### Scoring model (Prometric-aligned)
 
-**Pass threshold:** 75 % overall AND 100 % on all critical steps.
+| Component | Weight | Must achieve |
+|-----------|--------|-------------|
+| ✅ Checklist score | 40 % | ≥ 75 % |
+| 🚨 Critical-step score | 40 % | **100 %** — any miss = automatic Prometric failure |
+| 💬 Communication score | 20 % | ≥ 75 % |
+| 🎯 **Overall** | 100 % | **≥ 75 % AND all critical steps passed** |
 
-### Available scenarios
+### What each session contains
 
-- 🧼 **Hand Hygiene & PPE** – Hand-washing technique, donning/doffing sequence, post-care hygiene
-- 🦽 **Transfer: Bed ↔ Wheelchair** – Environment prep, gait belt, brakes/footrests, body mechanics
-- 🩺 **Vital Signs & Documentation** – Temp, pulse, respirations, BP, normal ranges, reporting
+1. **Scene briefing** — resident profile, clinical context, your role  
+2. **Pre-simulation knowledge check** — 3 theory questions (graded, Coach Mode)  
+3. **Skill simulation** — step-by-step decision points with Prometric-style choices  
+4. **Communication checkpoints** — resident interaction score  
+5. **Full results** — score breakdown, step review, curriculum map, remediation plan  
 
 ### Adding new scenarios
 
-Place a new JSON file under `knowledge/lab_scenarios/` following the existing scenario structure,
-then register it in `utils/lab_engine.py` in the `_SCENARIO_FILES` dictionary. Update
-`knowledge/lab_scenarios/curriculum_mapping.json` with the step mappings for the new scenario.
-            """
-        )
-    st.divider()
+Add a JSON file to `knowledge/lab_scenarios/`, register it in `utils/lab_engine.py`
+(`_SCENARIO_FILES`), and add step mappings to `curriculum_mapping.json`.
+        """)
 
 
 # ---------------------------------------------------------------------------
 # Scenario / mode selection
 # ---------------------------------------------------------------------------
 
+
 def _render_selection_screen() -> None:
-    col_left, col_right = st.columns([2, 1])
+    scenarios = list_scenarios()
+    if not scenarios:
+        st.error("No scenarios found. Check `knowledge/lab_scenarios/` for valid JSON files.")
+        return
+
+    col_left, col_right = st.columns([3, 2], gap="large")
 
     with col_left:
-        st.subheader("Select a scenario")
-        scenarios = list_scenarios()
-        if not scenarios:
-            st.error("No scenarios found. Check that `knowledge/lab_scenarios/` contains valid JSON files.")
-            return
-
-        scenario_options = {s["title"]: s["id"] for s in scenarios}
+        st.subheader("1️⃣  Choose a scenario")
+        scenario_map = {s["title"]: s["id"] for s in scenarios}
         selected_title = st.radio(
-            "Available scenarios",
-            options=list(scenario_options.keys()),
+            "scenario",
+            options=list(scenario_map.keys()),
             label_visibility="collapsed",
         )
-        selected_id = scenario_options[selected_title]
+        selected_id = scenario_map[selected_title]
+        sel = next((s for s in scenarios if s["id"] == selected_id), {})
 
-        # Show scenario details
-        selected = next((s for s in scenarios if s["id"] == selected_id), {})
-        if selected:
-            st.markdown(f"_{selected.get('description', '')}_")
-            domains = selected.get("natcep_domains", [])
+        # Scenario detail card
+        with st.container(border=True):
+            st.markdown(f"**{sel.get('title', '')}**")
+            st.markdown(f"_{sel.get('description', '')}_")
+            domains = sel.get("natcep_domains", [])
             if domains:
-                st.markdown("**NATCEP Domains:** " + " · ".join(domains))
-            mins = selected.get("estimated_minutes", 0)
+                st.markdown("**NATCEP domains:** " + " · ".join(f"`{d}`" for d in domains))
+            prom = sel.get("prometric_skill", "")
+            if prom:
+                st.markdown(f"**Prometric skill:** {prom}")
+            mins = sel.get("estimated_minutes", 0)
             if mins:
-                st.caption(f"⏱ Estimated time: {mins} minutes")
+                st.caption(f"⏱ Estimated: {mins} min including pre-check and debrief")
 
     with col_right:
-        st.subheader("Select mode")
-        mode_label = st.radio(
-            "Practice mode",
-            options=list(MODE_LABELS.values()),
+        st.subheader("2️⃣  Choose a mode")
+        mode_choice = st.radio(
+            "mode",
+            options=[_MODE_LABEL[MODE_COACH], _MODE_LABEL[MODE_EXAM]],
             label_visibility="collapsed",
         )
-        mode = MODE_COACH if MODE_LABELS[MODE_COACH] in mode_label else MODE_EXAM
-        st.markdown(MODE_DESCRIPTIONS[mode])
+        mode = MODE_COACH if MODE_COACH in mode_choice else MODE_EXAM
+
+        with st.container(border=True):
+            if mode == MODE_COACH:
+                st.markdown("### 🏋️ Coach Mode")
+                st.markdown("""
+- Full hints and theory facts after every step  
+- Immediate feedback with exam rationale  
+- Great for first-time practice  
+- Pre-check score shown as you go  
+                """)
+            else:
+                st.markdown("### 🎓 Exam Mode")
+                st.markdown("""
+- **No hints or rationale during the attempt**  
+- Mirrors actual Prometric exam conditions  
+- Full feedback appears in the final summary only  
+- Use after you've mastered Coach Mode  
+                """)
+
+        st.divider()
+        mapping = load_curriculum_mapping()
+        pool = mapping.get("prometric_skills_pool_2024", [])
+        if pool:
+            with st.expander("📋 Full Prometric TX Skills Pool (22 skills)", expanded=False):
+                for i, skill in enumerate(pool, 1):
+                    st.markdown(f"{i}. {skill}")
 
     st.divider()
     if st.button("▶️ Start Simulation", type="primary", use_container_width=True):
@@ -163,84 +207,319 @@ def _render_selection_screen() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Scene briefing
+# ---------------------------------------------------------------------------
+
+
+def _render_scene_briefing() -> None:
+    scenario = st.session_state.get("lab_scenario", {})
+    mode     = st.session_state.get("lab_mode", MODE_COACH)
+    briefing = scenario.get("scene_briefing", {})
+    alignment = scenario.get("texas_2024_alignment", {})
+
+    _render_phase_header("Scene Briefing", 1, 4, mode)
+
+    col_card, col_obj = st.columns([2, 1], gap="large")
+
+    with col_card:
+        st.markdown("### 🏥 Clinical Setting")
+        with st.container(border=True):
+            facility = briefing.get("facility", "")
+            if facility:
+                st.markdown(f"**Facility:** {facility}")
+
+            res_name = briefing.get("resident_name", "")
+            res_age  = briefing.get("resident_age", "")
+            room     = briefing.get("room", "")
+            if res_name:
+                st.markdown(f"**Resident:** {res_name}, Age {res_age} — {room}")
+
+            dx = briefing.get("primary_diagnosis", "")
+            if dx:
+                st.markdown(f"**Diagnosis:** {dx}")
+
+            iso = briefing.get("isolation_status", "")
+            fall = briefing.get("fall_risk", "")
+            if iso:
+                st.error(f"⚠️ Isolation: {iso}")
+            if fall:
+                st.warning(f"⚠️ Fall Risk: {fall}")
+
+            care_notes = briefing.get("care_plan_notes", "")
+            if care_notes:
+                st.markdown("**Care Plan Notes:**")
+                st.info(care_notes)
+
+        st.markdown("### 🎭 Your Role")
+        role = briefing.get("your_role", "")
+        if role:
+            st.markdown(role)
+
+        st.markdown("### 🖼️ Scene Description")
+        scene = briefing.get("scene_description", "")
+        if scene:
+            st.markdown(f"> {scene}")
+
+    with col_obj:
+        st.markdown("### 🎯 Learning Objectives")
+        objs = briefing.get("learning_objectives", [])
+        for obj in objs:
+            st.markdown(f"- {obj}")
+
+        st.divider()
+        st.markdown("### 📋 Standards Alignment")
+        with st.container(border=True):
+            tac = alignment.get("tac_reference", "")
+            sec = alignment.get("natcep_curriculum_section", "")
+            prom = alignment.get("prometric_skill_title", "")
+            tulip = alignment.get("tulip_relevance", "")
+            if tac:
+                st.caption(f"📜 {tac}")
+            if sec:
+                st.caption(f"📚 {sec}")
+            if prom:
+                st.markdown(f"**Prometric Skill:** _{prom}_")
+            if alignment.get("prometric_skill_always_tested"):
+                st.success("🔴 **Always tested** on every Prometric exam")
+            if tulip:
+                with st.expander("🔑 TULIP relevance"):
+                    st.markdown(tulip)
+
+    st.divider()
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("⛔ Cancel — choose another scenario"):
+            reset_lab_session(st.session_state)
+            st.rerun()
+    with col2:
+        pre_check_label = (
+            "▶️ Continue to Pre-Simulation Knowledge Check"
+            if has_pre_knowledge_check(scenario)
+            else "▶️ Begin Simulation"
+        )
+        if st.button(pre_check_label, type="primary", use_container_width=True):
+            if has_pre_knowledge_check(scenario):
+                st.session_state["lab_phase"] = "pre_check"
+            else:
+                st.session_state["lab_phase"] = "simulation"
+            st.rerun()
+
+
+# ---------------------------------------------------------------------------
+# Pre-simulation knowledge check (Labster-style theory quiz)
+# ---------------------------------------------------------------------------
+
+
+def _render_pre_knowledge_check() -> None:
+    scenario  = st.session_state.get("lab_scenario", {})
+    mode      = st.session_state.get("lab_mode", MODE_COACH)
+    questions = get_pre_check_questions(scenario)
+
+    if not questions:
+        st.session_state["lab_phase"] = "simulation"
+        st.rerun()
+        return
+
+    q_index = st.session_state.get("lab_pre_check_index", 0)
+
+    _render_phase_header("Pre-Simulation Knowledge Check", 2, 4, mode)
+
+    st.markdown(
+        "Answer these questions to confirm your foundational knowledge before the skill simulation. "
+        "In **Coach Mode** you see immediate explanations. In **Exam Mode** results appear in the final summary."
+    )
+
+    if q_index >= len(questions):
+        # All questions answered — show summary and continue
+        answers  = st.session_state.get("lab_pre_check_answers", {})
+        result   = compute_pre_check_score(questions, answers)
+        pct      = result["pct"]
+        correct  = result["correct"]
+        total    = result["total"]
+
+        st.divider()
+        st.markdown(f"### Pre-Check Complete: {correct}/{total} ({pct}%)")
+        if pct >= 67:
+            st.success("✅ Strong foundation — you're ready to begin the skill simulation.")
+        else:
+            st.warning(
+                "⚠️ Some gaps in foundational knowledge. In Coach Mode, the theory facts "
+                "during each step will help reinforce these concepts."
+            )
+
+        st.divider()
+        if st.button("▶️ Begin Skill Simulation", type="primary", use_container_width=True):
+            st.session_state["lab_pre_check_score"] = result
+            st.session_state["lab_phase"] = "simulation"
+            st.rerun()
+        return
+
+    question    = questions[q_index]
+    q_id        = question.get("id")
+    options_raw = question.get("options", [])
+    option_labels = [f"{o['id']}) {o['text']}" for o in options_raw]
+
+    _render_progress_bar(q_index, len(questions), label="Knowledge Check")
+
+    with st.container(border=True):
+        st.markdown(f"**Question {q_index + 1} of {len(questions)}**")
+        st.markdown(f"#### {question.get('question', '')}")
+
+        # Show Texas standard reference in Coach mode
+        if mode == MODE_COACH and question.get("texas_standard"):
+            st.caption(f"📜 Standard: {question['texas_standard']}")
+
+        chosen_label = st.radio(
+            "Select your answer:",
+            options=option_labels,
+            key=f"pre_check_{q_id}",
+            label_visibility="collapsed",
+        )
+        chosen_id = chosen_label.split(")")[0].strip()
+
+    if st.button("✔️ Submit Answer", key=f"submit_pc_{q_id}", type="primary"):
+        result = evaluate_pre_check_answer(question, chosen_id)
+        st.session_state["lab_pre_check_answers"][q_id] = chosen_id
+
+        if result["correct"]:
+            st.success(f"✅ **Correct!**")
+        else:
+            if mode == MODE_COACH:
+                st.error(f"❌ **Incorrect.** The correct answer was: _{result['correct_text']}_")
+            else:
+                st.error("❌ Incorrect. Review in your final summary.")
+
+        if mode == MODE_COACH and result.get("explanation"):
+            with st.expander("📖 Explanation (Texas HHSC 2024 Standard)"):
+                st.markdown(result["explanation"])
+
+        st.session_state["lab_pre_check_index"] = q_index + 1
+        if st.button("Next Question →", key=f"next_pc_{q_id}"):
+            st.rerun()
+        else:
+            st.rerun()
+
+
+# ---------------------------------------------------------------------------
 # Simulation runner
 # ---------------------------------------------------------------------------
 
+
 def _render_simulation() -> None:
-    scenario = st.session_state.get("lab_scenario", {})
-    mode = st.session_state.get("lab_mode", MODE_COACH)
+    scenario   = st.session_state.get("lab_scenario", {})
+    mode       = st.session_state.get("lab_mode", MODE_COACH)
     step_index = st.session_state.get("lab_step_index", 0)
-    steps = scenario.get("steps", [])
-    comms = scenario.get("communication_checkpoints", [])
-    total_steps = len(steps)
-    total_comms = len(comms)
+    steps      = scenario.get("steps", [])
+    comms      = scenario.get("communication_checkpoints", [])
+    total      = len(steps) + len(comms)
 
-    # --- Header ---
-    st.subheader(f"{scenario.get('title', 'Scenario')}")
-    st.caption(f"{MODE_LABELS[mode]}  |  Step {min(step_index + 1, total_steps + total_comms)} of {total_steps + total_comms}")
-    _render_progress_bar(step_index, total_steps + total_comms)
+    _render_phase_header("Skill Simulation", 3, 4, mode)
+    _render_progress_bar(step_index, total, label="Simulation")
 
+    # Resident sidebar card
+    briefing = scenario.get("scene_briefing", {})
+    if briefing:
+        with st.sidebar:
+            st.divider()
+            st.markdown("**👤 Resident Profile**")
+            st.caption(briefing.get("resident_name", ""))
+            st.caption(f"Age {briefing.get('resident_age', '')}")
+            dx = briefing.get("primary_diagnosis", "")
+            if dx:
+                st.caption(dx[:80] + ("…" if len(dx) > 80 else ""))
+            iso = briefing.get("isolation_status", "")
+            fall = briefing.get("fall_risk", "")
+            if iso:
+                st.sidebar.error(f"⚠️ {iso[:50]}")
+            if fall:
+                st.sidebar.warning(f"⚠️ Fall: {fall[:40]}")
+            st.divider()
+
+    col_main, col_info = st.columns([3, 1], gap="large")
+
+    with col_main:
+        if step_index < len(steps):
+            _render_step(steps[step_index], step_index, mode)
+        elif (step_index - len(steps)) < len(comms):
+            _render_comm_checkpoint(comms[step_index - len(steps)], step_index - len(steps), mode)
+        else:
+            _finalise(scenario, mode)
+
+    with col_info:
+        _render_step_legend(steps, comms, step_index)
+
+    # Abandon button (bottom)
+    st.divider()
     if st.button("⛔ Abandon simulation", key="abandon_sim"):
         reset_lab_session(st.session_state)
         st.rerun()
 
-    st.divider()
 
-    # Phase A: skill steps
-    if step_index < total_steps:
-        _render_step(steps[step_index], step_index, mode)
-        return
+def _render_step_legend(steps, comms, current_index):
+    st.markdown("**📍 Progress**")
+    for i, s in enumerate(steps):
+        crit = "🚨" if s.get("critical") else "📋"
+        if i < current_index:
+            answered = st.session_state.get("lab_step_answers", {}).get(s["id"])
+            correct_opt = s.get("decision_points", [{}])[0].get("correct_option") if s.get("decision_points") else None
+            icon = "✅" if answered == correct_opt else "❌"
+        elif i == current_index:
+            icon = "▶️"
+        else:
+            icon = "⬜"
+        st.caption(f"{icon} {crit} {s.get('title', '')[:35]}")
 
-    # Phase B: communication checkpoints
-    comm_index = step_index - total_steps
-    if comm_index < total_comms:
-        _render_comm_checkpoint(comms[comm_index], comm_index, mode)
-        return
-
-    # All done — compute scores and mark complete
-    _finalise(scenario, mode)
-
-
-def _render_progress_bar(current: int, total: int) -> None:
-    if total > 0:
-        pct = min(current / total, 1.0)
-        st.progress(pct, text=f"Progress: {current}/{total} completed")
+    if comms:
+        st.caption("**💬 Communication**")
+        for j, c in enumerate(comms):
+            ci = len(steps) + j
+            if ci < current_index:
+                icon = "✅"
+            elif ci == current_index:
+                icon = "▶️"
+            else:
+                icon = "⬜"
+            st.caption(f"{icon} {c.get('prompt', '')[:35]}…")
 
 
 def _render_step(step: dict, step_index: int, mode: str) -> None:
-    step_id = step.get("id")
-    is_critical = step.get("critical", False)
-    dps = step.get("decision_points", [])
+    step_id  = step.get("id")
+    is_crit  = step.get("critical", False)
+    dps      = step.get("decision_points", [])
     if not dps:
-        _advance_step()
+        st.session_state["lab_step_index"] += 1
+        st.rerun()
         return
 
-    dp = dps[0]  # one primary decision point per step
+    dp = dps[0]
 
     # Critical badge
-    if is_critical:
-        st.markdown("🚨 **Critical Step** – this step is auto-failed on the Prometric exam if missed")
+    if is_crit:
+        st.error("🚨 **CRITICAL STEP** — Prometric automatic failure if missed or incorrect")
     else:
-        st.markdown("📋 **Skill Step**")
+        st.info("�� **Skill Step**")
 
     st.markdown(f"### Step {step_index + 1}: {step.get('title', '')}")
     st.markdown(step.get("instruction", ""))
 
-    # Coach mode hint
-    if mode == MODE_COACH:
-        st.info("💡 **Coach hint:** Read each option carefully and select the one that matches CNA exam standards.")
+    # Coach Mode: theory knowledge fact
+    if mode == MODE_COACH and step.get("knowledge_fact"):
+        with st.expander("💡 Theory & Context (tap to read)", expanded=True):
+            st.markdown(step["knowledge_fact"])
 
-    options = dp.get("options", [])
-    option_map = {o["id"]: o["text"] for o in options}
-    option_ids = [o["id"] for o in options]
+    # Exam tip (always shown — prepares students for examiner behavior)
+    if step.get("exam_tip"):
+        with st.expander("🎯 Prometric Exam Tip", expanded=(mode == MODE_COACH)):
+            st.markdown(step["exam_tip"])
+
+    st.divider()
+    options      = dp.get("options", [])
     option_labels = [f"{o['id']}) {o['text']}" for o in options]
 
-    chosen_key = f"lab_choice_{step_id}"
     chosen_label = st.radio(
         dp.get("question", "Select the best answer:"),
         options=option_labels,
-        key=chosen_key,
-        label_visibility="visible",
+        key=f"lab_choice_{step_id}",
     )
     chosen_id = chosen_label.split(")")[0].strip()
 
@@ -252,32 +531,28 @@ def _render_step(step: dict, step_index: int, mode: str) -> None:
             st.success(result["feedback"])
         else:
             st.error(result["feedback"])
-            if mode == MODE_COACH and result.get("rationale"):
-                st.markdown(f"> **Exam rationale:** {result['rationale']}")
+            if mode == MODE_COACH:
+                if result.get("rationale"):
+                    st.markdown(f"**📖 Exam Rationale:** {result['rationale']}")
+                if result.get("consequence"):
+                    st.warning(f"**⚠️ Clinical Consequence:** {result['consequence']}")
 
-        # Advance after showing feedback
         st.session_state["lab_step_index"] += 1
-        if mode == MODE_COACH:
-            st.info("Click **Next Step** to continue.")
-            if st.button("Next Step →", key=f"next_{step_id}"):
-                st.rerun()
-        else:
-            st.rerun()
+        st.button("Next Step →", key=f"next_{step_id}", on_click=lambda: None)
+        st.rerun()
 
 
 def _render_comm_checkpoint(comm: dict, comm_index: int, mode: str) -> None:
     comm_id = comm.get("id")
-    total_steps = st.session_state.get("lab_total_steps", 0)
-    step_display = total_steps + comm_index + 1
 
-    st.markdown("💬 **Communication & Professionalism Checkpoint**")
-    st.markdown(f"### Checkpoint {comm_index + 1}: {comm.get('prompt', '')}")
+    st.info("💬 **Communication & Professionalism Checkpoint**")
+    st.markdown(f"### {comm.get('prompt', '')}")
 
     options = comm.get("options", [])
     option_labels = [f"{o['id']}) {o['text']}" for o in options]
 
     chosen_label = st.radio(
-        "Select your answer:",
+        "Your answer:",
         options=option_labels,
         key=f"lab_comm_{comm_id}",
         label_visibility="collapsed",
@@ -297,199 +572,310 @@ def _render_comm_checkpoint(comm: dict, comm_index: int, mode: str) -> None:
         st.rerun()
 
 
-def _advance_step() -> None:
-    st.session_state["lab_step_index"] = st.session_state.get("lab_step_index", 0) + 1
-    st.rerun()
-
-
 def _finalise(scenario: dict, mode: str) -> None:
     mapping = load_curriculum_mapping()
-    scores = compute_scores(
+    scores  = compute_scores(
         scenario,
         st.session_state.get("lab_step_answers", {}),
         st.session_state.get("lab_comm_answers", {}),
         mapping,
     )
-    st.session_state["lab_scores"] = scores
+    st.session_state["lab_scores"]  = scores
     st.session_state["lab_complete"] = True
+    st.session_state["lab_phase"]   = "complete"
     st.rerun()
 
 
 # ---------------------------------------------------------------------------
-# Results view
+# Results — tabbed, Labster-style debrief
 # ---------------------------------------------------------------------------
+
 
 def _render_results() -> None:
     scenario = st.session_state.get("lab_scenario", {})
-    mode = st.session_state.get("lab_mode", MODE_COACH)
-    scores = st.session_state.get("lab_scores", {})
+    mode     = st.session_state.get("lab_mode", MODE_COACH)
+    scores   = st.session_state.get("lab_scores", {})
+    mapping  = load_curriculum_mapping()
 
-    st.subheader(f"📊 Results: {scenario.get('title', 'Scenario')}")
-    st.caption(f"{MODE_LABELS[mode]}")
+    _render_phase_header("Results & Debrief", 4, 4, mode)
 
-    # Pass/fail banner
+    # ---- Pass/fail banner ----
     if scores.get("pass_ready"):
-        st.success("🎉 **Exam Ready** – You met the passing threshold for this skill!")
-    else:
-        if not scores.get("all_criticals_passed"):
-            st.error(
-                "🚨 **Critical Step Failure** – One or more critical steps were missed. "
-                "This would result in automatic skill failure on the Prometric exam."
-            )
-        else:
-            st.warning(
-                f"📋 Overall score below passing threshold ({scores.get('pass_threshold', 75)}%). "
-                "Review the remediation guidance below and retry."
-            )
-
-    st.divider()
-
-    # Score breakdown
-    st.markdown("### Score Breakdown")
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric(
-        "✅ Checklist Score",
-        f"{scores.get('checklist_score', 0)}%",
-        help="Correct non-critical technique steps. Weight: 40%",
-    )
-    c2.metric(
-        "🚨 Critical Steps",
-        f"{scores.get('critical_step_score', 0)}%",
-        help="Critical steps completed correctly. Weight: 40%. Must be 100% to pass.",
-    )
-    c3.metric(
-        "💬 Communication",
-        f"{scores.get('communication_score', 0)}%",
-        help="Communication and professionalism checkpoints. Weight: 20%",
-    )
-    c4.metric(
-        "🎯 Overall Score",
-        f"{scores.get('overall_score', 0)}%",
-        help=f"Weighted composite. Pass threshold: {scores.get('pass_threshold', 75)}%",
-    )
-
-    st.divider()
-
-    # Step-by-step breakdown
-    st.markdown("### Step Review")
-    for sr in scores.get("step_results", []):
-        icon = "✅" if sr["correct"] else ("🚨" if sr["critical"] else "❌")
-        label = f"{icon} **{sr['title']}**"
-        if sr["critical"]:
-            label += " *(critical)*"
-        domain = sr.get("domain", "")
-        if domain:
-            label += f" — domain: `{domain}`"
-        st.markdown(label)
-
-        # In Exam mode show full rationale only in results summary
-        if not sr["correct"] and mode == MODE_EXAM:
-            scenario_steps = scenario.get("steps", [])
-            step_obj = next((s for s in scenario_steps if s.get("id") == sr["step_id"]), None)
-            if step_obj:
-                dps = step_obj.get("decision_points", [])
-                if dps:
-                    dp = dps[0]
-                    chosen_opt = next(
-                        (o for o in dp.get("options", []) if o["id"] == sr.get("chosen")), None
-                    )
-                    if chosen_opt:
-                        original_feedback = chosen_opt.get("feedback", "")
-                        original_rationale = chosen_opt.get("rationale")
-                        if original_feedback:
-                            st.markdown(f"  > {original_feedback}")
-                        if original_rationale:
-                            st.markdown(f"  > **Exam rationale:** {original_rationale}")
-
-    st.divider()
-
-    # Communication checkpoints summary
-    comm_results = scores.get("comm_points_earned", 0)
-    comm_total = scores.get("comm_points_total", 0)
-    if comm_total > 0:
-        st.markdown(
-            f"### Communication & Professionalism: {comm_results}/{comm_total} points "
-            f"({scores.get('communication_score', 0)}%)"
+        st.success(
+            f"🎉 **Exam Ready!** You passed this skill simulation — "
+            f"overall score {scores.get('overall_score')}% with all critical steps correct."
         )
-        comms = scenario.get("communication_checkpoints", [])
-        for comm in comms:
-            comm_id = comm.get("id")
-            chosen = st.session_state.get("lab_comm_answers", {}).get(comm_id)
-            correct_opt = comm.get("correct_option")
-            is_correct = chosen == correct_opt
-            icon = "✅" if is_correct else "❌"
-            st.markdown(f"{icon} {comm.get('prompt', comm_id)}")
+        st.balloons()
+    elif not scores.get("all_criticals_passed"):
+        st.error(
+            "🚨 **Critical Step Failure** — One or more critical steps were missed. "
+            "On the Prometric exam this would be an **automatic skill failure**. "
+            "Study Coach Mode rationale and retry."
+        )
+    else:
+        st.warning(
+            f"📋 Score {scores.get('overall_score')}% — below the 75% passing threshold. "
+            "Review the step debrief and remediation below, then retry."
+        )
 
+    # ---- Score cards ----
+    c1, c2, c3, c4 = st.columns(4)
+    _score_card(c1, "✅ Checklist",   scores.get("checklist_score", 0),    "Non-critical technique steps · 40% weight")
+    _score_card(c2, "🚨 Critical",    scores.get("critical_step_score", 0), "Must be 100% — any miss = Prometric failure · 40% weight")
+    _score_card(c3, "💬 Communication", scores.get("communication_score", 0), "Resident interaction checkpoints · 20% weight")
+    _score_card(c4, "🎯 Overall",     scores.get("overall_score", 0),      f"Pass threshold: {scores.get('pass_threshold', 75)}%")
+
+    st.divider()
+
+    # ---- Pre-check summary ----
+    pre_score = st.session_state.get("lab_pre_check_score")
+    if pre_score:
+        pct = pre_score.get("pct", 0)
+        c = pre_score.get("correct", 0)
+        t = pre_score.get("total", 0)
+        st.markdown(
+            f"**🧠 Pre-Simulation Knowledge Check:** {c}/{t} ({pct}%) — "
+            + ("✅ Strong foundation" if pct >= 67 else "⚠️ Review foundational theory")
+        )
         st.divider()
 
-    # Curriculum mapping for standards alignment
-    mapping = load_curriculum_mapping()
-    scenario_id = scenario.get("id", "")
-    prometric_title = (
-        mapping.get("scenario_mappings", {})
-        .get(scenario_id, {})
-        .get("prometric_skill_title", "")
-    )
-    if prometric_title:
-        st.markdown(f"📋 **Prometric skill evaluated:** _{prometric_title}_")
+    # ---- Tabs ----
+    tab_step, tab_comm, tab_curric, tab_remed = st.tabs([
+        "📋 Step Review", "�� Communication", "🗺️ Curriculum Map", "📌 Remediation Plan"
+    ])
 
+    with tab_step:
+        _render_step_review(scenario, scores, mode)
+
+    with tab_comm:
+        _render_comm_review(scenario, scores)
+
+    with tab_curric:
+        _render_curriculum_map(scenario, scores, mapping)
+
+    with tab_remed:
+        _render_remediation(scores, mode)
+
+    # ---- Retry / restart ----
     st.divider()
-
-    # Next steps and remediation
-    st.markdown("### 📌 Recommendations & Remediation")
-    next_steps = build_next_steps_text(scores, mode)
-    for rec in next_steps:
-        st.markdown(f"- {rec}")
-
-    # Targeted remediation table
-    remediation = scores.get("remediation_targets", [])
-    if remediation:
-        st.markdown("#### Targeted Review")
-        rem_rows = []
-        for r in remediation:
-            rem_rows.append({
-                "Step": r.get("step_title", ""),
-                "Module": r.get("module", ""),
-                "Topic": r.get("topic", ""),
-                "Exam Domain": r.get("exam_domain", ""),
-                "Prometric Skill": r.get("prometric_skill", ""),
-            })
-        # Use st.dataframe for clean tabular display
-        import pandas as pd  # noqa: PLC0415 – deferred import to keep top-level lightweight
-
-        st.dataframe(
-            pd.DataFrame(rem_rows),
-            use_container_width=True,
-            hide_index=True,
-        )
-
-    st.divider()
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🔄 Retry this scenario", type="primary"):
-            scenario_id_saved = st.session_state.get("lab_scenario_id")
-            mode_saved = st.session_state.get("lab_mode", MODE_COACH)
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        if st.button("🔄 Retry (same scenario + mode)", type="primary"):
+            sid  = st.session_state.get("lab_scenario_id")
+            m    = st.session_state.get("lab_mode", MODE_COACH)
             reset_lab_session(st.session_state)
-            init_lab_session(st.session_state, scenario_id_saved, mode_saved)
+            init_lab_session(st.session_state, sid, m)
             st.rerun()
-    with col2:
+    with c2:
+        opp_mode = MODE_EXAM if mode == MODE_COACH else MODE_COACH
+        if st.button(f"🔀 Switch to {_MODE_LABEL[opp_mode]}"):
+            sid = st.session_state.get("lab_scenario_id")
+            reset_lab_session(st.session_state)
+            init_lab_session(st.session_state, sid, opp_mode)
+            st.rerun()
+    with c3:
         if st.button("📋 Choose another scenario"):
             reset_lab_session(st.session_state)
             st.rerun()
 
 
 # ---------------------------------------------------------------------------
-# Utility
+# Results sub-sections
 # ---------------------------------------------------------------------------
 
-def _is_at_start() -> bool:
-    """Return True if the lab state indicates no simulation is in progress."""
-    return (
-        st.session_state.get("lab_scenario_id") is None
-        or (
-            st.session_state.get("lab_step_index", 0) == 0
-            and not st.session_state.get("lab_step_answers")
-            and not st.session_state.get("lab_complete")
-        )
+
+def _render_step_review(scenario: dict, scores: dict, mode: str) -> None:
+    st.markdown("### Step-by-Step Performance")
+    steps_data = scores.get("step_results", [])
+    all_steps  = scenario.get("steps", [])
+
+    for sr in steps_data:
+        is_correct = sr["correct"]
+        is_crit    = sr["critical"]
+        icon = "✅" if is_correct else ("🚨" if is_crit else "❌")
+        domain_label = _DOMAIN_LABELS.get(sr.get("domain", ""), sr.get("domain", ""))
+
+        with st.expander(
+            f"{icon} **{sr['title']}** {'*(critical)*' if is_crit else ''} — {domain_label}",
+            expanded=(not is_correct),
+        ):
+            col_a, col_b = st.columns(2)
+            col_a.markdown(f"**Your answer:** option `{sr.get('chosen', 'N/A')}`")
+            col_b.markdown(f"**Correct answer:** option `{sr.get('correct_option', 'N/A')}`")
+
+            if sr.get("curriculum_module") or sr.get("curriculum_topic"):
+                st.caption(
+                    f"📚 {sr.get('curriculum_module', '')} — {sr.get('curriculum_topic', '')}"
+                )
+            if sr.get("exam_notes"):
+                st.info(f"🎯 **Prometric Note:** {sr['exam_notes']}")
+
+            # In Exam Mode, show full rationale now
+            if not is_correct:
+                step_obj = next((s for s in all_steps if s.get("id") == sr["step_id"]), None)
+                if step_obj:
+                    dps = step_obj.get("decision_points", [])
+                    if dps:
+                        dp = dps[0]
+                        chosen_opt = next(
+                            (o for o in dp.get("options", []) if o["id"] == sr.get("chosen")), None
+                        )
+                        if chosen_opt:
+                            if chosen_opt.get("feedback"):
+                                st.error(chosen_opt["feedback"])
+                            if chosen_opt.get("rationale"):
+                                st.markdown(f"**📖 Exam Rationale:** {chosen_opt['rationale']}")
+                            if chosen_opt.get("consequence"):
+                                st.warning(f"**⚠️ Clinical Consequence:** {chosen_opt['consequence']}")
+
+
+def _render_comm_review(scenario: dict, scores: dict) -> None:
+    st.markdown("### Communication & Professionalism Checkpoints")
+    comms = scenario.get("communication_checkpoints", [])
+    comm_answers = st.session_state.get("lab_comm_answers", {})
+    pts_earned = scores.get("comm_points_earned", 0)
+    pts_total  = scores.get("comm_points_total", 0)
+    comm_pct   = scores.get("communication_score", 0)
+
+    st.markdown(f"**Score: {pts_earned}/{pts_total} points ({comm_pct}%)**")
+
+    for comm in comms:
+        comm_id = comm.get("id")
+        chosen  = comm_answers.get(comm_id)
+        correct = comm.get("correct_option")
+        ok      = chosen == correct
+        icon    = "✅" if ok else "❌"
+        pts     = comm.get("points", 5)
+
+        with st.expander(f"{icon} {comm.get('prompt', comm_id)} (+{pts if ok else 0}/{pts} pts)"):
+            if ok:
+                st.success(comm.get("feedback_pass", "Checkpoint met."))
+            else:
+                st.warning(comm.get("feedback_fail", "Checkpoint missed."))
+            st.caption(
+                "Residents' Rights (Texas HHSC NATCEP 2024, Section X) requires CNAs to "
+                "maintain resident dignity, explain procedures, and ensure comfort at every care episode."
+            )
+
+
+def _render_curriculum_map(scenario: dict, scores: dict, mapping: dict) -> None:
+    st.markdown("### Texas HHSC 2024 Curriculum & Prometric Standards Map")
+
+    scenario_id  = scenario.get("id", "")
+    sc_map       = mapping.get("scenario_mappings", {}).get(scenario_id, {})
+    prom_title   = sc_map.get("prometric_skill_title", "")
+    always_tested = sc_map.get("always_tested", False)
+    tx_section   = sc_map.get("texas_2024_section", "")
+    tac_ref      = mapping.get("standards_reference", {}).get("tac_citation", "")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if prom_title:
+            st.markdown(f"**Prometric Skill:** {prom_title}")
+        if always_tested:
+            st.error("🔴 This skill is **always tested** on every Prometric exam")
+        if tx_section:
+            st.markdown(f"**NATCEP 2024 Section:** {tx_section}")
+        if tac_ref:
+            st.caption(f"📜 {tac_ref}")
+    with col2:
+        ref = mapping.get("standards_reference", {})
+        st.caption(f"📋 Exam: {', '.join(ref.get('exam_boards', []))}")
+        st.caption(f"⏱ Clinical training: {ref.get('clinical_training_hours', {}).get('minimum_total', '')} hours minimum")
+        st.caption(f"📝 Written exam: {ref.get('written_exam', {}).get('questions', '')} questions, "
+                   f"{ref.get('written_exam', {}).get('time_minutes', '')} min, "
+                   f"pass ≥{ref.get('written_exam', {}).get('passing_pct', '')}%")
+
+    st.divider()
+    st.markdown("**Step-Level Domain Map**")
+    step_map = sc_map.get("steps", {})
+    rows = []
+    for sr in scores.get("step_results", []):
+        sm = step_map.get(sr["step_id"], {})
+        rows.append({
+            "Step": sr["title"],
+            "Domain": _DOMAIN_LABELS.get(sm.get("domain", ""), sm.get("domain", "")),
+            "Criticality": sm.get("criticality", ""),
+            "Module": sm.get("curriculum_module", ""),
+            "Passed": "✅" if sr["correct"] else "❌",
+        })
+    if rows:
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    # Normal vital range reference card
+    vr = mapping.get("normal_vital_ranges_2024")
+    if vr:
+        st.divider()
+        with st.expander("📊 2024 Normal Vital Sign Ranges (Texas HHSC / AHA)", expanded=False):
+            st.markdown(f"""
+| Vital Sign | Normal Range | Abnormal Threshold |
+|---|---|---|
+| 🌡️ Temperature (oral) | {vr['temperature_oral_f']['min']}–{vr['temperature_oral_f']['max']} °F | Fever ≥{vr['temperature_oral_f']['fever']} °F |
+| 💓 Pulse | {vr['pulse_bpm']['min']}–{vr['pulse_bpm']['max']} bpm | Brady <{vr['pulse_bpm']['bradycardia_below']} / Tachy >{vr['pulse_bpm']['tachycardia_above']} |
+| 🫁 Respirations | {vr['respirations_per_min']['min']}–{vr['respirations_per_min']['max']} breaths/min | <{vr['respirations_per_min']['bradypnea_below']} or >{vr['respirations_per_min']['tachypnea_above']} |
+| ❤️ BP Normal | <{vr['bp_normal_systolic']['max']}/{vr['bp_normal_diastolic']['max']} mmHg | Stage 1 HTN: {vr['bp_stage1_htn']['systolic']}/{vr['bp_stage1_htn']['diastolic']} |
+| 🩸 BP Stage 2 HTN | ≥{vr['bp_stage2_htn']['systolic']}/{vr['bp_stage2_htn']['diastolic']} mmHg | Requires immediate reporting |
+| 💨 O₂ Saturation | ≥{vr['oxygen_saturation_pct']['normal_min']}% | Report <{vr['oxygen_saturation_pct']['normal_min']}% to nurse |
+            """)
+            st.caption(f"Source: {vr.get('source', '')}")
+
+
+def _render_remediation(scores: dict, mode: str) -> None:
+    st.markdown("### 📌 Personalised Remediation Plan")
+    next_steps = build_next_steps_text(scores, mode)
+    for rec in next_steps:
+        st.markdown(f"- {rec}")
+
+    remediation = scores.get("remediation_targets", [])
+    if remediation:
+        st.divider()
+        st.markdown("#### Targeted Study Topics")
+        rows = []
+        for r in remediation:
+            rows.append({
+                "Missed Step": r.get("step_title", ""),
+                "Module": r.get("module", ""),
+                "Topic": r.get("topic", ""),
+                "Exam Domain": r.get("exam_domain", ""),
+                "Prometric Skill": r.get("prometric_skill", ""),
+                "Critical": "🚨" if r.get("critical") else "📋",
+            })
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    # Prometric skills pool reminder
+    mapping = load_curriculum_mapping()
+    pool    = mapping.get("prometric_skills_pool_2024", [])
+    if pool:
+        st.divider()
+        with st.expander("📋 Full Prometric Texas Skills Pool — 22 skills", expanded=False):
+            cols = st.columns(2)
+            half = len(pool) // 2
+            for i, skill in enumerate(pool):
+                cols[0 if i < half else 1].markdown(f"- {skill}")
+
+
+# ---------------------------------------------------------------------------
+# Shared UI helpers
+# ---------------------------------------------------------------------------
+
+
+def _render_phase_header(phase_name: str, phase_num: int, total_phases: int, mode: str) -> None:
+    mode_label = _MODE_LABEL.get(mode, mode)
+    st.markdown(
+        f"**Phase {phase_num}/{total_phases}:** {phase_name} &nbsp;|&nbsp; "
+        f"<span style='color:gray'>{mode_label}</span>",
+        unsafe_allow_html=True,
     )
+
+
+def _render_progress_bar(current: int, total: int, label: str = "") -> None:
+    if total > 0:
+        pct = min(current / total, 1.0)
+        st.progress(pct, text=f"{label}: {current}/{total}")
+
+
+def _score_card(col, label: str, value: int, help_text: str) -> None:
+    delta_color = "normal"
+    if value >= 75:
+        delta_color = "normal"
+    col.metric(label, f"{value}%", help=help_text)

@@ -1,272 +1,105 @@
 {
-  "_comment": "Curriculum mapping for Clinical Skills Lab scenarios. Maps each scenario step to NATCEP domain, criticality, and curriculum module/topic. Used for result summaries and remediation targeting.",
-  "version": "1.0",
+  "_comment": "Curriculum mapping for Clinical Skills Lab. Maps scenario steps to NATCEP domain, criticality, and Texas HHSC 2024 curriculum module. Used in result summaries and remediation targeting.",
+  "version": "2.0",
+  "last_updated": "2024",
   "standards_reference": {
-    "exam_boards": ["Prometric", "Pearson VUE"],
-    "curriculum_framework": "Texas NATCEP (HHSC)",
+    "exam_boards": ["Prometric (primary Texas CNA skills evaluator)", "Pearson VUE"],
+    "curriculum_framework": "Texas NATCEP — Nurse Aide Training and Competency Evaluation Program",
     "regulatory_body": "Texas Health and Human Services Commission (HHSC)",
-    "competency_model": "NATCEP Nurse Aide Training and Competency Evaluation Program"
+    "tac_citation": "Texas Administrative Code (TAC) Title 26, Part 1, Chapter 95 — NATCEP Standards (2024)",
+    "federal_citation": "42 CFR Part 483, Subpart D — Requirements for Nurse Aide Training",
+    "tulip": "Texas Unified Licensure Information Portal — CNA registry and mandatory reporting system",
+    "texas_hsc_reference": "Texas Health and Safety Code Chapter 242 — Nursing Facility Standards",
+    "prometric_skills_pool_size": 22,
+    "prometric_total_skills_tested": 5,
+    "prometric_always_tested": "Handwashing",
+    "written_exam": {"questions": 70, "time_minutes": 90, "passing_pct": 70},
+    "clinical_training_hours": {"minimum_total": 100, "classroom_lab": 75, "clinical_facility": 25}
   },
-  "natcep_domains": [
-    {
-      "code": "IC",
-      "name": "Infection Control",
-      "description": "Standard precautions, hand hygiene, PPE use and disposal, isolation procedures"
-    },
-    {
-      "code": "SE",
-      "name": "Safety and Emergency",
-      "description": "Fall prevention, safe transfers, body mechanics, emergency response, restraint alternatives"
-    },
-    {
-      "code": "BNS",
-      "name": "Basic Nursing Skills",
-      "description": "Vital signs, positioning, range of motion, personal hygiene, feeding, elimination"
-    },
-    {
-      "code": "CD",
-      "name": "Communication and Documentation",
-      "description": "Verbal/nonverbal communication, documentation, reporting, medical terminology"
-    },
-    {
-      "code": "PR",
-      "name": "Professionalism and Role",
-      "description": "Scope of practice, ethics, resident rights, professional conduct, teamwork"
-    },
-    {
-      "code": "RC",
-      "name": "Restorative Care",
-      "description": "Mobility assistance, ADL support, assistive devices, independence promotion"
-    }
+  "natcep_domains_2024": [
+    {"code": "IC",  "name": "Infection Control",              "tac_section": "95.9(a)(4)",  "natcep_section": "IV"},
+    {"code": "SE",  "name": "Safety and Emergency",           "tac_section": "95.9(a)(5)",  "natcep_section": "V"},
+    {"code": "BNS", "name": "Basic Nursing Skills",           "tac_section": "95.9(a)(6)",  "natcep_section": "VI"},
+    {"code": "CD",  "name": "Communication and Documentation","tac_section": "95.9(a)(3)",  "natcep_section": "III"},
+    {"code": "PR",  "name": "Professional Role",              "tac_section": "95.9(a)(1)",  "natcep_section": "I"},
+    {"code": "RC",  "name": "Basic Restorative Services",     "tac_section": "95.9(a)(9)",  "natcep_section": "IX"},
+    {"code": "RR",  "name": "Residents' Rights",              "tac_section": "95.9(a)(10)", "natcep_section": "X"}
   ],
   "criticality_levels": {
-    "CRITICAL": "Failure of this step results in automatic skill failure on Prometric/Pearson exams. Represents direct patient safety risk.",
-    "MAJOR": "Significant deduction. Does not trigger automatic failure but indicates serious gap in competency.",
-    "MINOR": "Small deduction. Technique or communication issue with limited safety impact."
+    "CRITICAL": "Automatic skill failure on Prometric exam if missed. Represents direct patient safety risk. Maps to HHSC-designated critical safety steps.",
+    "MAJOR": "Significant point deduction (typically 5–8 points). Does not trigger automatic failure but indicates a serious competency gap.",
+    "MINOR": "Small deduction (1–3 points). Technique or communication issue with limited safety impact."
+  },
+  "normal_vital_ranges_2024": {
+    "source": "2024 Texas HHSC NATCEP curriculum; 2023 AHA/ACC Hypertension Guidelines",
+    "temperature_oral_f": {"min": 97.0, "max": 99.0, "low_grade_fever": "99.1–100.4", "fever": "≥100.5", "unit": "°F"},
+    "temperature_oral_c": {"min": 36.1, "max": 37.2, "unit": "°C"},
+    "pulse_bpm": {"min": 60, "max": 100, "bradycardia_below": 60, "tachycardia_above": 100, "unit": "bpm"},
+    "respirations_per_min": {"min": 12, "max": 20, "bradypnea_below": 12, "tachypnea_above": 20, "unit": "breaths/min"},
+    "bp_normal_systolic": {"max": 119, "unit": "mmHg"},
+    "bp_normal_diastolic": {"max": 79, "unit": "mmHg"},
+    "bp_elevated": {"systolic": "120–129", "diastolic": "<80"},
+    "bp_stage1_htn": {"systolic": "130–139", "diastolic": "80–89"},
+    "bp_stage2_htn": {"systolic": "≥140", "diastolic": "≥90"},
+    "oxygen_saturation_pct": {"normal_min": 95, "unit": "%"}
   },
   "scenario_mappings": {
     "hand_hygiene_ppe": {
       "title": "Hand Hygiene & PPE Donning/Doffing",
-      "prometric_skill_title": "Handwashing",
+      "prometric_skill_title": "Handwashing + Donning & Removing PPE",
+      "always_tested": true,
+      "texas_2024_section": "Section IV — Infection Prevention and Control",
       "steps": {
-        "step_01": {
-          "title": "Identify need for hand hygiene",
-          "domain": "IC",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 05",
-          "curriculum_topic": "Standard Precautions and Hand Hygiene",
-          "natcep_competency": "IC-1",
-          "exam_notes": "Failure to perform hand hygiene at the start of ANY skill = automatic skill failure on Prometric exam."
-        },
-        "step_02": {
-          "title": "Proper hand hygiene technique",
-          "domain": "IC",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 05",
-          "curriculum_topic": "Hand Hygiene Technique – CDC Guidelines",
-          "natcep_competency": "IC-1",
-          "exam_notes": "Must scrub all surfaces for minimum 20 seconds. Turn off faucet with paper towel."
-        },
-        "step_03": {
-          "title": "Select and don PPE in correct order",
-          "domain": "IC",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 05",
-          "curriculum_topic": "PPE Selection and Donning Sequence",
-          "natcep_competency": "IC-2",
-          "exam_notes": "CDC donning order: gown → mask → eye protection → gloves. Gloves must overlap gown cuffs."
-        },
-        "step_04": {
-          "title": "Doff PPE safely",
-          "domain": "IC",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 05",
-          "curriculum_topic": "PPE Doffing Sequence and Disposal",
-          "natcep_competency": "IC-2",
-          "exam_notes": "Doffing order: gloves → gown → mask. Each item removed without contaminating face or clothing."
-        },
-        "step_05": {
-          "title": "Hand hygiene after PPE removal",
-          "domain": "IC",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 05",
-          "curriculum_topic": "Post-Care Hand Hygiene",
-          "natcep_competency": "IC-1",
-          "exam_notes": "Hand hygiene after PPE removal is mandatory. Examiner verifies this step explicitly."
-        }
+        "step_01": {"title": "Hand hygiene before resident contact",        "domain": "IC",  "criticality": "CRITICAL", "curriculum_module": "Module 05", "curriculum_topic": "WHO 5 Moments for Hand Hygiene", "natcep_competency": "IC-1", "exam_notes": "Automatic failure if omitted at start of any skill."},
+        "step_02": {"title": "Correct handwashing technique (20 sec)",      "domain": "IC",  "criticality": "CRITICAL", "curriculum_module": "Module 05", "curriculum_topic": "Soap-and-Water Technique — CDC Standard",          "natcep_competency": "IC-1", "exam_notes": "20-sec minimum, all surfaces, rinse wrist→fingertips, towel for faucet."},
+        "step_03": {"title": "Select correct PPE for care type",            "domain": "IC",  "criticality": "CRITICAL", "curriculum_module": "Module 05", "curriculum_topic": "PPE Selection — Contact vs Droplet vs Airborne",    "natcep_competency": "IC-2", "exam_notes": "Contact precautions require gown + gloves minimum."},
+        "step_04": {"title": "Don PPE in correct CDC order",                "domain": "IC",  "criticality": "CRITICAL", "curriculum_module": "Module 05", "curriculum_topic": "PPE Donning Sequence — Gown→Mask→Gloves",           "natcep_competency": "IC-2", "exam_notes": "Gloves LAST overlapping gown cuffs. Examiner verifies sequence."},
+        "step_05": {"title": "Doff PPE safely",                             "domain": "IC",  "criticality": "CRITICAL", "curriculum_module": "Module 05", "curriculum_topic": "PPE Doffing Sequence — Gloves→Gown→Mask",           "natcep_competency": "IC-2", "exam_notes": "Gloves first (most contaminated), gown rolled inward, mask last."},
+        "step_06": {"title": "Hand hygiene after PPE removal",              "domain": "IC",  "criticality": "CRITICAL", "curriculum_module": "Module 05", "curriculum_topic": "Post-Care / Post-PPE Hand Hygiene",                 "natcep_competency": "IC-1", "exam_notes": "Independent critical step — explicitly on Prometric checklist."}
       },
       "communication_checkpoints": {
-        "comm_01": {
-          "domain": "PR",
-          "criticality": "MINOR",
-          "curriculum_module": "Module 02",
-          "curriculum_topic": "Resident Communication and Person-Centered Care"
-        },
-        "comm_02": {
-          "domain": "PR",
-          "criticality": "MINOR",
-          "curriculum_module": "Module 02",
-          "curriculum_topic": "Ensuring Resident Comfort and Dignity"
-        }
+        "comm_01": {"domain": "RR", "criticality": "MINOR", "curriculum_module": "Module 02", "curriculum_topic": "Residents' Rights — Knock, Introduce, Explain, Obtain Permission"},
+        "comm_02": {"domain": "RR", "criticality": "MINOR", "curriculum_module": "Module 02", "curriculum_topic": "Post-Care Comfort Check and Call-Light Placement"}
       }
     },
     "transfer_bed_wheelchair": {
-      "title": "Transfer: Bed to Wheelchair",
+      "title": "Safe Transfer: Bed to Wheelchair",
       "prometric_skill_title": "Transfer from Bed to Wheelchair",
+      "always_tested": false,
+      "texas_2024_section": "Section V — Safety and Emergency Procedures; Section IX — Basic Restorative Services",
       "steps": {
-        "step_01": {
-          "title": "Prepare environment",
-          "domain": "SE",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 07",
-          "curriculum_topic": "Safe Transfer Preparation and Environment Setup",
-          "natcep_competency": "SE-3",
-          "exam_notes": "Wheelchair must be locked at 45° angle before the resident moves. Missing this step = major deduction."
-        },
-        "step_02": {
-          "title": "Apply gait belt correctly",
-          "domain": "SE",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 07",
-          "curriculum_topic": "Gait Belt Application",
-          "natcep_competency": "SE-3",
-          "exam_notes": "Gait belt applied over clothing, snug with two-finger check, buckle not on spine. Required for transfer skills."
-        },
-        "step_03": {
-          "title": "Verify wheelchair locks and footrests",
-          "domain": "SE",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 07",
-          "curriculum_topic": "Wheelchair Safety Checks",
-          "natcep_competency": "SE-3",
-          "exam_notes": "Both wheels locked and footrests cleared before initiating stand. Examiner verifies verbally and observationally."
-        },
-        "step_04": {
-          "title": "Correct body mechanics during transfer",
-          "domain": "SE",
-          "criticality": "MAJOR",
-          "curriculum_module": "Module 07",
-          "curriculum_topic": "Body Mechanics for Safe Patient Handling",
-          "natcep_competency": "SE-4",
-          "exam_notes": "Examiner observes for proper body mechanics throughout the transfer. Twisting or bending at waist noted as deduction."
-        },
-        "step_05": {
-          "title": "Post-transfer positioning and safety",
-          "domain": "SE",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 07",
-          "curriculum_topic": "Post-Transfer Resident Safety",
-          "natcep_competency": "SE-3",
-          "exam_notes": "Footrests replaced, feet positioned, gait belt removed, comfort checked, hand hygiene performed."
-        }
+        "step_01": {"title": "Hand hygiene and transfer plan review",        "domain": "IC",  "criticality": "CRITICAL", "curriculum_module": "Module 07", "curriculum_topic": "Pre-Transfer Safety Verification",                 "natcep_competency": "SE-1", "exam_notes": "Hand hygiene before any resident contact."},
+        "step_02": {"title": "Environment preparation — full setup",        "domain": "SE",  "criticality": "CRITICAL", "curriculum_module": "Module 07", "curriculum_topic": "Wheelchair Positioning, Locks, and Bed Height",    "natcep_competency": "SE-3", "exam_notes": "Stronger-side positioning, 45°, both locks, footrests cleared, correct bed height."},
+        "step_03": {"title": "Explain procedure and assist to seated edge", "domain": "RC",  "criticality": "MAJOR",    "curriculum_module": "Module 07", "curriculum_topic": "Restorative Approach — Communication and Cooperation","natcep_competency": "RC-2", "exam_notes": "Seated balance pause prevents orthostatic hypotension."},
+        "step_04": {"title": "Gait belt application",                       "domain": "SE",  "criticality": "CRITICAL", "curriculum_module": "Module 07", "curriculum_topic": "Gait Belt — Application and Contraindications",    "natcep_competency": "SE-3", "exam_notes": "Over clothing, waist level, buckle not at spine, 2-finger test, underhand grip."},
+        "step_05": {"title": "Stand-pivot transfer with body mechanics",    "domain": "SE",  "criticality": "CRITICAL", "curriculum_module": "Module 07", "curriculum_topic": "Stand-Pivot Technique and CNA Body Mechanics",    "natcep_competency": "SE-4", "exam_notes": "Knee-block, verbal count-in, bend knees not waist, pivot feet not spine."},
+        "step_06": {"title": "Post-transfer positioning and completion",    "domain": "SE",  "criticality": "CRITICAL", "curriculum_module": "Module 07", "curriculum_topic": "Post-Transfer Safety Checklist",                   "natcep_competency": "SE-3", "exam_notes": "Footrests replaced, gait belt removed, fully seated, hand hygiene."}
       },
       "communication_checkpoints": {
-        "comm_01": {
-          "domain": "PR",
-          "criticality": "MINOR",
-          "curriculum_module": "Module 02",
-          "curriculum_topic": "Explaining Procedures and Gaining Cooperation"
-        },
-        "comm_02": {
-          "domain": "PR",
-          "criticality": "MINOR",
-          "curriculum_module": "Module 02",
-          "curriculum_topic": "Post-Care Resident Communication"
-        }
+        "comm_01": {"domain": "CD",  "criticality": "MINOR", "curriculum_module": "Module 02", "curriculum_topic": "Pre-Procedure Explanation, Pain Assessment, and Verbal Count-In"},
+        "comm_02": {"domain": "PR",  "criticality": "MINOR", "curriculum_module": "Module 02", "curriculum_topic": "Post-Transfer Encouragement, Comfort Check, and Documentation"}
       }
     },
     "vital_signs_documentation": {
       "title": "Vital Signs & Documentation",
-      "prometric_skill_title": "Measuring and Recording Vital Signs",
+      "prometric_skill_title": "Oral Temperature; Pulse and Respirations; Blood Pressure (Manual)",
+      "always_tested": false,
+      "texas_2024_section": "Section VI — Basic Nursing Skills; Section III — Communication and Documentation",
       "steps": {
-        "step_01": {
-          "title": "Prepare and identify resident",
-          "domain": "BNS",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 06",
-          "curriculum_topic": "Resident Identification and Pre-Care Preparation",
-          "natcep_competency": "BNS-1",
-          "exam_notes": "Two-identifier verification required before any resident care. Hand hygiene also required first."
-        },
-        "step_02": {
-          "title": "Oral temperature technique",
-          "domain": "BNS",
-          "criticality": "MAJOR",
-          "curriculum_module": "Module 06",
-          "curriculum_topic": "Temperature Measurement Techniques",
-          "natcep_competency": "BNS-2",
-          "exam_notes": "Sublingual placement, probe cover required, wait for device signal. Normal oral range 97–99°F."
-        },
-        "step_03": {
-          "title": "Radial pulse technique",
-          "domain": "BNS",
-          "criticality": "MAJOR",
-          "curriculum_module": "Module 06",
-          "curriculum_topic": "Pulse Assessment – Radial Site",
-          "natcep_competency": "BNS-2",
-          "exam_notes": "Index and middle fingers (not thumb), radial artery, 60-second count. Normal 60–100 bpm."
-        },
-        "step_04": {
-          "title": "Respiration count",
-          "domain": "BNS",
-          "criticality": "MAJOR",
-          "curriculum_module": "Module 06",
-          "curriculum_topic": "Respiration Assessment",
-          "natcep_competency": "BNS-2",
-          "exam_notes": "Count without informing resident, 60 seconds (rise + fall = 1 breath). Normal 12–20/min."
-        },
-        "step_05": {
-          "title": "Manual blood pressure technique",
-          "domain": "BNS",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 06",
-          "curriculum_topic": "Blood Pressure Measurement – Manual Auscultatory Method",
-          "natcep_competency": "BNS-2",
-          "exam_notes": "Cuff 1-2 inches above antecubital, arm at heart level, slow deflation, both systolic and diastolic recorded. Normal <120/80."
-        },
-        "step_06": {
-          "title": "Recognize normals and report abnormals",
-          "domain": "CD",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 03",
-          "curriculum_topic": "Reporting Abnormal Findings to Licensed Nurse",
-          "natcep_competency": "CD-2",
-          "exam_notes": "CNA must report abnormal findings to the licensed nurse promptly. Scope of practice — no independent clinical decisions."
-        },
-        "step_07": {
-          "title": "Accurate documentation",
-          "domain": "CD",
-          "criticality": "CRITICAL",
-          "curriculum_module": "Module 03",
-          "curriculum_topic": "Clinical Documentation Standards",
-          "natcep_competency": "CD-1",
-          "exam_notes": "All four values, units, date/time, signature, and notation of reporting required. Timely and complete."
-        }
+        "step_01": {"title": "Hand hygiene and two-identifier verification",  "domain": "BNS", "criticality": "CRITICAL", "curriculum_module": "Module 06", "curriculum_topic": "Patient Identification — Two-Identifier Rule",         "natcep_competency": "BNS-1", "exam_notes": "Open-ended name + DOB/wristband. Room number NOT acceptable."},
+        "step_02": {"title": "Oral temperature — electronic",               "domain": "BNS", "criticality": "MAJOR",    "curriculum_module": "Module 06", "curriculum_topic": "Temperature Measurement — Sublingual Technique",      "natcep_competency": "BNS-2", "exam_notes": "Probe cover, sublingual pocket, lips closed, wait for device signal."},
+        "step_03": {"title": "Radial pulse — rate, rhythm, quality",        "domain": "BNS", "criticality": "MAJOR",    "curriculum_module": "Module 06", "curriculum_topic": "Pulse Assessment — Radial Palpation, 60-Second Count","natcep_competency": "BNS-2", "exam_notes": "Index + middle fingers (no thumb), 60-sec count, three characteristics."},
+        "step_04": {"title": "Respirations — covert count, 60 seconds",     "domain": "BNS", "criticality": "MAJOR",    "curriculum_module": "Module 06", "curriculum_topic": "Respiratory Rate — Covert Observation Technique",     "natcep_competency": "BNS-2", "exam_notes": "Covert transition from pulse, complete rise+fall=1, 60 sec."},
+        "step_05": {"title": "BP preparation — arm selection and cuff",     "domain": "BNS", "criticality": "CRITICAL", "curriculum_module": "Module 06", "curriculum_topic": "BP — Arm Contraindications and Cuff Placement",       "natcep_competency": "BNS-2", "exam_notes": "No IV arm, 1-2 inches above antecubital, artery marker aligned, snug."},
+        "step_06": {"title": "BP auscultation — Korotkoff technique",       "domain": "BNS", "criticality": "CRITICAL", "curriculum_module": "Module 06", "curriculum_topic": "Manual BP — Palpatory Estimation and Auscultation",   "natcep_competency": "BNS-2", "exam_notes": "Palpatory step, 2-3 mmHg/sec deflation, record both values with units."},
+        "step_07": {"title": "Interpret findings and report abnormals",     "domain": "CD",  "criticality": "CRITICAL", "curriculum_module": "Module 03", "curriculum_topic": "Recognizing Abnormals and Immediate Nurse Notification","natcep_competency": "CD-2", "exam_notes": "Compare to care-plan thresholds. CNA scope: measure, document, REPORT."},
+        "step_08": {"title": "Accurate, complete, timely documentation",    "domain": "CD",  "criticality": "CRITICAL", "curriculum_module": "Module 03", "curriculum_topic": "Clinical Documentation — Contemporaneous and Complete", "natcep_competency": "CD-1", "exam_notes": "All 4 values + units + time + nurse notification noted + CNA signature."}
       },
       "communication_checkpoints": {
-        "comm_01": {
-          "domain": "PR",
-          "criticality": "MINOR",
-          "curriculum_module": "Module 02",
-          "curriculum_topic": "Explaining Procedures to Residents"
-        },
-        "comm_02": {
-          "domain": "PR",
-          "criticality": "MINOR",
-          "curriculum_module": "Module 02",
-          "curriculum_topic": "Post-Care Communication and Comfort"
-        }
+        "comm_01": {"domain": "CD", "criticality": "MINOR", "curriculum_module": "Module 02", "curriculum_topic": "Procedure Explanation, Pain Assessment, and Person-Centered Communication"},
+        "comm_02": {"domain": "RR", "criticality": "MINOR", "curriculum_module": "Module 02", "curriculum_topic": "Post-Assessment Resident Communication and Safety (Call Light, Nurse Follow-Up)"}
       }
     }
-  },
-  "normal_vital_ranges": {
-    "temperature_oral_f": {"min": 97.0, "max": 99.0, "unit": "°F"},
-    "temperature_oral_c": {"min": 36.1, "max": 37.2, "unit": "°C"},
-    "pulse_bpm": {"min": 60, "max": 100, "unit": "bpm"},
-    "respirations_per_min": {"min": 12, "max": 20, "unit": "breaths/min"},
-    "blood_pressure_systolic": {"normal_max": 119, "elevated_max": 129, "high_min": 130, "unit": "mmHg"},
-    "blood_pressure_diastolic": {"normal_max": 79, "high_min": 80, "unit": "mmHg"},
-    "oxygen_saturation_pct": {"min": 95, "max": 100, "unit": "%"}
   },
   "scoring_weights": {
     "checklist_score_weight": 0.40,
@@ -276,7 +109,32 @@
   "pass_thresholds": {
     "overall_pass_pct": 75,
     "critical_steps_pass_pct": 100,
-    "coach_mode_label": "Coach Mode (practice — not exam-scored)",
-    "exam_mode_label": "Exam Mode (Prometric-style strict scoring)"
-  }
+    "pre_check_mastery_pct": 67,
+    "coach_mode_label": "Coach Mode — learning and practice (not exam-scored)",
+    "exam_mode_label": "Exam Mode — Prometric-style strict evaluation"
+  },
+  "prometric_skills_pool_2024": [
+    "Handwashing (ALWAYS tested)",
+    "Positioning a Resident on Side",
+    "Transfer from Bed to Wheelchair",
+    "Weighing a Resident on Standing Scale",
+    "Measurement of Urinary Output",
+    "Partial Bath (Face, Arms, Axillae, Hands)",
+    "Mouth Care — Ambulatory Resident",
+    "Donning and Removing PPE",
+    "Passive Range of Motion — Lower Extremity",
+    "Passive Range of Motion — Upper Extremity",
+    "Making an Occupied Bed",
+    "Application of Knee-High Elastic Stocking",
+    "Blood Pressure (Manual Auscultatory Method)",
+    "Oral Temperature (Electronic Thermometer)",
+    "Pulse and Respirations",
+    "Assisting a Resident to Eat",
+    "Perineal Care (Female)",
+    "Care of Resident with Catheter",
+    "Application of Hand Mitts",
+    "Ambulating with Gait Belt",
+    "Fingernail Care",
+    "Mouth Care — Dependent Resident"
+  ]
 }

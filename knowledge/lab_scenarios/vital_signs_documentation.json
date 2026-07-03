@@ -1,47 +1,134 @@
 {
   "id": "vital_signs_documentation",
   "title": "Vital Signs & Documentation",
-  "description": "Practice measuring and recording vital signs (temperature, pulse, respirations, blood pressure) as evaluated on the Prometric CNA skills checklist. This scenario covers correct technique, normal ranges, reporting abnormals, and accurate documentation aligned with NATCEP standards.",
-  "natcep_domains": ["Basic Nursing Skills", "Communication and Documentation"],
-  "estimated_minutes": 12,
+  "description": "Practice measuring all four vital signs (temperature, pulse, respirations, blood pressure) and completing accurate clinical documentation as evaluated on the Prometric CNA skills exam. Aligned to Texas HHSC NATCEP 2024 curriculum, 2024 normal-range references, and TULIP mandatory reporting standards for abnormal findings.",
+  "natcep_domains": ["Basic Nursing Skills", "Communication and Documentation", "Infection Control"],
+  "estimated_minutes": 15,
+  "texas_2024_alignment": {
+    "tac_reference": "Texas Administrative Code Title 26, Part 1, Chapter 95 – NATCEP Standards (2024)",
+    "natcep_curriculum_section": "Section VI: Basic Nursing Skills — Vital Signs",
+    "natcep_minimum_hours": "6 classroom hours + 4 lab hours on vital sign measurement",
+    "prometric_skill_titles": ["Oral Temperature (Electronic)", "Pulse and Respirations", "Blood Pressure (Manual)"],
+    "prometric_skills_tested_separately": true,
+    "pearson_vue_domain": "Basic Nursing Skills",
+    "tulip_relevance": "CNAs must report abnormal vital signs to the supervising licensed nurse promptly and accurately. Under Texas law (Texas Health and Safety Code Chapter 242), CNAs who observe sudden changes in resident condition — including abnormal vital signs — must report to the charge nurse immediately. TULIP reporting may be required if the change suggests a pattern of neglect or a sentinel event.",
+    "hhsc_form_reference": "Texas Form 5497-NATCEP – Skills Competency, Basic Nursing Section",
+    "aha_2023_bp_reference": "2023 American Heart Association / ACC Blood Pressure Guidelines",
+    "cdc_2024_normal_ranges": "CDC / AHA 2024 adult vital sign reference ranges used in Texas NATCEP curriculum"
+  },
+  "normal_vital_ranges_2024": {
+    "temperature_oral": {"min_f": 97.0, "max_f": 99.0, "note": "Low-grade fever: 99.1–100.4°F; Fever: ≥100.5°F"},
+    "pulse": {"min_bpm": 60, "max_bpm": 100, "bradycardia_below": 60, "tachycardia_above": 100},
+    "respirations": {"min_rpm": 12, "max_rpm": 20, "bradypnea_below": 12, "tachypnea_above": 20},
+    "bp_systolic_normal": {"max_mmhg": 119},
+    "bp_diastolic_normal": {"max_mmhg": 79},
+    "bp_elevated": {"systolic": "120–129", "diastolic": "<80"},
+    "bp_stage1_htn": {"systolic": "130–139", "diastolic": "80–89"},
+    "bp_stage2_htn": {"systolic": "≥140", "diastolic": "≥90"}
+  },
+  "scene_briefing": {
+    "facility": "Hill Country Senior Living and Memory Care, San Antonio, Texas",
+    "resident_name": "Ms. Gloria Chen",
+    "resident_age": 69,
+    "room": "Room 305",
+    "primary_diagnosis": "Congestive Heart Failure (CHF), Stage 2 Hypertension, Post-op Day 2 after right total hip replacement (THR)",
+    "care_plan_notes": "Vital signs every 4 hours per post-op order. Report BP >150/90 or <90/60, HR >110 or <55, RR >22 or <10, Temp >100.4°F immediately to charge RN. Monitor for signs of deep vein thrombosis. Encourage fluids. Pain scale 0–10 with each assessment.",
+    "your_role": "You are the 0800 vital signs CNA on the medical-surgical floor. The charge RN has assigned you to complete the 0800 assessment for Ms. Chen and report all findings immediately. This is your first post-op day 2 assessment for this resident.",
+    "scene_description": "You knock on Room 305 and enter. Ms. Chen is awake, sitting up at 45 degrees. She says 'Good morning' in a slightly tired voice. You notice she looks a bit pale. Her IV is in the left antecubital, and she has a right hip dressing. You have your vital signs kit: electronic thermometer with probe covers, stethoscope, manual sphygmomanometer, and your documentation form. It is 08:02 AM.",
+    "learning_objectives": [
+      "Demonstrate correct technique for all four vital signs: temperature, pulse, respirations, and manual blood pressure",
+      "Apply 2024 Texas HHSC / AHA normal vital sign ranges to interpret findings",
+      "Recognize when findings are abnormal and require immediate nurse notification",
+      "Understand why certain techniques (covert respiration counting, sublingual placement) are required",
+      "Complete accurate, complete, timely clinical documentation per Texas HHSC standards",
+      "Identify the CNA scope-of-practice boundary: measure, document, and report — do not interpret or treat independently"
+    ]
+  },
+  "pre_simulation_knowledge_check": [
+    {
+      "id": "pkc_01",
+      "question": "Using the 2024 Texas HHSC NATCEP / AHA blood pressure classification, which category best describes a reading of 138/86 mmHg?",
+      "options": [
+        {"id": "A", "text": "Normal — within acceptable range"},
+        {"id": "B", "text": "Elevated — systolic 120–129 and diastolic less than 80"},
+        {"id": "C", "text": "Stage 1 Hypertension — systolic 130–139 OR diastolic 80–89"},
+        {"id": "D", "text": "Stage 2 Hypertension — systolic ≥140 OR diastolic ≥90"}
+      ],
+      "correct_option": "C",
+      "explanation": "138/86 mmHg classifies as Stage 1 Hypertension: systolic 130–139 OR diastolic 80–89 (either criterion met). The 2023 AHA/ACC guidelines — now incorporated into Texas HHSC NATCEP 2024 — define: Normal BP <120/80; Elevated 120–129/<80; Stage 1 HTN 130–139/80–89; Stage 2 HTN ≥140/≥90. A CNA must recognize Stage 1 HTN and compare the finding to the resident's care-plan thresholds before deciding whether to report immediately.",
+      "texas_standard": "Texas HHSC NATCEP 2024, Section VI; 2023 AHA/ACC Guideline on Hypertension"
+    },
+    {
+      "id": "pkc_02",
+      "question": "Ms. Chen's care plan orders: 'Report BP >150/90 immediately.' Her morning BP is 148/91. What is the correct CNA action?",
+      "options": [
+        {"id": "A", "text": "Do not report — the systolic of 148 is below the 150 threshold, so the reading is acceptable"},
+        {"id": "B", "text": "Report immediately — the diastolic of 91 exceeds the >90 threshold even though the systolic does not exceed its threshold"},
+        {"id": "C", "text": "Retake the BP three times and average the results before deciding"},
+        {"id": "D", "text": "Encourage Ms. Chen to rest and retake in 30 minutes without notifying the nurse"}
+      ],
+      "correct_option": "B",
+      "explanation": "The care-plan threshold is written as 'BP >150/90' — EITHER value triggering the threshold requires reporting. The diastolic of 91 exceeds >90, so this reading must be reported immediately to the charge RN regardless of the systolic value. CNAs read thresholds as individual numbers: systolic threshold AND diastolic threshold are independent. Waiting, retaking, or encouraging rest without first notifying the nurse is outside the CNA scope of practice.",
+      "texas_standard": "Texas HHSC NATCEP 2024, Section VI – Reporting Abnormals; Texas Health and Safety Code Ch. 242 (Change in Condition)"
+    },
+    {
+      "id": "pkc_03",
+      "question": "Why must a CNA count respirations WITHOUT telling the resident that they are being counted?",
+      "options": [
+        {"id": "A", "text": "It is faster to count without warning the resident"},
+        {"id": "B", "text": "Telling residents their breathing is being observed causes most people to consciously change their respiratory rate, producing an inaccurate baseline measurement"},
+        {"id": "C", "text": "Counting respirations openly violates HIPAA privacy regulations"},
+        {"id": "D", "text": "Residents may object to having their breathing counted if they know"}
+      ],
+      "correct_option": "B",
+      "explanation": "Patients consciously or unconsciously alter their breathing rate when they know it is being observed — a well-documented phenomenon in clinical measurement. The standard technique is to transition covertly from pulse counting to respiration counting (keeping fingers on the wrist as if still counting pulse) so the resident does not change their natural breathing pattern. This produces the most accurate baseline measurement and is the required technique on the Prometric CNA exam.",
+      "texas_standard": "Texas HHSC NATCEP 2024, Section VI – Vital Signs Technique"
+    }
+  ],
   "steps": [
     {
       "id": "step_01",
-      "title": "Prepare and identify the resident",
-      "instruction": "You are about to take a resident's vital signs. What are the FIRST two things you must do?",
+      "title": "Perform hand hygiene and verify resident identity with two identifiers",
+      "instruction": "You have knocked and entered Room 305. Ms. Chen is awake. Before touching her or any of her equipment, what must you do?",
       "critical": true,
+      "knowledge_fact": "🔑 **Texas HHSC / TJC Two-Identifier Rule:** Using two patient identifiers before every care episode is a Texas HHSC and Joint Commission (TJC) safety requirement. The two identifiers must be independent: typically NAME + DATE OF BIRTH or NAME + WRISTBAND ID NUMBER. Room number alone is NOT an acceptable identifier — residents move rooms, and admission errors can occur.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The two-identifier check is a critical step at the START of the vital signs skill. Examiners look for you to actively verify both identifiers — not just glance at the wristband. Ask the resident to state their name and confirm date of birth, then match to the wristband or documentation.",
       "decision_points": [
         {
           "id": "dp_01a",
-          "question": "What must happen before measuring any vital sign?",
+          "question": "What are your first actions upon entering Room 305?",
           "options": [
             {
               "id": "A",
-              "text": "Perform hand hygiene AND verify resident identity using at least two identifiers (name and date of birth or ID band)",
+              "text": "Perform hand hygiene → greet Ms. Chen → ask her to state her name and date of birth → verify against her wristband (two-identifier check) → explain you will be taking her vital signs",
               "correct": true,
-              "feedback": "Correct! Hand hygiene prevents transmission of infection, and verifying resident identity prevents errors. Both are critical steps — either missed can result in automatic failure on the Prometric exam.",
-              "rationale": null
+              "feedback": "✅ Correct! Hand hygiene first, then two-identifier verification (name + DOB confirmed against wristband), then explanation of the procedure. This sequence meets the Prometric critical-step requirement and Texas HHSC safety standards.",
+              "rationale": null,
+              "consequence": null
             },
             {
               "id": "B",
-              "text": "Gather your equipment and start measuring immediately",
+              "text": "Ask 'Are you Gloria Chen?' and proceed when she nods yes",
               "correct": false,
-              "feedback": "Incorrect. Skipping hand hygiene and identity verification before providing care is an infection control and patient safety violation.",
-              "rationale": "Hand hygiene and identity check must precede any resident care intervention, including vital sign measurement."
+              "feedback": "❌ Incorrect — two problems: (1) A leading question ('Are you X?') can result in a confused resident agreeing to any name. Ask open-ended: 'Can you tell me your name?' (2) One identifier is insufficient — a second identifier (DOB or wristband) is required.",
+              "rationale": "Leading questions like 'Are you X?' are ineffective identification tools. A disoriented resident may agree with any name presented. Open-ended questioning ('Please tell me your name') plus a second independent identifier is the standard.",
+              "consequence": "A single-identifier check using a leading question is the documented cause of wrong-resident procedures in hospitals and nursing facilities. This is why the two-identifier rule exists."
             },
             {
               "id": "C",
-              "text": "Ask the resident their name and proceed",
+              "text": "Check the room number on the door — she is in Room 305, so she must be Ms. Chen",
               "correct": false,
-              "feedback": "Incomplete. Asking the name is only one identifier. Two identifiers (name + date of birth or wristband) are required to positively confirm identity and prevent errors.",
-              "rationale": "Two-identifier verification is a fundamental patient safety standard required by The Joint Commission and reflected in CNA exam skills checklists."
+              "feedback": "❌ Incorrect. Room numbers are NOT accepted as patient identifiers. Residents are frequently moved between rooms, and room assignments can be updated in the system after a physical move has occurred.",
+              "rationale": "Room numbers reflect location, not identity. A resident may be in the wrong room due to a transfer that has not been updated, or a new resident may have been placed in the same room.",
+              "consequence": "Wrong-resident medication administration, procedures, or assessments caused by room-number-only identification are a category of serious adverse events in long-term care facilities."
             },
             {
               "id": "D",
-              "text": "Check the room number on the door to confirm the right resident",
+              "text": "Begin taking vital signs immediately — she is clearly awake and cooperative",
               "correct": false,
-              "feedback": "Incorrect. Room numbers alone are not a reliable patient identifier. Residents may move rooms, and bed assignments can change. Always verify with the resident directly using two identifiers.",
-              "rationale": "Room-number-only identification is considered a high-risk practice. Use name and a second identifier (DOB or wristband)."
+              "feedback": "❌ Incorrect. Awake and cooperative does not mean properly identified. Hand hygiene and two-identifier verification must always precede direct resident care, regardless of the resident's apparent alertness.",
+              "rationale": "A resident who appears oriented and cooperative may still be the wrong resident if you entered the wrong room or if bed assignments changed. Two identifiers eliminate this risk.",
+              "consequence": null
             }
           ],
           "correct_option": "A",
@@ -51,41 +138,47 @@
     },
     {
       "id": "step_02",
-      "title": "Measure oral temperature",
-      "instruction": "You are measuring oral temperature using an electronic thermometer. What is the correct technique?",
+      "title": "Measure oral temperature (electronic thermometer)",
+      "instruction": "You are now ready to take Ms. Chen's oral temperature. She has not had anything to eat or drink in the last 30 minutes. Which technique is correct?",
       "critical": false,
+      "knowledge_fact": "🌡️ **Prometric Fact:** Oral temperature is one of the three vital sign skills in the Prometric Texas skills pool. The examiner checks: probe cover used, sublingual pocket placement, lips closed, wait for device signal (not a timer), read and record with units (°F or °C). Normal oral range per Texas HHSC NATCEP 2024: 97.0–99.0°F (36.1–37.2°C). Low-grade fever: 99.1–100.4°F. Fever: ≥100.5°F.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** A common student error is placing the probe in the CENTER of the mouth (under the tongue midline) instead of the SUBLINGUAL POCKET (lateral to the frenulum on either side). The sublingual pocket has a richer blood supply and gives a more accurate core temperature reading.",
       "decision_points": [
         {
           "id": "dp_02a",
-          "question": "Which describes correct oral temperature measurement?",
+          "question": "Which technique for electronic oral temperature measurement fully meets Prometric CNA exam standards?",
           "options": [
             {
               "id": "A",
-              "text": "Use a probe cover, place thermometer under the tongue in the sublingual pocket, have the resident close their lips, wait for the beep, read and record the temperature",
+              "text": "Apply a probe cover → place thermometer in the sublingual pocket (to the side of the frenulum, under the tongue) → ask Ms. Chen to close her lips (not teeth) → wait for the device beep signal → read and record temperature in °F with the time",
               "correct": true,
-              "feedback": "Correct! The sublingual pocket (under the tongue to the side of the frenulum) provides the most accurate oral reading. The probe cover prevents cross-contamination. Waiting for the device signal ensures an accurate result.",
-              "rationale": null
+              "feedback": "✅ Correct! Probe cover (infection control), sublingual pocket (most accurate oral site), lips closed (seals the measurement zone), device signal (ensures stable reading), record with units and time (documentation standard). This is the complete Prometric-evaluated oral temperature technique.",
+              "rationale": null,
+              "consequence": null
             },
             {
               "id": "B",
-              "text": "Place the thermometer under the tongue anywhere, remove after 30 seconds",
+              "text": "Place probe under the tongue in the center, hold in place for 30 seconds, then read",
               "correct": false,
-              "feedback": "Incorrect. Placement location matters — the sublingual pocket is most accurate. Timing by seconds rather than the device signal can lead to an inaccurate reading.",
-              "rationale": "Electronic thermometers signal when the reading is stable. Removing early can give a falsely low result. Correct placement in the sublingual pocket is required for accuracy."
+              "feedback": "❌ Two errors: (1) The center of the tongue is NOT the sublingual pocket — place to the side of the frenulum where the blood supply is richest. (2) Timing by seconds rather than the device's completion signal can result in a falsely low reading if removed too early.",
+              "rationale": "The sublingual pockets (lateral to the frenulum) overlie the deep lingual arteries and provide the most accurate reflection of core body temperature. The center of the tongue does not have the same vascular supply and gives a less accurate reading.",
+              "consequence": "A falsely low temperature reading could mask a fever in a post-surgical resident like Ms. Chen, delaying recognition of a post-op infection."
             },
             {
               "id": "C",
-              "text": "No probe cover is needed for electronic thermometers — they self-sanitize",
+              "text": "No probe cover needed — electronic thermometers are self-sanitizing between uses",
               "correct": false,
-              "feedback": "Incorrect. A probe cover is ALWAYS required for oral thermometers to prevent cross-contamination between residents. Electronic thermometers do not self-sanitize.",
-              "rationale": "Probe covers are a standard infection control measure. Failure to use one is an infection control violation."
+              "feedback": "❌ Incorrect. Electronic oral thermometers are NOT self-sanitizing. A probe cover is ALWAYS required for every use to prevent cross-contamination between residents. Omitting the probe cover is an infection control violation and an exam deduction.",
+              "rationale": "Electronic thermometers require a single-use probe cover for each resident to prevent the oral mucosa of one resident from contacting surfaces that will then be placed in another resident's mouth.",
+              "consequence": "Reusing an oral thermometer probe without a cover between residents can transmit oral organisms, including blood-borne pathogens in residents with oral lesions."
             },
             {
               "id": "D",
-              "text": "Measure temperature with the resident talking to confirm correct placement",
+              "text": "Ask Ms. Chen to hold the thermometer between her teeth to keep it in place",
               "correct": false,
-              "feedback": "Incorrect. The resident must keep their lips closed and remain still. Talking disrupts placement and introduces ambient air, causing an inaccurately low reading.",
-              "rationale": "Mouth closure is required to maintain sublingual pocket temperature. Speaking introduces room-temperature air and invalidates the measurement."
+              "feedback": "❌ Incorrect. The thermometer is held in place by closed LIPS, not teeth. Clenching with the teeth can crack the probe and poses an oral injury risk, particularly for residents with dentures or dental work.",
+              "rationale": "Lip closure (not teeth clenching) seals the oral cavity around the probe without applying hard biting force that could damage the probe or the resident's mouth.",
+              "consequence": null
             }
           ],
           "correct_option": "A",
@@ -95,41 +188,47 @@
     },
     {
       "id": "step_03",
-      "title": "Measure pulse rate",
-      "instruction": "After temperature, you need to measure the resident's radial pulse. What is the correct technique?",
+      "title": "Assess radial pulse: rate, rhythm, and quality",
+      "instruction": "The thermometer reading is stable. While Ms. Chen keeps her lips closed around the thermometer, you can assess her radial pulse simultaneously. What is the correct technique?",
       "critical": false,
+      "knowledge_fact": "💓 **Clinical Fact:** Experienced CNAs often assess pulse WHILE the thermometer is measuring — this saves time and is acceptable technique. The radial (wrist) pulse is the standard site for CNA assessment. The three characteristics reported are: RATE (beats per minute), RHYTHM (regular or irregular), and QUALITY/STRENGTH (strong, weak, thready, bounding). Documenting all three is required by Texas HHSC NATCEP 2024.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The single most common error in pulse assessment is using the THUMB (which has its own pulse). Always use the INDEX and MIDDLE fingers. The examiner also checks that you count for a FULL 60 seconds — not 15 or 30 seconds with multiplication.",
       "decision_points": [
         {
           "id": "dp_03a",
-          "question": "How do you correctly measure a radial pulse?",
+          "question": "How do you correctly assess Ms. Chen's radial pulse?",
           "options": [
             {
               "id": "A",
-              "text": "Use the index and middle fingers (not the thumb) over the radial artery at the wrist, count for a full 60 seconds, note rate AND rhythm AND strength",
+              "text": "Place index and middle fingers (not thumb) on the radial artery at the inner wrist → apply light-to-moderate pressure → count beats for a full 60 seconds → note rate, rhythm (regular/irregular), and quality (strong/weak/thready)",
               "correct": true,
-              "feedback": "Correct! Using two fingers (not the thumb, which has its own pulse) on the radial artery at the wrist, counting for a full 60 seconds, and noting rate, rhythm, and strength meets the CNA exam standard.",
-              "rationale": null
+              "feedback": "✅ Correct! Index + middle fingers (no thumb), radial artery site, light-moderate pressure, 60-second count, three characteristics reported: rate, rhythm, quality. This is the complete Prometric-evaluated pulse assessment for CNAs.",
+              "rationale": null,
+              "consequence": null
             },
             {
               "id": "B",
-              "text": "Use your thumb to feel the pulse at the wrist, count for 15 seconds and multiply by 4",
+              "text": "Use thumb and index finger on the radial artery, count for 15 seconds and multiply by 4",
               "correct": false,
-              "feedback": "Incorrect. The thumb has its own pulsation and can produce an inaccurate count. For initial or abnormal rhythms, count for a full 60 seconds. The 15×4 shortcut is less accurate and not used on the CNA exam.",
-              "rationale": "The thumb's digital artery can be confused with the resident's pulse. Counting for only 15 seconds misses irregular rhythms. Full 60-second counting is the exam standard."
+              "feedback": "❌ Two errors: (1) The THUMB has its own digital artery — using it may confuse your pulse with the resident's. (2) A 15-second count multiplied by 4 significantly underestimates the rate for irregular rhythms and is not acceptable on the Prometric exam.",
+              "rationale": "The 15×4 method misses irregularities that occur in the unmeasured 45 seconds. For any potentially irregular rhythm (Ms. Chen has CHF, which can cause atrial fibrillation), a full 60-second count is required.",
+              "consequence": "A 15-second count could miss atrial fibrillation episodes in a CHF patient, leading to an inaccurate documentation that masks a significant cardiac finding."
             },
             {
               "id": "C",
-              "text": "Press firmly with four fingers until the pulse disappears, then release and count",
+              "text": "Use a pulse oximeter reading instead — it shows both SpO2 and pulse rate on the screen",
               "correct": false,
-              "feedback": "Incorrect. Pressing until the pulse disappears occludes blood flow. Correct technique uses light to moderate pressure to feel the artery without compressing it.",
-              "rationale": "Excess pressure obliterates the pulse. The correct technique is firm but gentle palpation to detect each beat clearly."
+              "feedback": "❌ Incorrect. On the Prometric CNA skills exam, manual radial pulse palpation is the required technique. A pulse oximeter reading does not demonstrate the manual assessment skill the examiner is evaluating. Additionally, pulse ox readings can be inaccurate in residents with poor peripheral circulation (common in CHF).",
+              "rationale": "Pulse oximeters measure plethysmographic waveforms that correlate with pulse but may not accurately reflect rhythm irregularities. The manual palpation technique is the exam skill being demonstrated.",
+              "consequence": null
             },
             {
               "id": "D",
-              "text": "Use a pulse oximeter only — it gives the pulse rate automatically",
+              "text": "Press very firmly until you can feel the strong thump of each beat for a more accurate count",
               "correct": false,
-              "feedback": "Incorrect. On the CNA skills exam, manual radial pulse assessment is required. A pulse oximeter reading alone does not demonstrate the manual palpation technique the examiner observes.",
-              "rationale": "The CNA skills exam requires demonstration of manual pulse assessment. Relying solely on equipment does not satisfy the skill objective."
+              "feedback": "❌ Incorrect. Firm pressure on the radial artery partially occludes the vessel, making beats harder to detect and potentially causing discomfort. The correct technique uses light-to-moderate pressure that allows you to feel each beat without compressing the artery.",
+              "rationale": "Excessive pressure on the radial artery can occlude blood flow and make the pulse feel weaker or absent — the opposite of the intended result.",
+              "consequence": null
             }
           ],
           "correct_option": "A",
@@ -139,41 +238,47 @@
     },
     {
       "id": "step_04",
-      "title": "Count respirations",
-      "instruction": "After pulse, you must count respirations. What is the correct technique — and why is the timing important?",
+      "title": "Count respirations covertly (rate, rhythm, depth)",
+      "instruction": "You have finished counting the pulse. Without alerting Ms. Chen, you need to count her respirations. What is the correct technique?",
       "critical": false,
+      "knowledge_fact": "🫁 **Technique Fact:** The transition from pulse to respiration counting is done seamlessly: keep your fingers on the wrist as if still counting pulse while your eyes shift to observe the chest rise and fall. This deception is not unethical — it is the medically accepted technique to obtain an accurate baseline respiratory rate. One complete respiration = ONE rise (inhalation) + ONE fall (exhalation).",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The examiner checks that you count for a full 60 seconds (or verbally confirm 30 seconds × 2). They also verify that you are observing chest movement, not just watching the resident's face. Count COMPLETE breaths (rise + fall = 1), not just the rise.",
       "decision_points": [
         {
           "id": "dp_04a",
-          "question": "How do you correctly count respirations?",
+          "question": "How do you correctly assess Ms. Chen's respiratory rate?",
           "options": [
             {
               "id": "A",
-              "text": "Without telling the resident, observe chest rise and fall for a full 60 seconds (or 30 seconds × 2) while pretending to still count the pulse",
+              "text": "Keep fingers on the wrist (appearing to still count pulse) → observe chest rise and fall from across the bed → count each complete breath cycle (rise + fall = 1) for a full 60 seconds → note rate, rhythm, and depth",
               "correct": true,
-              "feedback": "Correct! Counting respirations without alerting the resident prevents voluntary change in breathing rate. One complete breath = one rise AND one fall of the chest. The exam requires a full 60-second count (or equivalent).",
-              "rationale": null
+              "feedback": "✅ Correct! The covert wrist-to-respiration transition, full 60-second count, complete breath cycles (rise + fall = 1), and three characteristics (rate, rhythm, depth) — this is the full technique required on the Prometric exam.",
+              "rationale": null,
+              "consequence": null
             },
             {
               "id": "B",
-              "text": "Tell the resident to breathe normally and count breaths for 15 seconds",
+              "text": "Tell Ms. Chen: 'I need to count your breaths now — please breathe normally for 30 seconds'",
               "correct": false,
-              "feedback": "Incorrect. Telling a resident you are counting their breathing causes most people to alter their breathing rate. The 15-second count is not sufficient for the CNA exam standard.",
-              "rationale": "Patients consciously or unconsciously change their breathing when told it is being counted. Count without announcing it for an accurate baseline."
+              "feedback": "❌ Incorrect. Alerting the resident causes them to voluntarily or involuntarily alter their breathing rate. The resulting count does not reflect the true resting respiratory rate. The Prometric exam specifically tests the covert technique.",
+              "rationale": "When patients know their breathing is being counted, most people take slower and deeper breaths (a conscious effort to appear 'normal'), producing an artificially normal-appearing respiratory rate that masks any tachypnea.",
+              "consequence": "An inaccurately low respiratory count in a CHF patient could mask respiratory distress or early decompensation — a potentially life-threatening missed finding."
             },
             {
               "id": "C",
-              "text": "Ask the resident to count their own breaths to 20",
+              "text": "Count only the inhalations (chest rises) for 30 seconds and multiply by 4",
               "correct": false,
-              "feedback": "Incorrect. Self-counting by the resident is not a valid clinical assessment method and does not meet the CNA skill standard.",
-              "rationale": "Respiration rate must be assessed by the CNA through direct observation — self-reporting by the resident is not an accepted clinical measurement."
+              "feedback": "❌ Two errors: (1) One respiration = one COMPLETE cycle (rise + fall). Counting only rises doubles the actual rate. (2) 30 × 4 produces a less accurate result than a 60-second count for irregular breathing patterns.",
+              "rationale": "A respiration is a complete ventilatory cycle: inhalation + exhalation. Counting only inhalations (rises) would report a rate of 28 for a person breathing 14 times per minute — a value that would trigger unnecessary intervention.",
+              "consequence": "A falsely elevated respiratory rate would suggest tachypnea, potentially causing unnecessary escalation for a patient with normal respirations."
             },
             {
               "id": "D",
-              "text": "Count only inhalations (chest rises) for 30 seconds and multiply by 2",
+              "text": "Place your hand on her chest to feel each breath and count for 15 seconds × 4",
               "correct": false,
-              "feedback": "Partially incorrect. One respiration = one inhale + one exhale (both the rise and the fall). Counting only inhalations doubles the actual respiration count.",
-              "rationale": "A respiration is a complete breathing cycle (in + out). Counting only inhalations would give an inflated count."
+              "feedback": "❌ Incorrect. Placing your hand on the resident's chest alerts them to the respiratory count, invalidating the measurement. The visual observation technique is the standard, and the 15×4 shortcut is not accepted on the Prometric exam.",
+              "rationale": "Physical contact during respiration counting alerts the resident, causing voluntary breathing alteration. Visual observation is the standard non-invasive technique that does not disrupt normal breathing.",
+              "consequence": null
             }
           ],
           "correct_option": "A",
@@ -183,41 +288,47 @@
     },
     {
       "id": "step_05",
-      "title": "Measure blood pressure",
-      "instruction": "You are measuring blood pressure with a manual sphygmomanometer. Which technique is correct?",
+      "title": "Prepare for manual blood pressure: arm selection and cuff placement",
+      "instruction": "You are about to measure Ms. Chen's blood pressure manually. She has an IV in the LEFT antecubital fossa. Which arm do you use, and how do you prepare for the measurement?",
       "critical": true,
+      "knowledge_fact": "💉 **Clinical Safety Fact (Texas HHSC 2024):** Blood pressure must NEVER be measured on an arm with: (1) an IV line or catheter in the antecubital or distal vein, (2) an AV fistula or dialysis access, (3) a mastectomy/lymph node dissection on that side, (4) circumferential cast or bandage. For Ms. Chen, the IV is in the LEFT arm — use the RIGHT arm only.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** Cuff placement is a commonly failed item. The cuff must be placed 1–2 inches (2.5–5 cm) above the antecubital crease with the artery marker aligned over the brachial artery. The arm must be at HEART LEVEL (supported, not hanging). A dangling arm gives a falsely elevated reading.",
       "decision_points": [
         {
           "id": "dp_05a",
-          "question": "What is the correct manual blood pressure technique?",
+          "question": "Ms. Chen has an IV in her LEFT arm. Which arm and preparation are correct for manual blood pressure?",
           "options": [
             {
               "id": "A",
-              "text": "Position resident arm at heart level, apply cuff 1–2 inches above antecubital space, palpate radial artery, inflate 30 mmHg above loss of pulse, place stethoscope over brachial artery, deflate slowly (2–3 mmHg/sec), record first sound (systolic) and last sound (diastolic)",
+              "text": "Use the RIGHT arm (no IV) → position arm at heart level, palm up, slightly flexed → apply cuff 1–2 inches above the antecubital crease, artery marker over the brachial artery → ensure the cuff is snug (2-finger check) → locate the brachial pulse by palpation before inflating",
               "correct": true,
-              "feedback": "Correct! This complete technique — arm at heart level, correct cuff placement, palpatory estimate before auscultation, correct stethoscope position, slow deflation, and reading both systolic and diastolic — is required for the CNA skills exam.",
-              "rationale": null
+              "feedback": "✅ Correct! Right arm (no IV), heart level positioning, 1–2 inch cuff-to-crease distance, artery marker aligned, snug cuff, pre-inflation brachial pulse location — each of these affects accuracy and safety. This is the complete preparation required for the Prometric BP skill.",
+              "rationale": null,
+              "consequence": null
             },
             {
               "id": "B",
-              "text": "Apply cuff anywhere on the arm, inflate to 200 mmHg, deflate quickly",
+              "text": "Use the LEFT arm — the IV is small and won't interfere with the cuff",
               "correct": false,
-              "feedback": "Incorrect. Cuff placement 1–2 inches above the antecubital space is required. Inflating to a random high pressure is unnecessary and uncomfortable. Rapid deflation causes an inaccurate reading.",
-              "rationale": "Cuff position, inflation level, and deflation rate all directly affect reading accuracy. Each of these steps has a specific standard for a reason."
+              "feedback": "❌ Incorrect. Blood pressure measurement on an arm with an IV is contraindicated. The inflated cuff can disrupt IV flow, cause extravasation (IV fluid leaking into surrounding tissue), and potentially occlude the IV access — resulting in a pharmacy/IV access adverse event.",
+              "rationale": "Cuff inflation to above systolic pressure (typically 160–180 mmHg) completely occludes all vessels in the arm. Applied over an IV insertion site, this can cause the IV catheter to kink, the insertion site to bruise, or fluid to infiltrate the surrounding tissue.",
+              "consequence": "BP measurement over an IV can cause IV infiltration, which in a post-op patient receiving IV medications can result in medication extravasation — a reportable adverse event under Texas HHSC."
             },
             {
               "id": "C",
-              "text": "Record only the systolic pressure (first sound) — diastolic is less important",
+              "text": "Place the cuff at the forearm (wrist level) to avoid the antecubital area",
               "correct": false,
-              "feedback": "Incorrect. Both systolic and diastolic blood pressures must be measured and recorded. Both values are required on the CNA skills exam and in clinical documentation.",
-              "rationale": "Diastolic pressure reflects arterial pressure at rest between heartbeats. Both values together are needed to assess hypertension or hypotension."
+              "feedback": "❌ Incorrect. Wrist blood pressure readings with a standard manual sphygmomanometer are not equivalent to upper-arm readings and are not an acceptable substitution for the brachial artery technique. The standard site is the upper arm at the brachial artery.",
+              "rationale": "The standard site for auscultatory BP measurement is the brachial artery in the antecubital fossa. Wrist measurements require wrist-specific devices and produce different reference values than upper-arm measurements.",
+              "consequence": null
             },
             {
               "id": "D",
-              "text": "Re-inflate the cuff immediately if you miss a reading to try again",
+              "text": "Apply the cuff directly over the antecubital crease for the best stethoscope access to the brachial artery",
               "correct": false,
-              "feedback": "Incorrect. Re-inflating without waiting at least 1–2 minutes can cause venous congestion and produce a falsely elevated reading. If you miss the reading, deflate completely and wait before retaking.",
-              "rationale": "Immediate re-inflation traps venous blood in the arm, which can artificially raise the measured pressure. Always wait and allow full deflation before repeating."
+              "feedback": "❌ Incorrect. The cuff must be placed 1–2 inches ABOVE the antecubital crease, not over it. Placing the cuff directly on the crease obstructs stethoscope placement over the brachial artery and compresses the antecubital area, interfering with hearing Korotkoff sounds.",
+              "rationale": "The 1–2 inch gap between the cuff and the crease provides space for stethoscope placement directly over the brachial artery without cuff interference. Placing the cuff on the crease prevents proper auscultation.",
+              "consequence": null
             }
           ],
           "correct_option": "A",
@@ -227,41 +338,47 @@
     },
     {
       "id": "step_06",
-      "title": "Recognize normal ranges and report abnormal findings",
-      "instruction": "After taking all vital signs, you note: Temp 99.8°F, Pulse 98 bpm, Respirations 22/min, BP 148/94. What should you do?",
+      "title": "Perform manual blood pressure auscultation",
+      "instruction": "The cuff is correctly positioned on Ms. Chen's right arm at heart level. Describe the complete auscultatory technique for measuring her blood pressure.",
       "critical": true,
+      "knowledge_fact": "👂 **Korotkoff Sounds:** Manual BP measurement detects Korotkoff sounds produced by turbulent blood flow as the cuff deflates. Phase I (first sound heard) = SYSTOLIC pressure. Phase V (last sound heard before complete silence) = DIASTOLIC pressure. The deflation rate of 2–3 mmHg per second is critical — faster deflation can cause you to miss the Korotkoff sounds entirely.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The palpatory estimation step before auscultation (inflate cuff, palpate radial pulse until it disappears, add 30 mmHg, then deflate and re-inflate for auscultation) is part of the Prometric BP skill. This step prevents the 'auscultatory gap' — a period of silence that can lead to underestimating the systolic pressure.",
       "decision_points": [
         {
           "id": "dp_06a",
-          "question": "Are these vital signs within normal ranges, and what action is required?",
+          "question": "Which complete auscultatory blood pressure technique meets Prometric CNA exam standards?",
           "options": [
             {
               "id": "A",
-              "text": "All values are outside or at the upper limit of normal ranges — report ALL findings to the charge nurse promptly and document the time reported",
+              "text": "Palpate radial pulse → inflate cuff until pulse disappears, note that pressure → deflate → add 30 mmHg to get inflation target → place stethoscope over brachial artery → re-inflate to target → deflate slowly at 2–3 mmHg/sec → first Korotkoff sound heard = systolic; last sound heard = diastolic → record both with units",
               "correct": true,
-              "feedback": "Correct! Temp 99.8°F (normal 97–99°F), Pulse 98 (upper limit; normal 60–100), Respirations 22 (above normal 12–20), BP 148/94 (elevated; normal <120/80, hypertension ≥140/90) — all warrant prompt reporting. The CNA's role is to measure, observe, document, and REPORT abnormals to the licensed nurse.",
-              "rationale": null
+              "feedback": "✅ Correct! The palpatory estimation step (inflate-feel pulse disappear-add 30) prevents missed systolic readings from auscultatory gaps. Slow deflation (2–3 mmHg/sec) ensures you hear every Korotkoff sound. Recording both systolic AND diastolic with units (e.g., 142/88 mmHg) is the complete Prometric-evaluated technique.",
+              "rationale": null,
+              "consequence": null
             },
             {
               "id": "B",
-              "text": "The values are slightly elevated but not serious — just document and continue",
+              "text": "Inflate cuff to 200 mmHg for all residents, place stethoscope, deflate slowly, record both readings",
               "correct": false,
-              "feedback": "Incorrect. Abnormal vital signs — even mild elevations — must be reported to the supervising nurse. The CNA does not make independent clinical decisions about significance.",
-              "rationale": "The CNA's scope of practice includes measurement, documentation, and REPORTING. Clinical interpretation and management decisions belong to the licensed nurse."
+              "feedback": "❌ Incorrect. Inflating to a fixed 200 mmHg without palpatory estimation is unnecessarily painful for residents with lower BP (e.g., 100/60) and skips the auscultatory gap prevention step. The correct inflation target is palpated pulse-disappearance + 30 mmHg.",
+              "rationale": "Over-inflation causes unnecessary discomfort and prolongs the procedure. The palpatory estimation step individualizes the inflation target to each resident's actual systolic pressure.",
+              "consequence": "Routine inflation to 200 mmHg on a resident with labile hypertension and CHF can cause pain and anxiety — both of which will acutely elevate the BP reading, producing an inaccurate measurement."
             },
             {
               "id": "C",
-              "text": "Retake all the measurements before reporting anything",
+              "text": "Record only the systolic (first sound) — the diastolic is less clinically important for documentation",
               "correct": false,
-              "feedback": "Partially incorrect. While a single outlier may warrant rechecking, a consistent pattern of abnormals across all four vitals should be reported promptly. Delaying to repeat measurements can delay needed intervention.",
-              "rationale": "When multiple abnormals are present simultaneously, prompt reporting is the priority. Do not delay reporting to repeat all measurements."
+              "feedback": "❌ Incorrect. BOTH systolic and diastolic pressures must be measured and documented. Diastolic pressure is diagnostically important — Stage 1 HTN is defined by diastolic 80–89 OR systolic 130–139. A documentation with only systolic is incomplete.",
+              "rationale": "Diastolic pressure is physiologically important as it reflects the arterial pressure during cardiac rest (between beats). It is required for accurate HTN classification and for comparison against care-plan thresholds.",
+              "consequence": "If only systolic is documented, a diastolic threshold exceedance (like Ms. Chen's diastolic of 91 from the pre-check) would be missed, delaying required reporting to the charge nurse."
             },
             {
               "id": "D",
-              "text": "Administer water and encourage rest to normalize the readings before reporting",
+              "text": "If you miss the reading, immediately re-inflate the cuff and try again",
               "correct": false,
-              "feedback": "Incorrect. Administering interventions is outside the CNA scope of practice. CNAs do not intervene clinically — they measure, document, and report to the licensed nurse.",
-              "rationale": "The CNA's scope is to observe and report, not to independently treat or intervene. Administering interventions without nursing direction is a scope-of-practice violation."
+              "feedback": "❌ Incorrect. Immediately re-inflating the cuff without waiting at least 1–2 minutes causes venous congestion (blood trapped in the arm), which artificially elevates the next reading by 5–10 mmHg. Completely deflate, wait 1–2 minutes, then repeat.",
+              "rationale": "Re-inflation immediately after deflation traps venous blood in the arm (venous congestion). This congested state artificially elevates the measured pressure by providing additional resistance to the Korotkoff sounds.",
+              "consequence": "Venous congestion from immediate re-inflation can produce a falsely elevated BP reading, potentially triggering unnecessary urgent notification or medication adjustment."
             }
           ],
           "correct_option": "A",
@@ -271,41 +388,97 @@
     },
     {
       "id": "step_07",
-      "title": "Document vital signs accurately",
-      "instruction": "You are documenting the vital signs. What are the documentation requirements?",
+      "title": "Interpret findings and identify what requires immediate reporting",
+      "instruction": "You have completed all four vital signs. Ms. Chen's findings are: Temperature 100.6°F oral, Pulse 108 bpm (slightly irregular), Respirations 24/min, Blood Pressure 152/94 mmHg. Her care plan threshold: report BP >150/90, HR >110 or <55, RR >22 or <10, Temp >100.4°F. What do you do?",
       "critical": true,
+      "knowledge_fact": "📊 **CNA Scope of Practice (Texas HHSC 2024):** A CNA measures, observes, documents, and REPORTS. A CNA does NOT independently interpret clinical significance, make diagnoses, or initiate treatment. Every abnormal vital sign finding is reported to the supervising licensed nurse who then makes clinical decisions. For Ms. Chen — a post-op CHF patient — these findings together suggest potential post-op complication and require IMMEDIATE reporting.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** The examiner may verbally present abnormal vital sign scenarios and ask what you would do. The expected answer is always: compare to normal/care plan thresholds, identify abnormals, and report to the charge nurse. Never answer that you would administer medication, change the care plan, or wait and see.",
       "decision_points": [
         {
           "id": "dp_07a",
-          "question": "What must your documentation include?",
+          "question": "Ms. Chen's vitals: Temp 100.6°F, Pulse 108 (slightly irregular), RR 24/min, BP 152/94. Which action is correct?",
           "options": [
             {
               "id": "A",
-              "text": "All four vital sign values with units, date and time of measurement, your name/title, and a note if abnormal values were reported to the nurse",
+              "text": "ALL four values exceed the care-plan thresholds — immediately report ALL findings to the charge nurse with exact values, note the time of measurement and the time of reporting, and document per facility policy",
               "correct": true,
-              "feedback": "Correct! Complete documentation includes all values with units, date/time, your signature and title, and a notation that abnormals were reported. Incomplete documentation is a legal and exam standard issue.",
-              "rationale": null
+              "feedback": "✅ Correct! All four values exceed care-plan thresholds: Temp 100.6>100.4°F (fever), Pulse 108 (near upper threshold, irregular — reportable pattern), RR 24>22/min, BP 152/94 (both systolic 152>150 AND diastolic 94>90). Reporting ALL abnormals immediately is the CNA's required response. In a post-op CHF patient, these findings together may indicate infection, pulmonary edema, or arrhythmia — a nurse must assess immediately.",
+              "rationale": null,
+              "consequence": null
             },
             {
               "id": "B",
-              "text": "Just the numbers — the nurse will add the details later",
+              "text": "The pulse of 108 is below the >110 threshold, so only report the BP, temperature, and respirations",
               "correct": false,
-              "feedback": "Incorrect. Documentation must be complete at the time of entry. Missing date, time, and signature makes documentation legally and clinically invalid.",
-              "rationale": "Incomplete documentation is both a safety risk and a legal liability. CNA documentation must be contemporaneous, complete, and signed."
+              "feedback": "❌ Partially incorrect. While the rate of 108 is below the >110 reporting threshold, the IRREGULAR RHYTHM is independently reportable. A new irregular pulse in a CHF patient is a cardiac finding that always warrants immediate nursing notification regardless of rate. Report the rate AND the irregular rhythm.",
+              "rationale": "The care plan threshold specifies rate, but clinical practice requires reporting any NEW rhythm irregularity. For a CHF patient, a new irregular rhythm may indicate atrial fibrillation with ventricular rate response — requiring immediate assessment.",
+              "consequence": "Missing an irregular rhythm finding in a post-op CHF patient could delay recognition of atrial fibrillation, a leading cause of post-operative complications and stroke."
             },
             {
               "id": "C",
-              "text": "Document vitals from memory at the end of the shift to save time",
+              "text": "Encourage Ms. Chen to rest, offer water, and recheck vital signs in 30 minutes to see if they normalize",
               "correct": false,
-              "feedback": "Incorrect. Documentation must be done as soon as possible after measurement — not hours later from memory. Delayed documentation creates inaccuracy and a safety risk.",
-              "rationale": "Timely documentation is a fundamental nursing standard. Memory-based end-of-shift charting is prone to error and legally indefensible."
+              "feedback": "❌ Incorrect. Offering water and resting is OUTSIDE the CNA's scope of practice for responding to abnormal vital signs without nursing direction. Waiting 30 minutes delays the charge nurse's assessment. Abnormal findings must be reported IMMEDIATELY — not managed independently by the CNA.",
+              "rationale": "The CNA's scope of practice ends at observation, documentation, and reporting. Initiating an intervention (even as benign as encouraging fluids) without nursing direction and delaying reporting is a scope-of-practice violation.",
+              "consequence": "In Ms. Chen's case — post-op, CHF, fever, tachypnea, and hypertension — a 30-minute delay in reporting could allow a post-op infection or pulmonary edema to progress to a life-threatening emergency."
             },
             {
               "id": "D",
-              "text": "Only document values that are abnormal to keep notes brief",
+              "text": "Document the values in the chart first, then report to the nurse during the next routine handoff",
               "correct": false,
-              "feedback": "Incorrect. All vital signs must be documented regardless of whether they are normal or abnormal. Partial documentation creates an incomplete clinical record.",
-              "rationale": "The complete vital sign record is needed for trend analysis and legal documentation. Selective recording is incomplete and unacceptable."
+              "feedback": "❌ Incorrect. Abnormal vital signs meeting care-plan thresholds require IMMEDIATE verbal notification to the charge nurse — not scheduled handoff. Documentation should also occur promptly, but the verbal report comes first when findings require urgent attention.",
+              "rationale": "Per Texas Health and Safety Code Chapter 242, CNAs must report changes in resident condition promptly. Waiting for scheduled handoff when thresholds are met constitutes a delay of care.",
+              "consequence": "Delaying reporting of multiple simultaneous abnormal vital signs in a high-risk post-op patient violates Texas HHSC reporting requirements and could result in a preventable adverse outcome."
+            }
+          ],
+          "correct_option": "A",
+          "remediation_ref": "module_reporting"
+        }
+      ]
+    },
+    {
+      "id": "step_08",
+      "title": "Complete accurate, timely clinical documentation",
+      "instruction": "You have verbally reported all abnormal findings to the charge nurse. You now need to document the vital signs. What does complete, accurate documentation require?",
+      "critical": true,
+      "knowledge_fact": "📝 **Texas HHSC Documentation Standard (2024):** Documentation must be: contemporaneous (written at the time of measurement or immediately after), complete (all four vital signs with units), accurate (exact values — no rounding without policy guidance), signed (your name, CNA certification number, and date/time). Per Texas Occupations Code Chapter 301 and HHSC, CNAs are legally responsible for the accuracy of their own documentation.",
+      "exam_tip": "⚠️ **Prometric Watch Point:** Documentation is evaluated at the end of the vital signs skill. Examiners look for: all four values present, correct units (°F, bpm, breaths/min, mmHg), date AND time, CNA name and title/credential, and any note that abnormals were reported to the nurse. Missing any element is a documentation deduction.",
+      "decision_points": [
+        {
+          "id": "dp_08a",
+          "question": "Which documentation entry meets all Texas HHSC NATCEP 2024 and Prometric standards?",
+          "options": [
+            {
+              "id": "A",
+              "text": "08:10 — T: 100.6°F oral, P: 108 bpm (slightly irregular), R: 24/min, BP: 152/94 mmHg (right arm, manual). Charge RN Jones notified of all abnormal values at 08:12. Resident verbalized understanding of vitals being taken. J. Rivera, CNA — 07/03/2025",
+              "correct": true,
+              "feedback": "✅ Correct! Complete documentation includes: time of measurement, all four vital signs with units and method/site, note of nurse notification with time and name, resident communication note, CNA full name and credential, and date. This meets the Texas HHSC standard and would satisfy a Prometric documentation evaluation.",
+              "rationale": null,
+              "consequence": null
+            },
+            {
+              "id": "B",
+              "text": "Vitals done this morning — slightly high. Reported. Signed J.R.",
+              "correct": false,
+              "feedback": "❌ Incomplete on every required element: no specific time, no values recorded, no units, no specific nurse name or notification time, ambiguous signature. This entry would not pass a HHSC survey or a Prometric documentation review.",
+              "rationale": "Documentation must contain specific, measurable data. Vague entries like 'slightly high' are clinically meaningless and legally defensible only when specific values are present for comparison.",
+              "consequence": "A vague entry provides no basis for clinical decision-making by other providers and no legal protection for the CNA if the resident's condition deteriorates and documentation is reviewed."
+            },
+            {
+              "id": "C",
+              "text": "T: normal, P: normal, RR: high (24), BP: high. Reported to nurse. J. Rivera CNA",
+              "correct": false,
+              "feedback": "❌ Incorrect. Using 'normal' or 'high' instead of actual values is not acceptable documentation. Temperature of 100.6°F is NOT normal — and recording it as 'normal' constitutes an inaccurate entry. Always record the actual numeric values with units.",
+              "rationale": "Labeling a finding as 'normal' without recording the actual value is documentation fraud if the value was not actually normal. It also prevents meaningful trend analysis by other clinicians.",
+              "consequence": "Recording 100.6°F as 'normal' misrepresents the finding and would prevent the next CNA from recognizing a fever trend. In a post-op patient, this could delay treatment of a surgical site infection."
+            },
+            {
+              "id": "D",
+              "text": "Document vitals at the end of the shift with all other entries to keep documentation organized",
+              "correct": false,
+              "feedback": "❌ Incorrect. Documentation must be contemporaneous — completed at or very shortly after the time of care. End-of-shift documentation from memory is prone to error and is legally indefensible because the time recorded will not match the actual time of measurement.",
+              "rationale": "The time-stamp on a clinical entry represents the time of the event, not the time of writing. Entering data hours after the event with an incorrect time constitutes falsification of records under Texas law.",
+              "consequence": "End-of-shift documentation of critical findings in a post-op patient means other caregivers had no clinical record to reference during those hours — a patient safety failure and potential HHSC survey deficiency."
             }
           ],
           "correct_option": "A",
@@ -317,43 +490,56 @@
   "communication_checkpoints": [
     {
       "id": "comm_01",
-      "prompt": "Did you explain each vital sign measurement to the resident before performing it (e.g., 'I am going to take your temperature now')?",
+      "prompt": "Before taking each vital sign, did you explain what you were about to do, why it is part of Ms. Chen's post-op care, and ask about her comfort level or pain?",
       "options": [
-        {"id": "Y", "text": "Yes – I explained each step before performing it", "correct": true},
-        {"id": "N", "text": "No – I performed each measurement without explanation", "correct": false}
+        {"id": "Y", "text": "Yes — I explained each measurement, connected it to her post-op care plan, and included a pain assessment", "correct": true},
+        {"id": "N", "text": "No — I measured vital signs without full procedure explanation or pain assessment", "correct": false}
       ],
       "correct_option": "Y",
       "points": 5,
-      "feedback_pass": "Excellent. Explaining each step to the resident demonstrates person-centered care and is scored on the CNA exam.",
-      "feedback_fail": "Always explain what you are about to do before touching the resident or applying equipment. This is a professionalism requirement."
+      "feedback_pass": "✅ Excellent. Explaining each procedure and including a pain assessment reflects person-centered care, is required for post-op monitoring, and is a professionalism score point on the CNA exam.",
+      "feedback_fail": "📌 For each vital sign, briefly explain what you are doing and why ('I am going to take your blood pressure — this is part of checking how you are doing after your surgery.'). Including a pain scale (0–10) at the vital signs check is standard post-op practice in Texas nursing facilities."
     },
     {
       "id": "comm_02",
-      "prompt": "After completing vital signs, did you tell the resident their results (in simple terms) and ensure their comfort?",
+      "prompt": "After completing all vital signs and reporting to the nurse, did you: (1) tell Ms. Chen her nurse would be coming to check on her, (2) ensure her call light was within reach, and (3) provide any comfort measures within CNA scope?",
       "options": [
-        {"id": "Y", "text": "Yes – I provided general feedback and checked comfort", "correct": true},
-        {"id": "N", "text": "No – I documented and left without informing the resident", "correct": false}
+        {"id": "Y", "text": "Yes — I informed her the nurse would follow up, ensured call-light access, and offered comfort within my scope", "correct": true},
+        {"id": "N", "text": "No — I completed the vital signs and documentation and left without post-care communication", "correct": false}
       ],
       "correct_option": "Y",
       "points": 5,
-      "feedback_pass": "Good. Informing the resident and ensuring comfort after care is a person-centered care standard.",
-      "feedback_fail": "Always inform the resident that you have finished and ensure their comfort before leaving. This is part of the CNA communication standard."
+      "feedback_pass": "✅ Excellent. Keeping the resident informed about next steps, ensuring call-light access, and providing comfort within scope are Residents' Rights requirements, professionalism score points, and best-practice post-op care.",
+      "feedback_fail": "📌 After identifying and reporting abnormal vital signs, inform the resident that the nurse will be coming to see them. Ensure the call light is within reach so she can call for help if she feels worse before the nurse arrives. This is both a safety measure and a Residents' Rights practice."
     }
   ],
   "remediation_refs": {
     "module_vital_signs": {
-      "label": "Vital Signs: Measurement and Normal Ranges",
+      "label": "Vital Signs Measurement — Technique, Normal Ranges, and Equipment Use",
       "module": "Module 06",
-      "topic": "Temperature, Pulse, Respirations, and Blood Pressure",
+      "topic": "Temperature, Pulse, Respirations, and Blood Pressure (Manual Auscultatory Method)",
       "exam_domain": "Basic Nursing Skills",
-      "prometric_skill": "Measuring and Recording Vital Signs"
+      "prometric_skill": "Oral Temperature; Pulse and Respirations; Blood Pressure (Manual) — Prometric Skills Pool",
+      "hhsc_reference": "Texas HHSC NATCEP 2024, Section VI – Basic Nursing Skills",
+      "tac_reference": "TAC Title 26, Chapter 95.9(a)(6)"
+    },
+    "module_reporting": {
+      "label": "Reporting Abnormal Findings and Change in Condition",
+      "module": "Module 03",
+      "topic": "CNA Scope of Practice, Chain of Command, and Mandatory Reporting",
+      "exam_domain": "Communication and Documentation",
+      "prometric_skill": "Reporting Abnormal Vital Signs to Licensed Nurse",
+      "hhsc_reference": "Texas HHSC NATCEP 2024, Section III – Communication; Texas Health and Safety Code Ch. 242",
+      "tulip_reference": "TULIP Reporting Obligations — Mandatory Reporter Requirements for Texas CNAs"
     },
     "module_documentation": {
-      "label": "Clinical Documentation Standards",
+      "label": "Clinical Documentation Standards — Accuracy, Completeness, and Timeliness",
       "module": "Module 03",
-      "topic": "Accurate Reporting and Documentation",
+      "topic": "Documentation Requirements, Legal Standards, and CNA Accountability",
       "exam_domain": "Communication and Documentation",
-      "prometric_skill": "Reporting Abnormals and Documentation"
+      "prometric_skill": "Accurate and Complete Vital Sign Documentation",
+      "hhsc_reference": "Texas HHSC NATCEP 2024, Section III – Communication and Documentation",
+      "tac_reference": "TAC Title 26, Chapter 95.9(a)(3); Texas Occupations Code Ch. 301"
     }
   }
 }

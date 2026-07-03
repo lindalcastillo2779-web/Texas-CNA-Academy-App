@@ -1,7 +1,12 @@
 """Clinical Skills Lab engine – scenario loading, step progression, scoring, and feedback.
 
-This module is intentionally dependency-free beyond the Python standard library so it can
-be used from any Streamlit page without additional requirements.
+Aligned to:
+- Texas HHSC NATCEP Curriculum Standards (2024)
+- Prometric CNA Skills Evaluation Checklist (Texas pool)
+- Texas Administrative Code Title 26, Chapter 95 (NATCEP)
+- TULIP (Texas Unified Licensure Information Portal) reporting standards
+
+This module is intentionally dependency-free beyond the Python standard library.
 """
 
 from __future__ import annotations
@@ -28,8 +33,9 @@ _SCENARIO_FILES: dict[str, str] = {
 # Data loading helpers
 # ---------------------------------------------------------------------------
 
+
 def list_scenarios() -> list[dict[str, str]]:
-    """Return a list of available scenarios as ``{"id": ..., "title": ..., "description": ...}``."""
+    """Return a list of available scenarios as summary dicts."""
     scenarios = []
     for sid, fname in _SCENARIO_FILES.items():
         path = _SCENARIOS_DIR / fname
@@ -41,6 +47,7 @@ def list_scenarios() -> list[dict[str, str]]:
                 "description": data.get("description", ""),
                 "natcep_domains": data.get("natcep_domains", []),
                 "estimated_minutes": data.get("estimated_minutes", 0),
+                "prometric_skill": data.get("texas_2024_alignment", {}).get("prometric_skill_title", ""),
             })
         except (OSError, json.JSONDecodeError):
             pass
@@ -68,8 +75,64 @@ def load_curriculum_mapping() -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Pre-simulation knowledge check helpers
+# ---------------------------------------------------------------------------
+
+
+def has_pre_knowledge_check(scenario: dict[str, Any]) -> bool:
+    """Return True if the scenario has pre-simulation knowledge-check questions."""
+    return bool(scenario.get("pre_simulation_knowledge_check"))
+
+
+def get_pre_check_questions(scenario: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return the list of pre-simulation knowledge-check question dicts."""
+    return scenario.get("pre_simulation_knowledge_check", [])
+
+
+def evaluate_pre_check_answer(
+    question: dict[str, Any],
+    chosen_option_id: str,
+) -> dict[str, Any]:
+    """Evaluate a single pre-check question.
+
+    Returns a result dict with: correct (bool), feedback (str), explanation (str).
+    """
+    correct_id = question.get("correct_option")
+    is_correct = chosen_option_id == correct_id
+    options = question.get("options", [])
+    chosen_opt = next((o for o in options if o["id"] == chosen_option_id), None)
+    correct_opt = next((o for o in options if o["id"] == correct_id), None)
+    feedback = question.get("explanation", "")
+    return {
+        "correct": is_correct,
+        "chosen_text": chosen_opt.get("text", "") if chosen_opt else "",
+        "correct_text": correct_opt.get("text", "") if correct_opt else "",
+        "explanation": feedback,
+        "texas_standard": question.get("texas_standard", ""),
+    }
+
+
+def compute_pre_check_score(
+    questions: list[dict[str, Any]],
+    answers: dict[str, str],
+) -> dict[str, Any]:
+    """Compute the pre-check score."""
+    total = len(questions)
+    correct = sum(
+        1 for q in questions
+        if answers.get(q["id"]) == q.get("correct_option")
+    )
+    return {
+        "total": total,
+        "correct": correct,
+        "pct": round(correct / total * 100) if total else 0,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Session-state initialiser
 # ---------------------------------------------------------------------------
+
 
 def init_lab_session(state: Any, scenario_id: str, mode: str) -> None:
     """Initialise Streamlit session state keys for a new lab run.
@@ -77,7 +140,7 @@ def init_lab_session(state: Any, scenario_id: str, mode: str) -> None:
     Parameters
     ----------
     state:
-        ``st.session_state`` (or any dict-like object for testing).
+        ``st.session_state`` (or any dict-like for testing).
     scenario_id:
         One of the keys in ``_SCENARIO_FILES``.
     mode:
@@ -90,29 +153,33 @@ def init_lab_session(state: Any, scenario_id: str, mode: str) -> None:
     state["lab_scenario_id"] = scenario_id
     state["lab_scenario"] = scenario
     state["lab_mode"] = mode
+    # phase: "briefing" | "pre_check" | "simulation" | "complete"
+    state["lab_phase"] = "briefing"
     state["lab_step_index"] = 0
-    # Dict of step_id → chosen option id (str)
     state["lab_step_answers"] = {}
-    # Dict of comm_id → chosen option id (str)
     state["lab_comm_answers"] = {}
     state["lab_complete"] = False
     state["lab_total_steps"] = len(steps)
     state["lab_total_comms"] = len(comms)
+    # Pre-check state
+    state["lab_pre_check_index"] = 0
+    state["lab_pre_check_answers"] = {}
+    state["lab_pre_check_score"] = None
+    # Feedback shown for current step (cleared on advance)
+    state["lab_step_feedback"] = None
 
 
 def reset_lab_session(state: Any) -> None:
     """Remove all lab-related keys from session state."""
-    keys = [k for k in dir(state) if k.startswith("lab_")]
-    for k in keys:
-        try:
-            del state[k]
-        except (KeyError, AttributeError):
-            pass
+    keys_to_remove = [k for k in list(state.keys()) if k.startswith("lab_")]
+    for k in keys_to_remove:
+        del state[k]
 
 
 # ---------------------------------------------------------------------------
 # Step evaluation
 # ---------------------------------------------------------------------------
+
 
 def evaluate_step_answer(
     step: dict[str, Any],
@@ -124,18 +191,19 @@ def evaluate_step_answer(
 
     Returns a result dict with keys:
       - ``correct`` (bool)
-      - ``critical`` (bool)  – mirrors the step's criticality flag
-      - ``feedback`` (str)   – shown immediately in Coach mode, deferred in Exam mode
-      - ``rationale`` (str | None) – shown in Coach mode for wrong answers
+      - ``critical`` (bool)
+      - ``feedback`` (str)   – immediate in Coach; suppressed in Exam
+      - ``rationale`` (str | None)
+      - ``exam_tip`` (str | None)
+      - ``consequence`` (str | None)  – clinical consequence of wrong answer
+      - ``remediation_ref`` (str | None)
     """
     dps = step.get("decision_points", [])
     if dp_index >= len(dps):
         return {"correct": False, "critical": step.get("critical", False), "feedback": "", "rationale": None}
 
     dp = dps[dp_index]
-    correct_id = dp.get("correct_option")
     is_critical = step.get("critical", False)
-
     chosen_opt = next((o for o in dp.get("options", []) if o["id"] == chosen_option_id), None)
     if chosen_opt is None:
         return {"correct": False, "critical": is_critical, "feedback": "Invalid selection.", "rationale": None}
@@ -143,17 +211,20 @@ def evaluate_step_answer(
     is_correct = chosen_opt.get("correct", False)
     feedback = chosen_opt.get("feedback", "")
     rationale = chosen_opt.get("rationale")
+    consequence = chosen_opt.get("consequence")
 
-    # In Exam mode, suppress immediate rationale feedback for wrong answers
     if mode == "exam" and not is_correct:
-        feedback = "❌ Incorrect selection recorded."
+        feedback = "❌ Answer recorded. Full feedback will appear in your results summary."
         rationale = None
+        consequence = None
 
     return {
         "correct": is_correct,
         "critical": is_critical,
         "feedback": feedback,
         "rationale": rationale,
+        "consequence": consequence,
+        "exam_tip": step.get("exam_tip"),
         "remediation_ref": dp.get("remediation_ref"),
     }
 
@@ -170,11 +241,10 @@ def evaluate_comm_answer(
 
     if is_correct:
         feedback = comm.get("feedback_pass", "✅ Communication step completed.")
+    elif mode == "exam":
+        feedback = "❌ Communication checkpoint not met. Details in final summary."
     else:
-        if mode == "exam":
-            feedback = "❌ Communication checkpoint not met."
-        else:
-            feedback = comm.get("feedback_fail", "❌ Communication step missed.")
+        feedback = comm.get("feedback_fail", "❌ Communication step missed.")
 
     return {
         "correct": is_correct,
@@ -187,6 +257,7 @@ def evaluate_comm_answer(
 # Scoring
 # ---------------------------------------------------------------------------
 
+
 def compute_scores(
     scenario: dict[str, Any],
     step_answers: dict[str, str],
@@ -196,16 +267,16 @@ def compute_scores(
     """Compute the full scoring breakdown for a completed lab run.
 
     Returns a dict with:
-      - ``checklist_score`` (int)  – correct non-critical steps (0–100)
-      - ``critical_step_score`` (int)  – critical steps all correct = 100, else 0
-      - ``communication_score`` (int)  – communication checkpoints (0–100)
-      - ``overall_score`` (int)  – weighted composite (0–100)
-      - ``pass_ready`` (bool)  – True if all critical steps correct AND overall ≥ pass threshold
-      - ``critical_misses`` (list[dict])  – steps that were critical and answered incorrectly
-      - ``step_results`` (list[dict])  – per-step pass/fail breakdown
-      - ``remediation_targets`` (list[dict])  – targeted remediation suggestions
+      - ``checklist_score`` (int 0–100)
+      - ``critical_step_score`` (int 0–100)
+      - ``communication_score`` (int 0–100)
+      - ``overall_score`` (int 0–100)
+      - ``pass_ready`` (bool)
+      - ``critical_misses`` (list[dict])
+      - ``step_results`` (list[dict])
+      - ``remediation_targets`` (list[dict])
     """
-    mapping = load_curriculum_mapping()
+    mapping = curriculum_mapping or load_curriculum_mapping()
     weights = mapping.get("scoring_weights", {
         "checklist_score_weight": 0.40,
         "critical_step_score_weight": 0.40,
@@ -225,11 +296,10 @@ def compute_scores(
         .get("steps", {})
     )
 
-    step_results = []
-    critical_misses = []
-    remediation_targets = []
+    step_results: list[dict] = []
+    critical_misses: list[dict] = []
+    remediation_targets: list[dict] = []
 
-    # --- Step scoring ---
     critical_total = 0
     critical_correct = 0
     non_critical_total = 0
@@ -241,15 +311,13 @@ def compute_scores(
         dps = step.get("decision_points", [])
         if not dps:
             continue
-
-        # For simplicity each step has one primary decision point
         dp = dps[0]
         correct_opt_id = dp.get("correct_option")
         chosen = step_answers.get(step_id)
         is_correct = chosen == correct_opt_id
-
         step_map = scenario_step_mapping.get(step_id, {})
-        step_result = {
+
+        step_result: dict[str, Any] = {
             "step_id": step_id,
             "title": step.get("title", step_id),
             "critical": is_critical,
@@ -259,9 +327,13 @@ def compute_scores(
             "domain": step_map.get("domain", ""),
             "curriculum_module": step_map.get("curriculum_module", ""),
             "curriculum_topic": step_map.get("curriculum_topic", ""),
+            "exam_notes": step_map.get("exam_notes", ""),
             "remediation_ref": dp.get("remediation_ref"),
         }
         step_results.append(step_result)
+
+        ref_key = dp.get("remediation_ref")
+        ref_info = scenario.get("remediation_refs", {}).get(ref_key, {})
 
         if is_critical:
             critical_total += 1
@@ -269,9 +341,6 @@ def compute_scores(
                 critical_correct += 1
             else:
                 critical_misses.append(step_result)
-                # Build remediation entry
-                ref_key = dp.get("remediation_ref")
-                ref_info = scenario.get("remediation_refs", {}).get(ref_key, {})
                 remediation_targets.append({
                     "step_title": step.get("title", step_id),
                     "module": ref_info.get("module", step_map.get("curriculum_module", "")),
@@ -279,14 +348,13 @@ def compute_scores(
                     "exam_domain": ref_info.get("exam_domain", step_map.get("domain", "")),
                     "prometric_skill": ref_info.get("prometric_skill", ""),
                     "label": ref_info.get("label", ""),
+                    "critical": True,
                 })
         else:
             non_critical_total += 1
             if is_correct:
                 non_critical_correct += 1
-            elif chosen is not None and not is_correct:
-                ref_key = dp.get("remediation_ref")
-                ref_info = scenario.get("remediation_refs", {}).get(ref_key, {})
+            elif chosen is not None:
                 remediation_targets.append({
                     "step_title": step.get("title", step_id),
                     "module": ref_info.get("module", step_map.get("curriculum_module", "")),
@@ -294,34 +362,29 @@ def compute_scores(
                     "exam_domain": ref_info.get("exam_domain", step_map.get("domain", "")),
                     "prometric_skill": ref_info.get("prometric_skill", ""),
                     "label": ref_info.get("label", ""),
+                    "critical": False,
                 })
 
     checklist_score = (
         round(non_critical_correct / non_critical_total * 100) if non_critical_total > 0 else 100
     )
-
-    # Critical step score: all-or-nothing per critical step
     critical_step_score = (
         round(critical_correct / critical_total * 100) if critical_total > 0 else 100
     )
 
-    # --- Communication scoring ---
     comm_points_earned = 0
     comm_points_total = 0
     for comm in comms:
         comm_id = comm.get("id")
         points = comm.get("points", 5)
         comm_points_total += points
-        chosen = comm_answers.get(comm_id)
-        correct_opt_id = comm.get("correct_option")
-        if chosen == correct_opt_id:
+        if comm_answers.get(comm_id) == comm.get("correct_option"):
             comm_points_earned += points
 
     communication_score = (
         round(comm_points_earned / comm_points_total * 100) if comm_points_total > 0 else 100
     )
 
-    # --- Weighted composite ---
     w_check = weights.get("checklist_score_weight", 0.40)
     w_crit = weights.get("critical_step_score_weight", 0.40)
     w_comm = weights.get("communication_score_weight", 0.20)
@@ -335,7 +398,7 @@ def compute_scores(
     all_criticals_passed = critical_total == 0 or critical_correct == critical_total
     pass_ready = all_criticals_passed and overall_score >= pass_threshold
 
-    # Deduplicate remediation targets by topic
+    # Deduplicate by topic
     seen_topics: set[str] = set()
     unique_remediation: list[dict] = []
     for r in remediation_targets:
@@ -365,48 +428,46 @@ def compute_scores(
 
 
 def build_next_steps_text(scores: dict[str, Any], mode: str) -> list[str]:
-    """Return a list of prioritised next-step recommendation strings."""
-    recommendations: list[str] = []
+    """Return a prioritised list of next-step recommendation strings."""
+    recs: list[str] = []
 
     if not scores.get("all_criticals_passed"):
-        recommendations.append(
-            "🚨 **Critical step(s) missed.** Review infection control, safety, and exam-critical "
-            "technique steps immediately — these cause automatic failure on the Prometric exam."
+        recs.append(
+            "🚨 **Critical step(s) missed** — these trigger automatic failure on the Prometric exam. "
+            "Review the steps below and retry in Coach Mode before testing yourself in Exam Mode."
         )
-    if scores.get("critical_step_score", 100) < 100:
-        for miss in scores.get("critical_misses", []):
-            mod = miss.get("curriculum_module", "")
-            topic = miss.get("curriculum_topic", "")
-            if mod or topic:
-                recommendations.append(f"📌 Re-study: **{mod} – {topic}**")
+    for miss in scores.get("critical_misses", []):
+        mod = miss.get("curriculum_module", "")
+        topic = miss.get("curriculum_topic", "")
+        if mod or topic:
+            recs.append(f"📌 Re-study: **{mod}** → {topic}")
 
     if scores.get("checklist_score", 100) < 80:
-        recommendations.append(
-            "📋 **Checklist completion below 80%.** Practice each skill step in sequence before "
-            "attempting Exam Mode."
+        recs.append(
+            "📋 **Checklist completion below 80%.** Practice each skill step in sequence "
+            "using Coach Mode before switching to Exam Mode."
         )
 
     if scores.get("communication_score", 100) < 80:
-        recommendations.append(
-            "💬 **Communication score below 80%.** Practice greeting, explaining procedures, and "
-            "ensuring resident comfort — these are scored on the CNA exam."
+        recs.append(
+            "💬 **Communication score below 80%.** The CNA exam scores resident greeting, "
+            "procedure explanation, and post-care comfort check. Practice these with every simulation."
         )
 
     if scores.get("pass_ready"):
-        recommendations.append(
-            "✅ **You are showing exam readiness for this skill.** Continue practicing in Exam Mode "
-            "and expand to other lab scenarios."
+        recs.append(
+            "✅ **Exam ready for this skill.** Continue in Exam Mode and expand to other scenarios."
         )
     else:
-        recommendations.append(
-            "📚 **Use Coach Mode** to review rationale for each incorrect answer, then retry in Exam Mode."
+        recs.append(
+            "📚 Use **Coach Mode** to review the full rationale for each incorrect answer, "
+            "then test yourself in **Exam Mode** to simulate Prometric conditions."
         )
 
-    # Targeted remediation
     for r in scores.get("remediation_targets", [])[:3]:
         label = r.get("label") or r.get("topic", "")
         module = r.get("module", "")
         if label and module:
-            recommendations.append(f"📖 Targeted review: **{module}** → {label}")
+            recs.append(f"📖 Targeted review: **{module}** → {label}")
 
-    return recommendations
+    return recs
