@@ -18,6 +18,30 @@ video_caption: Add a safety walkthrough or emergency-response micro-lesson video
 - Use RACE/PASS concepts during fire and emergency events.
 - Recognize and report immediate resident safety risks.
 
+## Chapter 1: Environmental safety and hazard prevention
+
+- Complete room and equipment safety checks at start of care.
+- Identify high-risk hazards: clutter, wet floors, tubing, and poor lighting.
+- Use prevention-first actions to reduce falls and injuries.
+
+## Chapter 2: Safe movement and transfer readiness
+
+- Verify bed height, wheel locks, and assistive devices before movement.
+- Use gait-belt and body-mechanics fundamentals for safer transfers.
+- Stop and escalate when resident tolerance or setup is unsafe.
+
+## Chapter 3: Emergency response framework
+
+- Apply RACE and PASS steps for fire and smoke incidents.
+- Follow immediate priorities for choking, collapse, and urgent distress.
+- Activate facility-specific emergency protocols without delay.
+
+## Chapter 4: Post-incident actions and reporting
+
+- Protect resident safety after an incident and stay with the resident.
+- Report event details promptly to the supervising nurse.
+- Document objective observations, actions taken, and resident response.
+
 ## Study checklist
 
 1. Review room setup and assistive-device safety checks.

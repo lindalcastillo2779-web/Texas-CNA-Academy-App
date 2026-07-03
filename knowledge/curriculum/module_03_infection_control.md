@@ -18,6 +18,30 @@ video_caption: Add a PPE or hand-hygiene demonstration video here.
 - Choose and sequence PPE donning and doffing correctly.
 - Use hand hygiene timing points to reduce transmission risk.
 
+## Chapter 1: Infection prevention principles
+
+- Explain chain-of-infection links and interruption strategies.
+- Apply standard precautions in all resident-care encounters.
+- Distinguish clean, contaminated, and high-touch care surfaces.
+
+## Chapter 2: Hand hygiene excellence
+
+- Perform soap-and-water handwashing with full-surface coverage.
+- Use alcohol-based hand rub at appropriate care moments.
+- Recognize situations where soap and water is required.
+
+## Chapter 3: PPE selection and sequencing
+
+- Match PPE to task risk and transmission concern.
+- Don PPE in correct order before resident contact.
+- Doff PPE in safe sequence to prevent self-contamination.
+
+## Chapter 4: Transmission-based precautions and reporting
+
+- Differentiate contact, droplet, and airborne precaution cues.
+- Follow isolation signage, dedicated equipment, and room workflow.
+- Report exposure events and breaches in infection protocol immediately.
+
 ## Study checklist
 
 1. Review standard vs. transmission-based precaution concepts.

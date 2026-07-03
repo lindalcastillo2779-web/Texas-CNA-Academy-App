@@ -46,5 +46,7 @@ The Texas NATCEP competency evaluation consists of:
 Candidates must pass both components. The written test is administered by Prometric on behalf of HHSC.
 
 ---
+See `curriculum_crosswalk_8_domains_to_14_modules.md` for the mapping between the 8 NATCEP domains and the app's 14-course module structure.
+
 *Add additional curriculum documents (lesson plans, domain guides, skills checklists) to this folder.*
 *Buddy will automatically include this content when the knowledge index is built.*

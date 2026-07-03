@@ -18,6 +18,30 @@ video_caption: Add a short CNA scope-of-practice or communication demo video her
 - Explain delegation boundaries and when to report to a nurse.
 - Demonstrate resident-rights aware communication and documentation habits.
 
+## Chapter 1: CNA role, scope, and accountability
+
+- Define tasks within CNA scope and identify nurse-only duties.
+- Follow assignment acceptance standards based on competency and safety.
+- Recognize legal accountability for actions and omissions in care.
+
+## Chapter 2: Delegation and chain of command
+
+- Apply the proper reporting chain for routine and urgent observations.
+- Clarify instructions when assignments are unclear or unsafe.
+- Escalate sudden resident condition changes to licensed nursing staff immediately.
+
+## Chapter 3: Professional boundaries and ethics
+
+- Maintain therapeutic boundaries with residents and families.
+- Protect confidentiality and avoid social media/privacy violations.
+- Use ethical decision-making for dignity, autonomy, and safety conflicts.
+
+## Chapter 4: Documentation and handoff fundamentals
+
+- Chart objective resident observations without assumptions.
+- Include time, action taken, and who was notified in notes.
+- Support safe handoff communication for shift continuity.
+
 ## Study checklist
 
 1. Review scope limits vs. nurse-only tasks.
