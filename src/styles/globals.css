@@ -1,19 +1,19 @@
 :root {
-  --bg: #f7f2e8;
-  --surface: #fffaf2;
-  --surface-2: #f2eadf;
-  --border: #dbcdb7;
-  --text: #16284a;
-  --muted: #5d6780;
-  --primary: #7f1d2d;
-  --primary-hover: #651726;
-  --accent: #c8a64d;
-  --success: #5d7c5a;
-  --shadow-sm: 0 2px 10px rgba(22, 40, 74, 0.06);
-  --shadow-md: 0 10px 24px rgba(22, 40, 74, 0.08);
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
+  --bg: #F5EDE0;
+  --surface: #FEFBF5;
+  --surface-2: #EDE5D4;
+  --border: #D4C3A8;
+  --text: #0B1D35;
+  --muted: #4A5568;
+  --primary: #5A0C1A;
+  --primary-hover: #400813;
+  --accent: #9E6C00;
+  --success: #2D6A4F;
+  --shadow-sm: 0 2px 10px rgba(11, 29, 53, 0.07);
+  --shadow-md: 0 10px 24px rgba(11, 29, 53, 0.10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
   --max-width: 1200px;
 }
 
@@ -32,7 +32,7 @@ body,
 
 body {
   font-family: Inter, Arial, sans-serif;
-  background: linear-gradient(180deg, #fbf6ee 0%, var(--bg) 100%);
+  background: linear-gradient(180deg, #F8F2E8 0%, var(--bg) 100%);
   color: var(--text);
 }
 
@@ -83,21 +83,22 @@ a {
   justify-content: space-between;
   gap: 16px;
   padding: 16px 20px;
-  background: rgba(255, 250, 242, 0.92);
+  background: rgba(254, 251, 245, 0.93);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(22, 40, 74, 0.08);
+  border-bottom: 1px solid rgba(11, 29, 53, 0.1);
+  border-bottom-width: 1px;
 }
 
 .brand-kicker {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--primary);
 }
 
 .topbar-title {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text);
@@ -127,23 +128,25 @@ a {
 .panel-card,
 .course-card {
   background: var(--surface);
-  border: 1px solid rgba(22, 40, 74, 0.08);
+  border: 1px solid rgba(11, 29, 53, 0.10);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
 
 .hero-card {
-  padding: 24px;
+  padding: 28px;
   background:
-    linear-gradient(135deg, rgba(200, 166, 77, 0.12), rgba(127, 29, 45, 0.05)),
+    linear-gradient(135deg, rgba(158, 108, 0, 0.10), rgba(90, 12, 26, 0.05)),
     var(--surface);
+  border-top: 3px solid var(--accent);
 }
 
 .hero-card h1,
 .section-header h2,
 .panel-card h3,
 .course-card h3 {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-weight: 700;
   margin: 0;
 }
 
@@ -242,8 +245,8 @@ a {
   min-height: 32px;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(127, 29, 45, 0.14);
-  background: rgba(127, 29, 45, 0.06);
+  border: 1px solid rgba(90, 12, 26, 0.16);
+  background: rgba(90, 12, 26, 0.06);
   color: var(--primary);
   font-size: 0.82rem;
   font-weight: 600;
@@ -284,9 +287,9 @@ a {
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-  background: rgba(255, 250, 242, 0.96);
+  background: rgba(254, 251, 245, 0.96);
   backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(22, 40, 74, 0.08);
+  border-top: 1px solid rgba(11, 29, 53, 0.10);
 }
 
 .bottom-nav-item {
@@ -303,8 +306,8 @@ a {
 
 .bottom-nav-item.is-active {
   color: var(--primary);
-  background: rgba(127, 29, 45, 0.08);
-  border-color: rgba(127, 29, 45, 0.12);
+  background: rgba(90, 12, 26, 0.08);
+  border-color: rgba(90, 12, 26, 0.12);
 }
 
 .bottom-nav-icon {
