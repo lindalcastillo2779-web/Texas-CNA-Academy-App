@@ -130,11 +130,10 @@
             font-family: 'Playfair Display', Georgia, serif;
             font-size: 1.35rem;
             font-weight: 700;
-            color: white;
+            color: var(--gold);
             text-decoration: none;
             letter-spacing: 0.01em;
         }
-        .logo span { color: var(--gold); }
         .nav {
             display: flex;
             gap: 28px;
@@ -424,37 +423,8 @@
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <a href="/" class="logo">Texas CNA <span>Academy</span></a>
-            <nav class="nav">
-                <a href="#mission">About</a>
-                <div class="nav-dropdown">
-                    <button class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-                        Student <span class="chevron">&#9660;</span>
-                    </button>
-                    <div class="nav-dropdown-menu">
-                        <a href="dashboard.html">🎓 CNA Course</a>
-                    </div>
-                </div>
-                <a href="#renewal">Renewal</a>
-                <a href="#resources">Resources</a>
-                <a href="#testimonials">Testimonials</a>
-                <a href="signup.html" class="btn btn-primary">Sign Up</a>
-            </nav>
-            <div class="mobile-toggle" onclick="document.querySelector('.mobile-nav').classList.toggle('open')">&#9776;</div>
+            <a href="/" class="logo">Texas CNA Academy</a>
         </div>
-        <nav class="mobile-nav">
-            <a href="#mission">About</a>
-            <div>
-                <span class="mobile-dropdown-label">Student</span>
-                <div class="mobile-submenu">
-                    <a href="dashboard.html">🎓 CNA Course</a>
-                </div>
-            </div>
-            <a href="#renewal">Renewal</a>
-            <a href="#resources">Resources</a>
-            <a href="#testimonials">Testimonials</a>
-            <a href="signup.html">Sign Up</a>
-        </nav>
     </header>
 
     <!-- Hero Section -->
