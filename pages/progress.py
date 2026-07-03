@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
@@ -241,15 +242,12 @@ def _render_domain_table(stats: list[dict]) -> None:
                 "Status": "🔲",
             })
 
-    import pandas as pd
     df = pd.DataFrame(rows)
     st.dataframe(df, use_container_width=True, hide_index=True)
 
 
 def _render_trend(trend_data: list[dict]) -> None:
     """Line chart of quiz score % over time."""
-    import pandas as pd
-
     df = pd.DataFrame(trend_data)
     df["taken_at"] = pd.to_datetime(df["taken_at"])
 

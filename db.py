@@ -401,19 +401,23 @@ def get_quiz_stats_by_domain(user_id: int) -> list[dict]:
 def get_quiz_trend(user_id: int, limit: int = 30) -> list[dict]:
     """Return the last *limit* quiz attempts with their percentage score and date.
 
-    Each dict has keys: taken_at (ISO str), pct (float), domain (str).
+    Results are in chronological order (oldest first) so they can be plotted
+    as a left-to-right trend line.  Each dict has keys: taken_at (ISO str),
+    pct (float), domain (str).
     """
     with get_conn() as conn:
         rows = conn.execute(
             """
-            SELECT
-                taken_at,
-                domain,
-                ROUND(CAST(score AS REAL) / CAST(total AS REAL) * 100, 1) AS pct
-            FROM quiz_attempts
-            WHERE user_id = ? AND total > 0
+            SELECT taken_at, domain,
+                   ROUND(CAST(score AS REAL) / CAST(total AS REAL) * 100, 1) AS pct
+            FROM (
+                SELECT taken_at, domain, score, total
+                FROM quiz_attempts
+                WHERE user_id = ? AND total > 0
+                ORDER BY taken_at DESC
+                LIMIT ?
+            )
             ORDER BY taken_at ASC
-            LIMIT ?
             """,
             (user_id, limit),
         ).fetchall()
