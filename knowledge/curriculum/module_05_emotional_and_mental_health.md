@@ -3,7 +3,7 @@ module_id: module_05_emotional_and_mental_health
 title: Module 05: Emotional and Mental Health Needs
 hero_image: assets/images/lessons/module_05_emotional_and_mental_health.svg
 thumbnail: assets/images/lessons/module_05_emotional_and_mental_health.svg
-video_url: https://www.youtube.com/watch?v=66h3zA8M3_E
+video_url:
 caption: Psychosocial support, therapeutic communication, and urgent mental-health reporting.
 credit: Texas CNA Academy curriculum team
 source: Texas NATCEP psychosocial care competencies

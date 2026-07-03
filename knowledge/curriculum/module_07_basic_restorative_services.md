@@ -3,7 +3,7 @@ module_id: module_07_basic_restorative_services
 title: Module 07: Basic Restorative Services
 hero_image: assets/images/lessons/module_07_basic_restorative_services.svg
 thumbnail: assets/images/lessons/module_07_basic_restorative_services.svg
-video_url: https://www.youtube.com/watch?v=H6R9Vx1Y4Xk
+video_url:
 caption: Mobility support, ROM practice, restorative documentation, and independence coaching.
 credit: Texas CNA Academy curriculum team
 source: Texas NATCEP restorative-care domain guidance

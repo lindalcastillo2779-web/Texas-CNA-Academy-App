@@ -3,7 +3,7 @@ module_id: module_06_spiritual_and_cultural_needs
 title: Module 06: Spiritual and Cultural Needs
 hero_image: assets/images/lessons/module_06_spiritual_and_cultural_needs.svg
 thumbnail: assets/images/lessons/module_06_spiritual_and_cultural_needs.svg
-video_url: https://www.youtube.com/watch?v=2fH8N9wGgF4
+video_url:
 caption: Culturally responsive and spiritually sensitive care in long-term care settings.
 credit: Texas CNA Academy curriculum team
 source: Texas NATCEP domain guide and person-centered care standards

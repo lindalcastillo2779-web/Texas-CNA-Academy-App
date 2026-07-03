@@ -3,7 +3,7 @@ module_id: module_02_safety_and_emergency
 title: Module 02: Safety and Emergency Response
 hero_image: assets/images/lessons/module_02_safety_and_emergency.svg
 thumbnail: assets/images/lessons/module_02_safety_and_emergency.svg
-video_url: https://www.youtube.com/watch?v=8M9J8t6wQ1A
+video_url:
 caption: Resident safety scans, transfer readiness, emergency actions, and post-incident reporting.
 credit: Texas CNA Academy curriculum team
 source: Texas NATCEP competency alignment

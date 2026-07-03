@@ -3,7 +3,7 @@ module_id: module_08_residents_rights
 title: Module 08: Residents' Rights
 hero_image: assets/images/lessons/module_08_residents_rights.svg
 thumbnail: assets/images/lessons/module_08_residents_rights.svg
-video_url: https://www.youtube.com/watch?v=te2z93y4A0Y
+video_url:
 caption: OBRA rights, dignity, consent, abuse prevention, and grievance advocacy in CNA practice.
 credit: Texas CNA Academy curriculum team
 source: OBRA and Texas long-term care compliance guidance

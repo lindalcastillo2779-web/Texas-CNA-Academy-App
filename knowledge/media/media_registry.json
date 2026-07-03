@@ -85,7 +85,7 @@
     "module_04_cognitively_impaired_care": {
       "hero_image": "assets/images/lessons/module_04_cognitively_impaired_care.svg",
       "thumbnail": "assets/images/lessons/module_04_cognitively_impaired_care.svg",
-      "video_url": "https://www.youtube.com/watch?v=toJb7L3O6IM",
+      "video_url": null,
       "caption": "Dementia communication and safety supervision training visual.",
       "credit": "Texas CNA Academy curriculum team",
       "source": "Owned curriculum media",
@@ -94,7 +94,7 @@
     "module_05_emotional_and_mental_health": {
       "hero_image": "assets/images/lessons/module_05_emotional_and_mental_health.svg",
       "thumbnail": "assets/images/lessons/module_05_emotional_and_mental_health.svg",
-      "video_url": "https://www.youtube.com/watch?v=66h3zA8M3_E",
+      "video_url": null,
       "caption": "Therapeutic communication and psychosocial care training visual.",
       "credit": "Texas CNA Academy curriculum team",
       "source": "Owned curriculum media",
@@ -103,7 +103,7 @@
     "module_06_spiritual_and_cultural_needs": {
       "hero_image": "assets/images/lessons/module_06_spiritual_and_cultural_needs.svg",
       "thumbnail": "assets/images/lessons/module_06_spiritual_and_cultural_needs.svg",
-      "video_url": "https://www.youtube.com/watch?v=2fH8N9wGgF4",
+      "video_url": null,
       "caption": "Cultural humility and spiritual preference support training visual.",
       "credit": "Texas CNA Academy curriculum team",
       "source": "Owned curriculum media",
@@ -112,7 +112,7 @@
     "module_07_basic_restorative_services": {
       "hero_image": "assets/images/lessons/module_07_basic_restorative_services.svg",
       "thumbnail": "assets/images/lessons/module_07_basic_restorative_services.svg",
-      "video_url": "https://www.youtube.com/watch?v=H6R9Vx1Y4Xk",
+      "video_url": null,
       "caption": "Restorative mobility, ROM, and functional documentation training visual.",
       "credit": "Texas CNA Academy curriculum team",
       "source": "Owned curriculum media",
@@ -121,7 +121,7 @@
     "module_08_residents_rights": {
       "hero_image": "assets/images/lessons/module_08_residents_rights.svg",
       "thumbnail": "assets/images/lessons/module_08_residents_rights.svg",
-      "video_url": "https://www.youtube.com/watch?v=te2z93y4A0Y",
+      "video_url": null,
       "caption": "OBRA rights, consent, and mandatory reporting training visual.",
       "credit": "Texas CNA Academy curriculum team",
       "source": "Owned curriculum media",

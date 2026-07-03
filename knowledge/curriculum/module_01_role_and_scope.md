@@ -3,7 +3,7 @@ module_id: module_01_role_and_scope
 title: Module 01: Role of the Nurse Aide
 hero_image: assets/images/lessons/module_01_role_and_scope.svg
 thumbnail: assets/images/lessons/module_01_role_and_scope.svg
-video_url: https://www.youtube.com/watch?v=Q7h8FD2fS6Y
+video_url:
 caption: Foundational nurse aide role, scope, delegation, and reporting workflow.
 credit: Texas CNA Academy curriculum team
 source: Texas NATCEP competency alignment

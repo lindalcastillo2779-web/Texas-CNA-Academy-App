@@ -3,7 +3,7 @@ module_id: module_04_cognitively_impaired_care
 title: Module 04: Care of Cognitively Impaired Residents
 hero_image: assets/images/lessons/module_04_cognitively_impaired_care.svg
 thumbnail: assets/images/lessons/module_04_cognitively_impaired_care.svg
-video_url: https://www.youtube.com/watch?v=toJb7L3O6IM
+video_url:
 caption: Dementia-focused communication, behavior support, and wandering-risk safety actions.
 credit: Texas CNA Academy curriculum team
 source: Texas NATCEP domain guidance and dementia care best practices

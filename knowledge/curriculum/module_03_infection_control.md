@@ -3,7 +3,7 @@ module_id: module_03_infection_control
 title: Module 03: Infection Control Foundations
 hero_image: assets/images/lessons/module_03_infection_control.svg
 thumbnail: assets/images/lessons/module_03_infection_control.svg
-video_url: https://www.youtube.com/watch?v=Qy0v-D2R8lY
+video_url:
 caption: Infection prevention essentials, hand hygiene, PPE sequencing, and transmission controls.
 credit: Texas CNA Academy curriculum team
 source: CDC and Texas NATCEP competency alignment
