@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles/globals.css';
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById('app');
 
 if (!rootElement) {
-  throw new Error('Missing #root element in index.html');
+  throw new Error('Missing #app element in HTML entrypoint');
 }
 
 ReactDOM.createRoot(rootElement).render(
@@ -14,12 +14,3 @@ ReactDOM.createRoot(rootElement).render(
     <App />
   </React.StrictMode>
 );
-
-const app = document.querySelector('#app') || document.body;
-
-app.innerHTML = `
-  <section style="padding:24px">
-    <h2>Texas CNA Academy frontend connected ✅</h2>
-    <p>Vite + TypeScript build is working.</p>
-  </section>
-`;

@@ -1,6 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  getDomainLabel,
+  getModulesWithProgress,
+  getNextLesson,
+} from '../../features/courses';
 
-type AppView = 'home' | 'courses' | 'clinical-skills' | 'flashcards' | 'more';
+type AppView = 'home' | 'courses' | 'skills' | 'review' | 'more';
 
 type NavItem = {
   key: AppView;
@@ -8,126 +13,393 @@ type NavItem = {
   icon: string;
 };
 
+type TaskItem = {
+  title: string;
+  detail: string;
+  status: string;
+  view: AppView;
+};
+
 const NAV_ITEMS: NavItem[] = [
   { key: 'home', label: 'Home', icon: '⌂' },
   { key: 'courses', label: 'Courses', icon: '▣' },
-  { key: 'clinical-skills', label: 'Clinical Skills', icon: '✚' },
-  { key: 'flashcards', label: 'Flashcards', icon: '◫' },
+  { key: 'skills', label: 'Skills', icon: '✚' },
+  { key: 'review', label: 'Review', icon: '◫' },
   { key: 'more', label: 'More', icon: '⋯' },
 ];
 
-function HomeScreen() {
+const DEMO_LEARNER_STATE = {
+  completedModuleIds: ['M01', 'M02'],
+  moduleProgress: {
+    M01: {
+      moduleId: 'M01',
+      completedLessonIds: ['M01-L01', 'M01-L02', 'M01-L03', 'M01-L04', 'M01-L05', 'M01-L06'],
+      totalLessons: 6,
+      completedLessons: 6,
+      percentComplete: 100,
+      lastAccessedAt: '2026-06-28T08:30:00Z',
+      status: 'completed',
+    },
+    M02: {
+      moduleId: 'M02',
+      completedLessonIds: ['M02-L01', 'M02-L02', 'M02-L03', 'M02-L04', 'M02-L05', 'M02-L06', 'M02-L07'],
+      totalLessons: 7,
+      completedLessons: 7,
+      percentComplete: 100,
+      lastAccessedAt: '2026-06-29T14:15:00Z',
+      status: 'completed',
+    },
+    M03: {
+      moduleId: 'M03',
+      completedLessonIds: ['M03-L01', 'M03-L02', 'M03-L03', 'M03-L04'],
+      totalLessons: 8,
+      completedLessons: 4,
+      percentComplete: 50,
+      lastAccessedAt: '2026-07-02T18:00:00Z',
+      status: 'in-progress',
+    },
+    M04: {
+      moduleId: 'M04',
+      completedLessonIds: ['M04-L01', 'M04-L02'],
+      totalLessons: 8,
+      completedLessons: 2,
+      percentComplete: 25,
+      lastAccessedAt: '2026-07-01T09:45:00Z',
+      status: 'in-progress',
+    },
+  },
+};
+
+const TODAY_TASKS: TaskItem[] = [
+  {
+    title: 'Resume communication module',
+    detail: 'Finish the next lesson and keep your study streak active.',
+    status: '15 min',
+    view: 'courses',
+  },
+  {
+    title: 'Review infection control misses',
+    detail: 'Target the weakest domain before your next quiz.',
+    status: '8 cards due',
+    view: 'review',
+  },
+  {
+    title: 'Practice one clinical skill',
+    detail: 'Run a handwashing or transfer readiness check today.',
+    status: '1 skill focus',
+    view: 'skills',
+  },
+];
+
+const GOALS = [
+  { title: 'Pass the written exam in 30 days', progress: 78, note: 'You are on pace this week.' },
+  { title: 'Finish 3 modules this month', progress: 67, note: 'One more module completes the goal.' },
+  { title: 'Keep CEU records organized', progress: 50, note: 'Upload the next certificate after completion.' },
+];
+
+const REVIEW_DECKS = [
+  { title: 'Infection control', due: '8 cards due today', mastery: 62, action: 'Spaced repetition priority' },
+  { title: 'Safety and emergency', due: '5 cards due tomorrow', mastery: 74, action: 'Adaptive quiz recommended' },
+  { title: 'Resident rights', due: 'Mastered this week', mastery: 91, action: 'Light refresh only' },
+];
+
+const SKILL_TRACKER = [
+  { title: 'Handwashing', readiness: 92, notes: 'Strong sequencing. Keep wet-hand timing consistent.' },
+  { title: 'Transfer: bed to wheelchair', readiness: 71, notes: 'Focus on lock brakes and clear cueing.' },
+  { title: 'Vital signs and documentation', readiness: 64, notes: 'Recheck normal ranges before testing.' },
+];
+
+const TOOL_CARDS = [
+  { title: 'Exam Prep', status: 'Live now', copy: 'Use adaptive quizzes by domain and subtopic.' },
+  { title: 'CEU Tracker', status: 'Live now', copy: 'Track annual credits and upload proof faster.' },
+  { title: 'Renewal Check', status: 'Live now', copy: 'See readiness, deadlines, and missing steps.' },
+  { title: 'Buddy', status: 'Next up', copy: 'Turn chat into study plans, explanations, and reminders.' },
+  { title: 'Document Vault', status: 'Recommended', copy: 'Store certificates, completion records, and forms.' },
+  { title: 'Instructor Views', status: 'Roadmap', copy: 'Give instructors and facilities a tailored dashboard.' },
+];
+
+function ProgressBar({ value, tone = 'accent' }: { value: number; tone?: 'accent' | 'success' | 'navy' }) {
+  return (
+    <div className="progress-meter" aria-hidden="true">
+      <span className={`progress-meter-bar tone-${tone}`} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+    </div>
+  );
+}
+
+function SectionHeader({
+  eyebrow,
+  title,
+  copy,
+}: {
+  eyebrow: string;
+  title: string;
+  copy?: string;
+}) {
+  return (
+    <div className="section-header">
+      <div>
+        <div className="section-kicker">{eyebrow}</div>
+        <h2 className="section-title">{title}</h2>
+        {copy ? <p className="section-copy">{copy}</p> : null}
+      </div>
+    </div>
+  );
+}
+
+function HomeScreen({
+  onNavigate,
+  courseworkCompletion,
+  completedModules,
+  nextLessonSummary,
+  renewalDaysLeft,
+}: {
+  onNavigate: (view: AppView) => void;
+  courseworkCompletion: number;
+  completedModules: number;
+  nextLessonSummary: string;
+  renewalDaysLeft: number;
+}) {
+  const weakestDomain = getDomainLabel('INFECT');
+
   return (
     <div className="screen-stack">
       <section className="hero-card">
-        <div className="eyebrow">Texas CNA Academy</div>
-        <h1>Study next with confidence.</h1>
-        <p className="hero-copy">
-          Track coursework, clinical preparation, flashcard review, and renewal support in one place.
-        </p>
-        <div className="button-row">
-          <button className="btn btn-primary">Continue learning</button>
-          <button className="btn btn-secondary">View progress</button>
+        <div className="eyebrow">Student portal</div>
+        <div className="hero-grid">
+          <div>
+            <h1>Your CNA command center.</h1>
+            <p className="hero-copy">
+              See what to study next, which skill needs attention, and whether you are on track for testing and renewal.
+            </p>
+            <div className="hero-actions">
+              <button className="btn btn-primary" type="button" onClick={() => onNavigate('courses')}>
+                Continue learning
+              </button>
+              <button className="btn btn-secondary" type="button" onClick={() => onNavigate('review')}>
+                Review weak area
+              </button>
+            </div>
+          </div>
+
+          <aside className="section-card emphasis-card">
+            <span className="metric-label">Study next</span>
+            <strong className="metric-value">{nextLessonSummary}</strong>
+            <p className="metric-copy">Finish this lesson to stay on pace for your 30-day exam goal.</p>
+            <ProgressBar value={courseworkCompletion} />
+            <div className="progress-meta">
+              <span>{courseworkCompletion}% coursework complete</span>
+              <span>{completedModules} modules finished</span>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <section className="kpi-grid">
-        <article className="panel-card">
-          <span className="kpi-label">Study next</span>
-          <strong className="kpi-value">Module 1 Review</strong>
-          <p className="kpi-copy">Resume your current learning path and keep momentum.</p>
+      <section className="metric-grid">
+        <article className="metric-card">
+          <span className="metric-label">Weakest domain</span>
+          <strong className="metric-value">{weakestDomain.shortLabel}</strong>
+          <p className="metric-copy">{weakestDomain.description}</p>
+        </article>
+        <article className="metric-card">
+          <span className="metric-label">Exam readiness</span>
+          <strong className="metric-value">78%</strong>
+          <p className="metric-copy">Strong pace overall. Keep drilling infection control and transfer safety.</p>
+        </article>
+        <article className="metric-card">
+          <span className="metric-label">Renewal countdown</span>
+          <strong className="metric-value">{renewalDaysLeft} days</strong>
+          <p className="metric-copy">Stay ahead on CEU uploads and renewal proof collection.</p>
+        </article>
+      </section>
+
+      <section className="panel-grid">
+        <article className="section-card">
+          <SectionHeader eyebrow="Today" title="Priority tasks" copy="One clear plan for the next study session." />
+          <div className="task-list">
+            {TODAY_TASKS.map((task) => (
+              <button key={task.title} type="button" className="task-item" onClick={() => onNavigate(task.view)}>
+                <div className="task-copy">
+                  <span className="task-kicker">{task.status}</span>
+                  <strong className="task-title">{task.title}</strong>
+                  <span className="task-meta">{task.detail}</span>
+                </div>
+                <span className="task-action">Open</span>
+              </button>
+            ))}
+          </div>
         </article>
 
-        <article className="panel-card">
-          <span className="kpi-label">Renewal due</span>
-          <strong className="kpi-value">Not due yet</strong>
-          <p className="kpi-copy">Verify final renewal timing with Texas HHSC, TULIP, and Prometric.</p>
+        <article className="section-card">
+          <SectionHeader eyebrow="Snapshot" title="Readiness overview" copy="Focus on the signals that matter most this week." />
+          <div className="insight-stack">
+            <div>
+              <div className="progress-meta"><span>Coursework</span><span>{courseworkCompletion}%</span></div>
+              <ProgressBar value={courseworkCompletion} tone="navy" />
+            </div>
+            <div>
+              <div className="progress-meta"><span>Skill confidence</span><span>76%</span></div>
+              <ProgressBar value={76} tone="success" />
+            </div>
+            <div>
+              <div className="progress-meta"><span>CEU progress</span><span>50%</span></div>
+              <ProgressBar value={50} />
+            </div>
+          </div>
         </article>
+      </section>
 
-        <article className="panel-card">
-          <span className="kpi-label">Weak area</span>
-          <strong className="kpi-value">Infection control</strong>
-          <p className="kpi-copy">Focus review and safety steps are ready when you need them.</p>
+      <section className="section-card">
+        <SectionHeader eyebrow="Goals" title="Momentum this month" copy="Goals, reminders, and progress should live in the same place." />
+        <div className="goal-grid">
+          {GOALS.map((goal) => (
+            <article key={goal.title} className="goal-card">
+              <strong>{goal.title}</strong>
+              <p>{goal.note}</p>
+              <div className="progress-meta"><span>Progress</span><span>{goal.progress}%</span></div>
+              <ProgressBar value={goal.progress} />
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function CoursesScreen({
+  modules,
+  nextLessonSummary,
+}: {
+  modules: Array<any>;
+  nextLessonSummary: string;
+}) {
+  return (
+    <div className="screen-stack">
+      <section className="section-card">
+        <SectionHeader
+          eyebrow="Courses"
+          title="Personalized learning path"
+          copy="The portal now uses real course metadata so the dashboard and module list stay aligned."
+        />
+        <div className="focus-banner">
+          <span className="badge badge-accent">Recommended next step</span>
+          <strong>{nextLessonSummary}</strong>
+        </div>
+      </section>
+
+      <section className="module-grid" aria-label="Course modules">
+        {modules.map((module) => (
+          <article key={module.moduleId} className="module-card">
+            <div className="badge-row">
+              <span className="badge badge-muted">Module {module.moduleNumber}</span>
+              <span className={`badge ${module.isUnlocked ? 'badge-success' : 'badge-warning'}`}>
+                {module.isUnlocked ? 'Unlocked' : 'Locked'}
+              </span>
+            </div>
+            <h3 className="module-title">{module.title}</h3>
+            <p className="module-copy">{module.description}</p>
+            <div className="progress-meta">
+              <span>{module.progress.completedLessons}/{module.progress.totalLessons} lessons</span>
+              <span>{Math.round(module.progress.percentComplete)}%</span>
+            </div>
+            <ProgressBar value={module.progress.percentComplete} tone={module.progress.percentComplete >= 75 ? 'success' : 'accent'} />
+            <div className="module-footer">
+              <span>{module.estimatedMinutes} min</span>
+              <span>{module.clinicalSkillsCount} skills</span>
+              <span>{module.primaryDomain}</span>
+            </div>
+          </article>
+        ))}
+      </section>
+    </div>
+  );
+}
+
+function SkillsScreen() {
+  return (
+    <div className="screen-stack">
+      <section className="section-card">
+        <SectionHeader
+          eyebrow="Clinical skills"
+          title="Skills mastery tracker"
+          copy="Track readiness, common misses, and the next coaching focus for each high-value skill."
+        />
+      </section>
+
+      <section className="card-grid">
+        {SKILL_TRACKER.map((skill) => (
+          <article key={skill.title} className="section-card">
+            <span className="metric-label">Pass-readiness</span>
+            <h3 className="module-title">{skill.title}</h3>
+            <p className="module-copy">{skill.notes}</p>
+            <div className="progress-meta"><span>Confidence</span><span>{skill.readiness}%</span></div>
+            <ProgressBar value={skill.readiness} tone={skill.readiness >= 80 ? 'success' : 'accent'} />
+          </article>
+        ))}
+      </section>
+
+      <section className="panel-grid">
+        <article className="section-card">
+          <SectionHeader eyebrow="Exam day" title="Common misses to prevent" />
+          <ul className="info-list">
+            <li>Lock wheelchair brakes before any transfer movement.</li>
+            <li>Keep resident communication clear before touching equipment.</li>
+            <li>Document readings immediately after taking vital signs.</li>
+          </ul>
+        </article>
+        <article className="section-card">
+          <SectionHeader eyebrow="Coaching" title="What to practice next" />
+          <ul className="info-list">
+            <li>Run one timed transfer simulation this afternoon.</li>
+            <li>Repeat handwashing sequence with wet-hand timing.</li>
+            <li>Review normal blood pressure ranges before the next quiz.</li>
+          </ul>
         </article>
       </section>
     </div>
   );
 }
 
-function CoursesScreen() {
+function ReviewScreen() {
   return (
     <div className="screen-stack">
-      <section className="section-header">
-        <div>
-          <div className="eyebrow">Courses</div>
-          <h2>Texas curriculum modules</h2>
-        </div>
-        <button className="btn btn-secondary">Browse all</button>
+      <section className="section-card">
+        <SectionHeader
+          eyebrow="Review center"
+          title="Adaptive study + spaced repetition"
+          copy="The review experience should prioritize weak areas, due flashcards, and just-in-time exam drills."
+        />
       </section>
 
-      <article className="course-card">
-        <div className="course-meta-row">
-          <span className="tag">Module 1</span>
-          <span className="tag">Core training</span>
-        </div>
-        <h3>Role of the Nurse Aide</h3>
-        <p>
-          Learn the responsibilities, work standards, communication basics, and expectations that shape safe CNA practice in Texas settings.
-        </p>
-        <div className="progress-row">
-          <span>Progress: 42%</span>
-          <span>6 lessons</span>
-          <span>25 min left</span>
-        </div>
-        <div className="button-row">
-          <button className="btn btn-primary">Continue module</button>
-          <button className="btn btn-secondary">View details</button>
-        </div>
-      </article>
-    </div>
-  );
-}
-
-function ClinicalSkillsScreen() {
-  return (
-    <div className="screen-stack">
-      <section className="section-header">
-        <div>
-          <div className="eyebrow">Clinical Skills</div>
-          <h2>Step-by-step skills training</h2>
-        </div>
+      <section className="card-grid">
+        {REVIEW_DECKS.map((deck) => (
+          <article key={deck.title} className="section-card">
+            <span className="metric-label">{deck.due}</span>
+            <h3 className="module-title">{deck.title}</h3>
+            <p className="module-copy">{deck.action}</p>
+            <div className="progress-meta"><span>Mastery</span><span>{deck.mastery}%</span></div>
+            <ProgressBar value={deck.mastery} tone={deck.mastery >= 85 ? 'success' : 'accent'} />
+          </article>
+        ))}
       </section>
 
-      <article className="panel-card">
-        <h3>Handwashing</h3>
-        <p>Review each step in sequence, why it matters, and the most common exam-day misses.</p>
-        <div className="button-row">
-          <button className="btn btn-primary">Start skill</button>
-          <button className="btn btn-secondary">Why it matters</button>
-        </div>
-      </article>
-    </div>
-  );
-}
-
-function FlashcardsScreen() {
-  return (
-    <div className="screen-stack">
-      <section className="section-header">
-        <div>
-          <div className="eyebrow">Flashcards</div>
-          <h2>Quick review and exam recall</h2>
-        </div>
+      <section className="panel-grid">
+        <article className="section-card">
+          <SectionHeader eyebrow="Smart review" title="What excellent feels like" />
+          <ul className="info-list">
+            <li>Auto-schedule cards based on mistakes and recall confidence.</li>
+            <li>Serve more quiz items from low-mastery domains.</li>
+            <li>Recommend the next lesson when a pattern of misses appears.</li>
+          </ul>
+        </article>
+        <article className="section-card">
+          <SectionHeader eyebrow="This week" title="Recommended review cadence" />
+          <ul className="info-list">
+            <li>Mon/Wed/Fri: infection control flashcards</li>
+            <li>Tue/Thu: mixed safety quiz blocks</li>
+            <li>Weekend: one clinical skill simulation + debrief</li>
+          </ul>
+        </article>
       </section>
-
-      <article className="panel-card">
-        <h3>Safety and infection control</h3>
-        <p>Review key terms, steps, and test-style prompts with short rationale support.</p>
-        <div className="button-row">
-          <button className="btn btn-primary">Open deck</button>
-          <button className="btn btn-secondary">Shuffle review</button>
-        </div>
-      </article>
     </div>
   );
 }
@@ -135,64 +407,135 @@ function FlashcardsScreen() {
 function MoreScreen() {
   return (
     <div className="screen-stack">
-      <section className="section-header">
-        <div>
-          <div className="eyebrow">More</div>
-          <h2>More tools and support</h2>
-        </div>
+      <section className="section-card">
+        <SectionHeader
+          eyebrow="Platform roadmap"
+          title="More tools in one unified experience"
+          copy="These are the product areas that should feel connected instead of split across separate pages and prototypes."
+        />
       </section>
 
-      <div className="more-grid">
-        {[
-          'Skills Lab',
-          'Study Buddy',
-          'Verified Resources',
-          'Accessibility',
-          'About',
-          'Settings',
-        ].map((item) => (
-          <article key={item} className="panel-card compact-card">
-            <h3>{item}</h3>
-            <p>Open this area.</p>
+      <section className="card-grid">
+        {TOOL_CARDS.map((tool) => (
+          <article key={tool.title} className="section-card compact-card">
+            <div className="badge-row">
+              <span className="badge badge-muted">{tool.status}</span>
+            </div>
+            <h3 className="module-title">{tool.title}</h3>
+            <p className="module-copy">{tool.copy}</p>
           </article>
         ))}
-      </div>
+      </section>
     </div>
   );
 }
 
-function renderView(view: AppView) {
+function renderView(view: AppView, args: {
+  onNavigate: (view: AppView) => void;
+  courseworkCompletion: number;
+  completedModules: number;
+  nextLessonSummary: string;
+  renewalDaysLeft: number;
+  modules: Array<any>;
+}) {
   switch (view) {
     case 'home':
-      return <HomeScreen />;
+      return (
+        <HomeScreen
+          onNavigate={args.onNavigate}
+          courseworkCompletion={args.courseworkCompletion}
+          completedModules={args.completedModules}
+          nextLessonSummary={args.nextLessonSummary}
+          renewalDaysLeft={args.renewalDaysLeft}
+        />
+      );
     case 'courses':
-      return <CoursesScreen />;
-    case 'clinical-skills':
-      return <ClinicalSkillsScreen />;
-    case 'flashcards':
-      return <FlashcardsScreen />;
+      return <CoursesScreen modules={args.modules} nextLessonSummary={args.nextLessonSummary} />;
+    case 'skills':
+      return <SkillsScreen />;
+    case 'review':
+      return <ReviewScreen />;
     case 'more':
       return <MoreScreen />;
     default:
-      return <HomeScreen />;
+      return null;
   }
 }
 
 export function IntegratedAppShell() {
   const [currentView, setCurrentView] = useState<AppView>('home');
 
+  const modulesWithProgress = useMemo(
+    () => getModulesWithProgress(DEMO_LEARNER_STATE as never).filter((module: any) => module.status === 'available'),
+    []
+  );
+
+  const nextLessonSummary = useMemo(() => {
+    const nextLesson = getNextLesson(DEMO_LEARNER_STATE as never);
+    if (!nextLesson) {
+      return 'Prometric Exam Preparation';
+    }
+
+    const module = modulesWithProgress.find((item: any) => item.moduleId === nextLesson.moduleId);
+    const lessonNumber = nextLesson.lessonId.split('-')[1]?.replace('L', 'Lesson ') ?? nextLesson.lessonId;
+
+    return `${module?.title ?? nextLesson.moduleId} · ${lessonNumber}`;
+  }, [modulesWithProgress]);
+
+  const courseworkCompletion = useMemo(() => {
+    const totals = modulesWithProgress.reduce(
+      (acc: { complete: number; total: number }, module: any) => {
+        acc.complete += module.progress.completedLessons;
+        acc.total += module.progress.totalLessons;
+        return acc;
+      },
+      { complete: 0, total: 0 }
+    );
+
+    return totals.total ? Math.round((totals.complete / totals.total) * 100) : 0;
+  }, [modulesWithProgress]);
+
+  const completedModules = useMemo(
+    () => modulesWithProgress.filter((module: any) => module.progress.status === 'completed').length,
+    [modulesWithProgress]
+  );
+
+  const renewalDaysLeft = useMemo(() => {
+    const target = new Date('2026-12-31T00:00:00Z').getTime();
+    const today = Date.now();
+    return Math.max(0, Math.ceil((target - today) / (1000 * 60 * 60 * 24)));
+  }, []);
+
+  useEffect(() => {
+    const syncFromHash = () => {
+      const rawHash = window.location.hash.replace('#', '');
+      if (NAV_ITEMS.some((item) => item.key === rawHash)) {
+        setCurrentView(rawHash as AppView);
+      }
+    };
+
+    syncFromHash();
+    window.addEventListener('hashchange', syncFromHash);
+    return () => window.removeEventListener('hashchange', syncFromHash);
+  }, []);
+
+  const navigate = (view: AppView) => {
+    setCurrentView(view);
+    window.history.replaceState(null, '', `#${view}`);
+  };
+
   const currentTitle = useMemo(() => {
     switch (currentView) {
       case 'home':
-        return 'Student Home';
+        return 'Today dashboard';
       case 'courses':
-        return 'Courses';
-      case 'clinical-skills':
-        return 'Clinical Skills';
-      case 'flashcards':
-        return 'Flashcards';
+        return 'Learning path';
+      case 'skills':
+        return 'Skills mastery';
+      case 'review':
+        return 'Review center';
       case 'more':
-        return 'More';
+        return 'More tools';
       default:
         return 'Texas CNA Academy';
     }
@@ -205,17 +548,28 @@ export function IntegratedAppShell() {
       </a>
 
       <header className="topbar">
-        <div>
+        <div className="topbar-copy">
           <div className="brand-kicker">Texas CNA Academy</div>
           <div className="topbar-title">{currentTitle}</div>
+          <p className="topbar-subtitle">A unified student portal for courses, readiness, skills, and renewal support.</p>
         </div>
-        <button className="profile-chip" type="button">
-          Student
-        </button>
+        <div className="topbar-actions">
+          <span className="status-chip">30-day plan active</span>
+          <button className="profile-chip" type="button" aria-label="Student profile">
+            Student
+          </button>
+        </div>
       </header>
 
       <main id="main-content" className="main-content">
-        {renderView(currentView)}
+        {renderView(currentView, {
+          onNavigate: navigate,
+          courseworkCompletion,
+          completedModules,
+          nextLessonSummary,
+          renewalDaysLeft,
+          modules: modulesWithProgress,
+        })}
       </main>
 
       <nav className="bottom-nav" aria-label="Primary">
@@ -227,7 +581,7 @@ export function IntegratedAppShell() {
               key={item.key}
               type="button"
               className={`bottom-nav-item ${isActive ? 'is-active' : ''}`}
-              onClick={() => setCurrentView(item.key)}
+              onClick={() => navigate(item.key)}
               aria-current={isActive ? 'page' : undefined}
             >
               <span className="bottom-nav-icon" aria-hidden="true">
