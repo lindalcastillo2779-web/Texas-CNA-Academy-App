@@ -30,9 +30,119 @@ init_db()
 # ---------------------------------------------------------------------------
 st.set_page_config(
     page_title="Texas CNA Academy",
-    page_icon="🌸",
+    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded",
+)
+
+# ---------------------------------------------------------------------------
+# Global custom CSS — academic color palette + Playfair Display titles
+# ---------------------------------------------------------------------------
+st.markdown(
+    """
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ── Color tokens ── */
+        :root {
+            --navy:     #0B1D35;
+            --burgundy: #5A0C1A;
+            --gold:     #9E6C00;
+            --beige:    #F5EDE0;
+            --beige-2:  #EDE5D4;
+            --card:     #FEFBF5;
+        }
+
+        /* ── All headings → Bold Playfair Display ── */
+        h1, h2, h3, h4, h5, h6,
+        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
+        .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 {
+            font-family: 'Playfair Display', Georgia, serif !important;
+            font-weight: 700 !important;
+            color: var(--navy) !important;
+            letter-spacing: -0.01em;
+        }
+
+        /* ── App background ── */
+        .stApp {
+            background-color: var(--beige) !important;
+        }
+
+        /* ── Main content area ── */
+        section[data-testid="stMain"] > div {
+            background: transparent;
+        }
+
+        /* ── Sidebar ── */
+        [data-testid="stSidebar"] {
+            background-color: var(--navy) !important;
+        }
+        [data-testid="stSidebar"] * {
+            color: rgba(255,255,255,0.88) !important;
+        }
+        [data-testid="stSidebar"] .stRadio label {
+            font-weight: 500 !important;
+        }
+        [data-testid="stSidebar"] hr {
+            border-color: rgba(255,255,255,0.15) !important;
+        }
+
+        /* ── Metric cards ── */
+        [data-testid="stMetric"] {
+            background: var(--card) !important;
+            border: 1px solid #D4C3A8 !important;
+            border-top: 3px solid var(--gold) !important;
+            border-radius: 6px !important;
+            padding: 16px !important;
+        }
+        [data-testid="stMetricValue"] {
+            color: var(--navy) !important;
+            font-family: 'Playfair Display', Georgia, serif !important;
+            font-weight: 700 !important;
+        }
+        [data-testid="stMetricLabel"] {
+            color: #4A5568 !important;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+        }
+
+        /* ── Primary buttons ── */
+        .stButton > button[kind="primary"],
+        .stButton > button {
+            background-color: var(--burgundy) !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 4px !important;
+            font-weight: 600 !important;
+        }
+        .stButton > button:hover {
+            background-color: #400813 !important;
+        }
+
+        /* ── Tab headers ── */
+        .stTabs [data-baseweb="tab"] {
+            font-family: 'Playfair Display', Georgia, serif !important;
+            font-weight: 600 !important;
+            color: var(--navy) !important;
+        }
+        .stTabs [data-baseweb="tab-highlight"] {
+            background-color: var(--burgundy) !important;
+        }
+
+        /* ── Data tables ── */
+        [data-testid="stDataFrame"] {
+            border: 1px solid #D4C3A8 !important;
+            border-radius: 6px !important;
+        }
+
+        /* ── Dividers ── */
+        hr {
+            border-color: #D4C3A8 !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 # ---------------------------------------------------------------------------
