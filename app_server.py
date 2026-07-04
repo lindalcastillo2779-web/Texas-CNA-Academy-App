@@ -73,6 +73,13 @@ STRIPE_PRO_PRICE_IDS = {
     for price_id in os.environ.get("STRIPE_PRO_PRICE_IDS", "").split(",")
     if price_id.strip()
 }
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "").strip()
+STRIPE_SUCCESS_URL = os.environ.get(
+    "STRIPE_SUCCESS_URL", "/dashboard.html?checkout=success"
+).strip()
+STRIPE_CANCEL_URL = os.environ.get(
+    "STRIPE_CANCEL_URL", "/dashboard.html?checkout=cancelled"
+).strip()
 init_db()
 
 
@@ -469,6 +476,68 @@ async def current_entitlement(request: Request) -> JSONResponse:
     return JSONResponse({"ok": True, "entitlement": entitlement})
 
 
+async def create_checkout_session(request: Request) -> JSONResponse:
+    if not STRIPE_SECRET_KEY:
+        return _json_error("Stripe is not configured on this server.", 503)
+
+    try:
+        user = _require_user(request)
+    except PermissionError as exc:
+        return _json_error(str(exc), 401)
+
+    try:
+        body = await request.json()
+    except Exception:
+        return _json_error("Request body must be valid JSON.", 400)
+
+    price_id = str(body.get("price_id", "")).strip()
+    if not price_id:
+        return _json_error("price_id is required.", 400)
+
+    # Build the Stripe Checkout Session parameters (form-encoded).
+    params: list[tuple[str, str]] = [
+        ("mode", "subscription"),
+        ("line_items[0][price]", price_id),
+        ("line_items[0][quantity]", "1"),
+        ("success_url", STRIPE_SUCCESS_URL),
+        ("cancel_url", STRIPE_CANCEL_URL),
+        ("client_reference_id", str(user["id"])),
+    ]
+
+    # Attach an existing Stripe customer or pre-fill the email field.
+    existing_customer_id = str(user.get("stripe_customer_id") or "").strip()
+    if existing_customer_id:
+        params.append(("customer", existing_customer_id))
+    else:
+        user_email = str(user.get("email") or "").strip()
+        if user_email:
+            params.append(("customer_email", user_email))
+
+    # Embed the user id in metadata so the webhook can match the session.
+    params.append(("metadata[user_id]", str(user["id"])))
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.post(
+                "https://api.stripe.com/v1/checkout/sessions",
+                headers={"Authorization": "Bearer " + STRIPE_SECRET_KEY},
+                data=params,
+            )
+    except httpx.RequestError as exc:
+        return _json_error(f"Failed to reach Stripe: {exc}", 502)
+
+    if response.status_code != 200:
+        stripe_error = response.json().get("error", {}).get("message", "Unknown error")
+        return _json_error(f"Stripe error: {stripe_error}", 502)
+
+    session_data = response.json()
+    checkout_url = session_data.get("url")
+    if not checkout_url:
+        return _json_error("Stripe did not return a checkout URL.", 502)
+
+    return JSONResponse({"ok": True, "url": checkout_url})
+
+
 async def stripe_webhook(request: Request) -> JSONResponse:
     if not STRIPE_WEBHOOK_SECRET:
         return _json_error("Stripe webhook is not configured.", 503)
@@ -717,6 +786,7 @@ routes = [
     Route("/api/portal/staff", staff_portal, methods=["GET"]),
     Route("/api/portal/admin", admin_portal, methods=["GET"]),
     Route("/api/billing/entitlement", current_entitlement, methods=["GET"]),
+    Route("/api/billing/create-checkout-session", create_checkout_session, methods=["POST"]),
     Route("/api/billing/stripe/webhook", stripe_webhook, methods=["POST"]),
     Route(f"/{STREAMLIT_BASE_PATH}", root_redirect),
     Route(f"/{STREAMLIT_BASE_PATH}/{{path:path}}", proxy_streamlit_http, methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]),
