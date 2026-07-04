@@ -406,12 +406,15 @@ def _hash_password(password: str) -> str:
 
 def verify_password(password: str, password_hash: str | None) -> bool:
     if not password_hash:
+        _run_dummy_password_check(password)
         return False
     try:
         algorithm, iterations, salt, expected_hash = password_hash.split("$", 3)
     except ValueError:
+        _run_dummy_password_check(password)
         return False
     if algorithm != "pbkdf2_sha256":
+        _run_dummy_password_check(password)
         return False
     derived_key = hashlib.pbkdf2_hmac(
         "sha256",
@@ -424,6 +427,15 @@ def verify_password(password: str, password_hash: str | None) -> bool:
 
 def _hash_session_token(session_token: str) -> str:
     return hashlib.sha256(session_token.encode("utf-8")).hexdigest()
+
+
+def _run_dummy_password_check(password: str) -> None:
+    hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        b"texas-cna-academy-dummy-salt",
+        PASSWORD_HASH_ITERATIONS,
+    )
 
 
 def get_or_create_user(name: str, email: str, role: str = "student") -> int:
@@ -1180,7 +1192,8 @@ def _build_student_portal_record(user: dict) -> dict:
     if access["subscribed"]:
         status_chip = "Subscription active"
     elif access["trial_active"]:
-        status_chip = f"{access['days_left']} day trial left"
+        unit = "day" if access["days_left"] == 1 else "days"
+        status_chip = f"{access['days_left']} {unit} trial left"
     else:
         status_chip = "Subscription required"
 

@@ -143,10 +143,21 @@ async function fetchApi<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: unknown = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new PortalApiError(`Invalid API response from ${path}.`, response.status);
+    }
+  }
 
   if (!response.ok) {
-    throw new PortalApiError(data?.error || response.statusText, response.status);
+    const errorMessage =
+      typeof data === 'object' && data !== null && 'error' in data && typeof data.error === 'string'
+        ? data.error
+        : response.statusText;
+    throw new PortalApiError(errorMessage, response.status);
   }
 
   return data as T;

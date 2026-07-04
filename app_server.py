@@ -153,7 +153,7 @@ async def register(request: Request) -> JSONResponse:
 
     full_name = " ".join(part for part in [first_name, last_name] if part).strip()
     if not full_name or not email or not password:
-        return _json_error("First name, last name, email, and password are required.", 400)
+        return _json_error("Name, email, and password are required.", 400)
     if len(password) < 8:
         return _json_error("Please choose a password with at least 8 characters.", 400)
     if password != confirm_password:
