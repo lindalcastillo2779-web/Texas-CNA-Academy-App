@@ -1571,7 +1571,11 @@ def _build_admin_portal_snapshot() -> dict:
         "compliance": [
             {"label": "Accounts with access", "value": str(active_access_count), "tone": "is-success"},
             {"label": "Renewals pending", "value": str(renewal_pending_count), "tone": "is-warning"},
-            {"label": "Non-compliant shifts", "value": str(non_compliant_shifts), "tone": "is-danger" if non_compliant_shifts else "is-success"},
+            {
+                "label": "Non-compliant shifts",
+                "value": str(non_compliant_shifts),
+                "tone": "is-danger" if non_compliant_shifts else "is-success",
+            },
         ],
         "communityHealth": [
             {"label": "Mentor profiles", "value": str(mentor_profiles), "tone": "is-success"},
