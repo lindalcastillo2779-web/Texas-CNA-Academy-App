@@ -1,10 +1,16 @@
 export type PortalProfile = {
+  name?: string;
   firstName?: string;
   lastName?: string;
   email?: string;
   phone?: string;
   role?: string;
   facility?: string;
+};
+
+export type PortalSessionUser = PortalProfile & {
+  id: number;
+  dashboardPath: string;
 };
 
 export type StudentPortalRecord = {
@@ -108,38 +114,46 @@ export type AdminPortalSnapshot = {
   communityReviewQueue: Array<{ title: string; detail: string; tone: string }>;
 };
 
-type StudentDashboardSnapshot = {
+export type StudentPortalPayload = {
   generatedAt: string;
-  students: StudentPortalRecord[];
+  profile: PortalProfile;
+  student: StudentPortalRecord;
 };
 
-function safeJsonParse<T>(value: string | null): T | null {
-  if (!value) {
-    return null;
-  }
+export class PortalApiError extends Error {
+  readonly status: number;
 
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return null;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
   }
 }
 
-async function fetchSnapshot<T>(path: string): Promise<T | null> {
-  const response = await fetch(path, { headers: { Accept: 'application/json' } });
+async function fetchApi<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers ?? {});
+  headers.set('Accept', 'application/json');
+  if (init?.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  const response = await fetch(path, {
+    credentials: 'include',
+    ...init,
+    headers,
+  });
+
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+
   if (!response.ok) {
-    return null;
+    throw new PortalApiError(data?.error || response.statusText, response.status);
   }
 
-  return (await response.json()) as T;
+  return data as T;
 }
 
-export function readPortalProfile(): PortalProfile | null {
-  return safeJsonParse<PortalProfile>(window.localStorage.getItem('texas-cna-academy.portal-profile'));
-}
-
-export function getPortalDisplayName(profile: PortalProfile | null): string {
-  const fullName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim();
+export function getPortalDisplayName(profile: PortalProfile | null | undefined): string {
+  const fullName = profile?.name?.trim() || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim();
   return fullName || 'Portal user';
 }
 
@@ -170,30 +184,22 @@ export function formatRelativeDate(value: string | null | undefined): string {
   return timestamp.toLocaleDateString();
 }
 
-export async function loadStudentPortalRecord(): Promise<{
-  generatedAt: string | null;
-  profile: PortalProfile | null;
-  student: StudentPortalRecord | null;
-}> {
-  const profile = readPortalProfile();
-  const snapshot = await fetchSnapshot<StudentDashboardSnapshot>('/portal-data/student-dashboard.json');
-  const requestedEmail = profile?.email?.trim().toLowerCase();
-  const student =
-    snapshot?.students.find((candidate) => candidate.email.trim().toLowerCase() === requestedEmail) ??
-    snapshot?.students[0] ??
-    null;
-
-  return {
-    generatedAt: snapshot?.generatedAt ?? null,
-    profile,
-    student,
-  };
+export async function loadPortalSession(): Promise<{ authenticated: true; user: PortalSessionUser }> {
+  return fetchApi<{ authenticated: true; user: PortalSessionUser }>('/api/auth/session');
 }
 
-export async function loadStaffPortalSnapshot(): Promise<StaffPortalSnapshot | null> {
-  return fetchSnapshot<StaffPortalSnapshot>('/portal-data/staff-dashboard.json');
+export async function signOutPortalSession(): Promise<void> {
+  await fetchApi<{ ok: boolean }>('/api/auth/logout', { method: 'POST' });
 }
 
-export async function loadAdminPortalSnapshot(): Promise<AdminPortalSnapshot | null> {
-  return fetchSnapshot<AdminPortalSnapshot>('/portal-data/admin-dashboard.json');
+export async function loadStudentPortalRecord(): Promise<StudentPortalPayload> {
+  return fetchApi<StudentPortalPayload>('/api/portal/student');
+}
+
+export async function loadStaffPortalSnapshot(): Promise<StaffPortalSnapshot> {
+  return fetchApi<StaffPortalSnapshot>('/api/portal/staff');
+}
+
+export async function loadAdminPortalSnapshot(): Promise<AdminPortalSnapshot> {
+  return fetchApi<AdminPortalSnapshot>('/api/portal/admin');
 }

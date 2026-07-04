@@ -1,4 +1,5 @@
 export type PortalSignupRole = 'student' | 'staff' | 'admin';
+export type PortalAuthMode = 'register' | 'login';
 
 const SUPPORT_MESSAGE = 'Please allow pop-ups for this site to use this action.';
 
@@ -11,8 +12,12 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
-export function goToPortalSignup(role: PortalSignupRole): void {
-  window.location.assign(`signup.html?role=${role}`);
+export function goToPortalSignup(role: PortalSignupRole, mode: PortalAuthMode = 'register'): void {
+  const params = new URLSearchParams({ role });
+  if (mode !== 'register') {
+    params.set('mode', mode);
+  }
+  window.location.assign(`signup.html?${params.toString()}`);
 }
 
 export function goToPage(path: string): void {

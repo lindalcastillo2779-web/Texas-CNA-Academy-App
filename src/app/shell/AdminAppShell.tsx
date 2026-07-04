@@ -1,6 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { goToPortalSignup, printHtmlReport } from './portalActions';
-import { formatRelativeDate, loadAdminPortalSnapshot, type AdminPortalSnapshot } from './portalData';
+import {
+  PortalApiError,
+  formatRelativeDate,
+  loadAdminPortalSnapshot,
+  loadPortalSession,
+  signOutPortalSession,
+  type AdminPortalSnapshot,
+  type PortalSessionUser,
+} from './portalData';
 
 type AdminView = 'overview' | 'users' | 'courses' | 'community' | 'compliance' | 'reports';
 
@@ -84,6 +92,42 @@ function SectionHeader({
         <h2 className="section-title">{title}</h2>
         {copy ? <p className="section-copy">{copy}</p> : null}
       </div>
+    </div>
+  );
+}
+
+function PortalAccessNotice({
+  title,
+  message,
+  primaryLabel,
+  onPrimary,
+}: {
+  title: string;
+  message: string;
+  primaryLabel: string;
+  onPrimary: () => void;
+}) {
+  return (
+    <div className="app-shell">
+      <main id="main-content" className="main-content">
+        <section className="hero-card">
+          <div className="eyebrow">Admin portal</div>
+          <div className="screen-stack">
+            <div>
+              <h1>{title}</h1>
+              <p className="hero-copy">{message}</p>
+            </div>
+            <div className="hero-actions">
+              <button className="btn btn-primary" type="button" onClick={onPrimary}>
+                {primaryLabel}
+              </button>
+              <button className="btn btn-secondary" type="button" onClick={() => window.location.assign('/index.html')}>
+                Return home
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
@@ -391,6 +435,9 @@ function renderView(
 export function AdminAppShell() {
   const [currentView, setCurrentView] = useState<AdminView>('overview');
   const [portalSnapshot, setPortalSnapshot] = useState<AdminPortalSnapshot | null>(null);
+  const [sessionUser, setSessionUser] = useState<PortalSessionUser | null>(null);
+  const [loadState, setLoadState] = useState<'loading' | 'ready' | 'unauthenticated' | 'error'>('loading');
+  const [loadMessage, setLoadMessage] = useState('Checking your admin session.');
 
   const overviewMetrics = portalSnapshot?.overviewMetrics ?? OVERVIEW_METRICS;
   const recentActivity = portalSnapshot?.recentActivity.map((item) => ({
@@ -422,15 +469,26 @@ export function AdminAppShell() {
   useEffect(() => {
     let isMounted = true;
 
-    loadAdminPortalSnapshot()
-      .then((snapshot) => {
+    Promise.all([loadPortalSession(), loadAdminPortalSnapshot()])
+      .then(([session, snapshot]) => {
         if (isMounted) {
+          setSessionUser(session.user);
           setPortalSnapshot(snapshot);
+          setLoadState('ready');
+          setLoadMessage('');
         }
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (isMounted) {
+          setSessionUser(null);
           setPortalSnapshot(null);
+          if (error instanceof PortalApiError && (error.status === 401 || error.status === 403)) {
+            setLoadState('unauthenticated');
+            setLoadMessage(error.message);
+            return;
+          }
+          setLoadState('error');
+          setLoadMessage('We could not load the admin portal right now.');
         }
       });
 
@@ -463,6 +521,44 @@ export function AdminAppShell() {
     }
   }, [currentView]);
 
+  const handleSignOut = async () => {
+    await signOutPortalSession();
+    goToPortalSignup('admin', 'login');
+  };
+
+  if (loadState === 'loading') {
+    return (
+      <PortalAccessNotice
+        title="Loading your admin portal"
+        message={loadMessage}
+        primaryLabel="Refresh"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
+  if (loadState === 'unauthenticated') {
+    return (
+      <PortalAccessNotice
+        title="Sign in to open the admin portal"
+        message={loadMessage}
+        primaryLabel="Sign in"
+        onPrimary={() => goToPortalSignup('admin', 'login')}
+      />
+    );
+  }
+
+  if (loadState === 'error' || !portalSnapshot) {
+    return (
+      <PortalAccessNotice
+        title="We couldn’t load your admin data"
+        message={loadMessage || 'Please try again in a moment.'}
+        primaryLabel="Try again"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -477,13 +573,16 @@ export function AdminAppShell() {
         </div>
         <div className="topbar-actions">
           <span className="status-chip">{overviewMetrics[4]?.value ?? '0'} reviews pending</span>
+          <button className="btn btn-secondary" type="button" onClick={handleSignOut}>
+            Sign out
+          </button>
           <button
             className="profile-chip"
             type="button"
             aria-label="Admin profile"
-            onClick={() => goToPortalSignup('admin')}
+            onClick={() => goToPortalSignup('admin', 'login')}
           >
-            Admin
+            {sessionUser?.name ?? 'Admin'}
           </button>
         </div>
       </header>

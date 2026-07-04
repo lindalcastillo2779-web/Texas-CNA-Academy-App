@@ -1,5 +1,6 @@
 """Admin authentication helpers for Texas CNA Academy."""
 
+import hmac
 import os
 import streamlit as st
 
@@ -20,7 +21,7 @@ def check_admin_password(password: str) -> bool:
     secret = _admin_secret()
     if not secret:
         return False
-    return password == secret
+    return hmac.compare_digest(password, secret)
 
 
 def require_admin() -> bool:

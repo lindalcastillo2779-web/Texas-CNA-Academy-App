@@ -1,7 +1,9 @@
 """Database initialisation and helper functions for Texas CNA Academy."""
 
+import hashlib
 import json
 import os
+import secrets
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
@@ -20,6 +22,8 @@ else:
 PORTAL_DATA_DIR = os.path.join(os.path.dirname(__file__), "public", "portal-data")
 RENEWAL_HOURS_REQUIRED = 24.0
 COURSE_MODULE_COUNT = 14
+PASSWORD_HASH_ITERATIONS = 390000
+PORTAL_SESSION_DAYS = 7
 _PORTAL_DOMAIN_KEY_BY_NAME = {
     "Role of the Nurse Aide": "ROLE",
     "Safety and Emergency": "SAFETY",
@@ -59,7 +63,11 @@ CREATE TABLE IF NOT EXISTS users (
     email       TEXT    NOT NULL UNIQUE,
     role        TEXT    NOT NULL DEFAULT 'student',   -- student | cna | don | instructor | facility
     state_id    TEXT,
+    phone       TEXT,
+    facility    TEXT,
+    password_hash TEXT,
     subscription_active INTEGER NOT NULL DEFAULT 0,
+    last_login_at TEXT,
     created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -137,6 +145,21 @@ CREATE TABLE IF NOT EXISTS community_posts (
     status          TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
     created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS portal_sessions (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id             INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    session_token_hash  TEXT NOT NULL UNIQUE,
+    created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at          TEXT NOT NULL,
+    last_seen_at        TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_portal_sessions_user_id
+    ON portal_sessions(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_portal_sessions_expires_at
+    ON portal_sessions(expires_at);
 """
 
 
@@ -145,6 +168,7 @@ def init_db() -> None:
     with get_conn() as conn:
         conn.executescript(_DDL)
         _migrate_user_subscription_fields(conn)
+        _migrate_user_auth_fields(conn)
         _seed_questions(conn)
         _seed_community_posts(conn)
     _export_portal_snapshots()
@@ -160,6 +184,22 @@ def _migrate_user_subscription_fields(conn: sqlite3.Connection) -> None:
         conn.execute(
             "ALTER TABLE users ADD COLUMN subscription_active INTEGER NOT NULL DEFAULT 0"
         )
+
+
+def _migrate_user_auth_fields(conn: sqlite3.Connection) -> None:
+    """Ensure legacy databases contain required auth/profile fields."""
+    cols = {
+        row[1]
+        for row in conn.execute("PRAGMA table_info(users)").fetchall()
+    }
+    if "phone" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN phone TEXT")
+    if "facility" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN facility TEXT")
+    if "password_hash" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN password_hash TEXT")
+    if "last_login_at" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN last_login_at TEXT")
 
 
 # ---------------------------------------------------------------------------
@@ -331,8 +371,65 @@ def _split_tokens(value: str | None) -> set[str]:
 # ---------------------------------------------------------------------------
 # User helpers
 # ---------------------------------------------------------------------------
+def _utc_sql_timestamp(value: datetime | None = None) -> str:
+    current = value or datetime.now(timezone.utc)
+    return current.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def normalize_email(email: str) -> str:
+    return email.strip().lower()
+
+
+def normalize_role(role: str | None) -> str:
+    return (role or "student").strip().lower() or "student"
+
+
+def split_name(name: str) -> tuple[str, str]:
+    parts = [part for part in name.strip().split() if part]
+    if not parts:
+        return "", ""
+    if len(parts) == 1:
+        return parts[0], ""
+    return parts[0], " ".join(parts[1:])
+
+
+def _hash_password(password: str, salt: str | None = None) -> str:
+    password_salt = salt or secrets.token_hex(16)
+    derived_key = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        password_salt.encode("utf-8"),
+        PASSWORD_HASH_ITERATIONS,
+    )
+    return f"pbkdf2_sha256${PASSWORD_HASH_ITERATIONS}${password_salt}${derived_key.hex()}"
+
+
+def verify_password(password: str, password_hash: str | None) -> bool:
+    if not password_hash:
+        return False
+    try:
+        algorithm, iterations, salt, expected_hash = password_hash.split("$", 3)
+    except ValueError:
+        return False
+    if algorithm != "pbkdf2_sha256":
+        return False
+    derived_key = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        salt.encode("utf-8"),
+        int(iterations),
+    ).hex()
+    return secrets.compare_digest(derived_key, expected_hash)
+
+
+def _hash_session_token(session_token: str) -> str:
+    return hashlib.sha256(session_token.encode("utf-8")).hexdigest()
+
+
 def get_or_create_user(name: str, email: str, role: str = "student") -> int:
     """Return the user-id for *email*, creating the row if needed."""
+    email = normalize_email(email)
+    role = normalize_role(role)
     with get_conn() as conn:
         row = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
         if row:
@@ -347,6 +444,7 @@ def get_or_create_user(name: str, email: str, role: str = "student") -> int:
 
 
 def get_user_by_email(email: str):
+    email = normalize_email(email)
     with get_conn() as conn:
         return conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
 
@@ -355,6 +453,167 @@ def get_user_by_id(user_id: int) -> sqlite3.Row | None:
     """Return a single user row by id, or None when not found."""
     with get_conn() as conn:
         return conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+
+
+def create_or_claim_user_account(
+    *,
+    name: str,
+    email: str,
+    password: str,
+    role: str = "student",
+    phone: str = "",
+    facility: str = "",
+) -> sqlite3.Row:
+    email = normalize_email(email)
+    role = normalize_role(role)
+    with get_conn() as conn:
+        existing = conn.execute(
+            "SELECT * FROM users WHERE email = ?",
+            (email,),
+        ).fetchone()
+
+        if existing and existing["password_hash"]:
+            raise ValueError("An account already exists for that email.")
+
+        password_hash = _hash_password(password)
+        normalized_name = name.strip()
+        normalized_phone = phone.strip()
+        normalized_facility = facility.strip()
+
+        if existing:
+            conn.execute(
+                """
+                UPDATE users
+                SET name = ?, role = ?, phone = ?, facility = ?, password_hash = ?
+                WHERE id = ?
+                """,
+                (
+                    normalized_name,
+                    role,
+                    normalized_phone,
+                    normalized_facility,
+                    password_hash,
+                    existing["id"],
+                ),
+            )
+            user_id = int(existing["id"])
+        else:
+            cur = conn.execute(
+                """
+                INSERT INTO users (name, email, role, phone, facility, password_hash)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    normalized_name,
+                    email,
+                    role,
+                    normalized_phone,
+                    normalized_facility,
+                    password_hash,
+                ),
+            )
+            user_id = int(cur.lastrowid)
+
+    _export_portal_snapshots()
+    user = get_user_by_id(user_id)
+    if user is None:
+        raise ValueError("Unable to load the created account.")
+    return user
+
+
+def authenticate_user(email: str, password: str) -> sqlite3.Row | None:
+    user = get_user_by_email(email)
+    if not user or not verify_password(password, user["password_hash"]):
+        return None
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE users SET last_login_at = ? WHERE id = ?",
+            (_utc_sql_timestamp(), user["id"]),
+        )
+    return get_user_by_id(int(user["id"]))
+
+
+def create_portal_session(user_id: int, duration_days: int = PORTAL_SESSION_DAYS) -> str:
+    cleanup_expired_portal_sessions()
+    session_token = secrets.token_urlsafe(32)
+    expires_at = _utc_sql_timestamp(datetime.now(timezone.utc) + timedelta(days=duration_days))
+    with get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO portal_sessions (user_id, session_token_hash, expires_at, last_seen_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (user_id, _hash_session_token(session_token), expires_at, _utc_sql_timestamp()),
+        )
+    return session_token
+
+
+def cleanup_expired_portal_sessions() -> None:
+    with get_conn() as conn:
+        conn.execute("DELETE FROM portal_sessions WHERE expires_at <= datetime('now')")
+
+
+def delete_portal_session(session_token: str) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            "DELETE FROM portal_sessions WHERE session_token_hash = ?",
+            (_hash_session_token(session_token),),
+        )
+
+
+def get_user_by_session_token(session_token: str) -> sqlite3.Row | None:
+    cleanup_expired_portal_sessions()
+    token_hash = _hash_session_token(session_token)
+    with get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT u.*
+            FROM portal_sessions ps
+            JOIN users u ON u.id = ps.user_id
+            WHERE ps.session_token_hash = ? AND ps.expires_at > datetime('now')
+            """,
+            (token_hash,),
+        ).fetchone()
+        if row:
+            conn.execute(
+                "UPDATE portal_sessions SET last_seen_at = ? WHERE session_token_hash = ?",
+                (_utc_sql_timestamp(), token_hash),
+            )
+        return row
+
+
+def get_portal_profile(user: sqlite3.Row | dict) -> dict:
+    first_name, last_name = split_name(str(user["name"]))
+    return {
+        "firstName": first_name,
+        "lastName": last_name,
+        "email": user["email"],
+        "phone": user["phone"] or "",
+        "role": user["role"],
+        "facility": user["facility"] or "",
+        "name": user["name"],
+    }
+
+
+def is_admin_role(role: str | None) -> bool:
+    return normalize_role(role) == "admin"
+
+
+def is_staff_role(role: str | None) -> bool:
+    return normalize_role(role) in {"staff", "instructor", "don", "admin"}
+
+
+def is_student_role(role: str | None) -> bool:
+    return not is_staff_role(role)
+
+
+def get_portal_dashboard_path(role: str | None) -> str:
+    normalized_role = normalize_role(role)
+    if is_admin_role(normalized_role):
+        return "/admin-dashboard.html"
+    if is_staff_role(normalized_role):
+        return "/staff-dashboard.html"
+    return "/dashboard.html"
 
 
 def set_subscription_active(user_id: int, active: bool) -> None:
@@ -981,6 +1240,17 @@ def _build_student_portal_record(user: dict) -> dict:
     }
 
 
+def build_student_portal_payload(user_id: int) -> dict | None:
+    user = get_user_by_id(user_id)
+    if user is None:
+        return None
+    return {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "profile": get_portal_profile(user),
+        "student": _build_student_portal_record(dict(user)),
+    }
+
+
 def _build_student_portal_snapshot() -> dict:
     with get_conn() as conn:
         users = [
@@ -998,6 +1268,10 @@ def _build_student_portal_snapshot() -> dict:
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "students": [_build_student_portal_record(user) for user in users],
     }
+
+
+def build_staff_portal_payload() -> dict:
+    return _build_staff_portal_snapshot()
 
 
 def _build_staff_portal_snapshot() -> dict:
@@ -1115,6 +1389,10 @@ def _build_staff_portal_snapshot() -> dict:
             },
         ],
     }
+
+
+def build_admin_portal_payload() -> dict:
+    return _build_admin_portal_snapshot()
 
 
 def _build_admin_recent_activity() -> list[dict]:

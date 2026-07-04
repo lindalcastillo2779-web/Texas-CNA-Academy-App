@@ -6,9 +6,13 @@ import {
 } from '../../features/courses';
 import { goToPortalSignup } from './portalActions';
 import {
+  PortalApiError,
   getPortalDisplayName,
+  loadPortalSession,
   loadStudentPortalRecord,
+  signOutPortalSession,
   type PortalProfile,
+  type PortalSessionUser,
   type StudentPortalRecord,
 } from './portalData';
 
@@ -224,6 +228,42 @@ function SectionHeader({
         <h2 className="section-title">{title}</h2>
         {copy ? <p className="section-copy">{copy}</p> : null}
       </div>
+    </div>
+  );
+}
+
+function PortalAccessNotice({
+  title,
+  message,
+  primaryLabel,
+  onPrimary,
+}: {
+  title: string;
+  message: string;
+  primaryLabel: string;
+  onPrimary: () => void;
+}) {
+  return (
+    <div className="app-shell">
+      <main id="main-content" className="main-content">
+        <section className="hero-card">
+          <div className="eyebrow">Student portal</div>
+          <div className="screen-stack">
+            <div>
+              <h1>{title}</h1>
+              <p className="hero-copy">{message}</p>
+            </div>
+            <div className="hero-actions">
+              <button className="btn btn-primary" type="button" onClick={onPrimary}>
+                {primaryLabel}
+              </button>
+              <button className="btn btn-secondary" type="button" onClick={() => window.location.assign('/index.html')}>
+                Return home
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
@@ -647,6 +687,9 @@ export function IntegratedAppShell() {
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [portalProfile, setPortalProfile] = useState<PortalProfile | null>(null);
   const [portalStudent, setPortalStudent] = useState<StudentPortalRecord | null>(null);
+  const [sessionUser, setSessionUser] = useState<PortalSessionUser | null>(null);
+  const [loadState, setLoadState] = useState<'loading' | 'ready' | 'unauthenticated' | 'error'>('loading');
+  const [loadMessage, setLoadMessage] = useState('Checking your portal session.');
   const learnerState = DEMO_LEARNER_STATE as unknown as Parameters<typeof getModulesWithProgress>[0];
 
   const modulesWithProgress = useMemo(
@@ -758,20 +801,31 @@ export function IntegratedAppShell() {
   useEffect(() => {
     let isMounted = true;
 
-    loadStudentPortalRecord()
-      .then((result) => {
+    Promise.all([loadPortalSession(), loadStudentPortalRecord()])
+      .then(([session, result]) => {
         if (!isMounted) {
           return;
         }
+        setSessionUser(session.user);
         setPortalProfile(result.profile);
         setPortalStudent(result.student);
+        setLoadState('ready');
+        setLoadMessage('');
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (!isMounted) {
           return;
         }
+        setSessionUser(null);
         setPortalProfile(null);
         setPortalStudent(null);
+        if (error instanceof PortalApiError && (error.status === 401 || error.status === 403)) {
+          setLoadState('unauthenticated');
+          setLoadMessage(error.message);
+          return;
+        }
+        setLoadState('error');
+        setLoadMessage('We could not load your student portal right now.');
       });
 
     return () => {
@@ -803,6 +857,44 @@ export function IntegratedAppShell() {
     }
   }, [currentView]);
 
+  const handleSignOut = async () => {
+    await signOutPortalSession();
+    goToPortalSignup('student', 'login');
+  };
+
+  if (loadState === 'loading') {
+    return (
+      <PortalAccessNotice
+        title="Loading your student portal"
+        message={loadMessage}
+        primaryLabel="Refresh"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
+  if (loadState === 'unauthenticated') {
+    return (
+      <PortalAccessNotice
+        title="Sign in to open your student portal"
+        message={loadMessage}
+        primaryLabel="Sign in"
+        onPrimary={() => goToPortalSignup('student', 'login')}
+      />
+    );
+  }
+
+  if (loadState === 'error' || !portalStudent) {
+    return (
+      <PortalAccessNotice
+        title="We couldn’t load your portal data"
+        message={loadMessage || 'Please try again in a moment.'}
+        primaryLabel="Try again"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -816,14 +908,17 @@ export function IntegratedAppShell() {
           <p className="topbar-subtitle">A unified student portal for courses, readiness, skills, and renewal support.</p>
         </div>
         <div className="topbar-actions">
-          <span className="status-chip">{portalStudent?.statusChip ?? '30-day plan active'}</span>
+          <span className="status-chip">{portalStudent.statusChip}</span>
+          <button className="btn btn-secondary" type="button" onClick={handleSignOut}>
+            Sign out
+          </button>
           <button
             className="profile-chip"
             type="button"
             aria-label="Student profile"
-            onClick={() => goToPortalSignup('student')}
+            onClick={() => goToPortalSignup('student', 'login')}
           >
-            {portalStudent?.name ?? getPortalDisplayName(portalProfile)}
+            {getPortalDisplayName(sessionUser ?? portalProfile)}
           </button>
         </div>
       </header>

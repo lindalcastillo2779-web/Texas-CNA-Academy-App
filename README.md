@@ -100,13 +100,17 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 
 # 2. Install dependencies
 pip install -r requirements.txt
+npm ci
 
 # 3. Copy and edit secrets (never commit secrets.toml)
 cp .streamlit/secrets.toml.example .streamlit/secrets.toml
 # Edit .streamlit/secrets.toml with your SMTP and admin credentials
 
-# 4. Run the app
-streamlit run streamlit_app.py
+# 4. Build the portal frontend
+npm run build
+
+# 5. Run the unified server (serves the portal API/static site and proxies Streamlit under /app)
+python -m uvicorn app_server:app --host 0.0.0.0 --port 8000 --proxy-headers
 ```
 
 The local SQLite database is stored at `data/cna_academy.db` and is git-ignored.
@@ -122,6 +126,7 @@ The `render.yaml` file in this repository is pre-configured for deployment.
 Recommended environment variables:
 
 - `STREAMLIT_SERVER_HEADLESS=true`
+- `STREAMLIT_INTERNAL_PORT=8501`
 - `SMTP_HOST=smtp.gmail.com`
 - `SMTP_PORT=587`
 - `SMTP_USER=your email`
@@ -153,6 +158,7 @@ Configured domain:
 | `SMTP_USER` | No* | SMTP username / email |
 | `SMTP_PASSWORD` | No* | SMTP password or app password |
 | `ADMIN_SECRET` | Yes | Password for the Admin Panel |
+| `STREAMLIT_INTERNAL_PORT` | No | Internal child-process port used by the ASGI server to proxy Streamlit (default: `8501`) |
 
 \* Email features are skipped when SMTP is not configured.
 
