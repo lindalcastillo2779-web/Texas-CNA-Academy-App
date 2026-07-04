@@ -6,6 +6,7 @@ import asyncio
 import os
 import subprocess
 import sys
+from contextlib import asynccontextmanager
 from contextlib import suppress
 from pathlib import Path
 from typing import Any
@@ -380,6 +381,7 @@ async def _wait_for_streamlit() -> None:
     raise RuntimeError("Streamlit child server did not become ready.")
 
 
+@asynccontextmanager
 async def lifespan(app: Starlette):
     _ensure_frontend_build()
 
