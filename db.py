@@ -22,7 +22,7 @@ else:
 PORTAL_DATA_DIR = os.path.join(os.path.dirname(__file__), "public", "portal-data")
 RENEWAL_HOURS_REQUIRED = 24.0
 COURSE_MODULE_COUNT = 14
-PASSWORD_HASH_ITERATIONS = 390000
+PASSWORD_HASH_ITERATIONS = 600000
 PORTAL_SESSION_DAYS = 7
 _PORTAL_DOMAIN_KEY_BY_NAME = {
     "Role of the Nurse Aide": "ROLE",

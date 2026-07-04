@@ -51,8 +51,6 @@ STREAMLIT_PORT = int(os.environ.get("STREAMLIT_INTERNAL_PORT", "8501"))
 STREAMLIT_BASE_PATH = os.environ.get("STREAMLIT_BASE_PATH", "app").strip("/") or "app"
 STREAMLIT_HTTP_BASE = f"http://{STREAMLIT_HOST}:{STREAMLIT_PORT}"
 STREAMLIT_WS_BASE = f"ws://{STREAMLIT_HOST}:{STREAMLIT_PORT}"
-IS_PRODUCTION = os.environ.get("RENDER", "").lower() == "true"
-
 init_db()
 
 
@@ -65,7 +63,7 @@ def _role_requires_facility(role: str) -> bool:
 
 
 def _session_cookie_secure(request: Request) -> bool:
-    return request.url.scheme == "https" or IS_PRODUCTION
+    return request.url.scheme == "https"
 
 
 def _set_session_cookie(response: Response, session_token: str, request: Request) -> None:
@@ -370,7 +368,7 @@ def _ensure_frontend_build() -> None:
         raise RuntimeError(
             "Missing built frontend files: "
             + ", ".join(missing)
-            + ". Run `npm run build` before starting the server."
+            + f". Run `npm run build` from {BASE_DIR} before starting the server."
         )
 
 
