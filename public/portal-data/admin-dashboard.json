@@ -1,0 +1,119 @@
+{
+  "generatedAt": "2026-07-04T04:46:55.096644+00:00",
+  "overviewMetrics": [
+    {
+      "label": "Total students",
+      "value": "0",
+      "detail": "Student and CNA learner accounts in the live database."
+    },
+    {
+      "label": "Active instructors",
+      "value": "0",
+      "detail": "Instructor and DON accounts currently registered."
+    },
+    {
+      "label": "Live course modules",
+      "value": "14",
+      "detail": "React portals are aligned to the full CNA course roadmap."
+    },
+    {
+      "label": "Pass rate",
+      "value": "0%",
+      "detail": "Based on learners with recorded quiz attempts."
+    },
+    {
+      "label": "Pending reviews",
+      "value": "3",
+      "detail": "Recent community posts still visible in the moderation queue."
+    }
+  ],
+  "recentActivity": [
+    {
+      "title": "Community post: Weekly infection control study circle",
+      "detail": "study_group \u00b7 2026-07-04 04:46:55",
+      "tone": "is-warning"
+    },
+    {
+      "title": "Community post: Practice partner search for Prometric clinical skills",
+      "detail": "practice_partner \u00b7 2026-07-04 04:46:55",
+      "tone": "is-warning"
+    },
+    {
+      "title": "Community post: Experienced CNA mentor available for exam-readiness coaching",
+      "detail": "mentor_offer \u00b7 2026-07-04 04:46:55",
+      "tone": "is-warning"
+    }
+  ],
+  "users": [],
+  "courses": [
+    {
+      "title": "CNA Certification Roadmap",
+      "detail": "14 modules \u00b7 React student portal connected to live progress signals",
+      "status": "Active",
+      "meta": "0 learner accounts"
+    },
+    {
+      "title": "Exam Prep Question Bank",
+      "detail": "11 seeded practice questions in SQLite",
+      "status": "Active",
+      "meta": "0 learners with quiz history"
+    },
+    {
+      "title": "Community + Workforce Hub",
+      "detail": "4 active posts \u00b7 mentorship and opportunity routing",
+      "status": "Active",
+      "meta": "0 mentor profile(s)"
+    }
+  ],
+  "compliance": [
+    {
+      "label": "Accounts with access",
+      "value": "0",
+      "tone": "is-success"
+    },
+    {
+      "label": "Renewals pending",
+      "value": "0",
+      "tone": "is-warning"
+    },
+    {
+      "label": "Non-compliant shifts",
+      "value": "0",
+      "tone": "is-success"
+    }
+  ],
+  "communityHealth": [
+    {
+      "label": "Mentor profiles",
+      "value": "0",
+      "tone": "is-success"
+    },
+    {
+      "label": "Active posts",
+      "value": "4",
+      "tone": "is-warning"
+    },
+    {
+      "label": "Renewal-ready pros",
+      "value": "0",
+      "tone": "is-muted"
+    }
+  ],
+  "communityReviewQueue": [
+    {
+      "title": "Experienced CNA mentor available for exam-readiness coaching",
+      "detail": "mentor_offer \u00b7 2026-07-04 04:46:55",
+      "tone": "is-warning"
+    },
+    {
+      "title": "Weekly infection control study circle",
+      "detail": "study_group \u00b7 2026-07-04 04:46:55",
+      "tone": "is-warning"
+    },
+    {
+      "title": "Practice partner search for Prometric clinical skills",
+      "detail": "practice_partner \u00b7 2026-07-04 04:46:55",
+      "tone": "is-warning"
+    }
+  ]
+}

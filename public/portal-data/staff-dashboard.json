@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-07-04T04:46:55.095799+00:00",
+  "studentMetrics": [
+    {
+      "label": "Total students",
+      "value": "0",
+      "detail": "Connected learner accounts in the live database."
+    },
+    {
+      "label": "Passing rate",
+      "value": "0%",
+      "detail": "Based on learners with recorded quiz attempts."
+    },
+    {
+      "label": "Average readiness",
+      "value": "0%",
+      "detail": "Weighted from each learner's quiz history."
+    }
+  ],
+  "studentRoster": [],
+  "facilitySchedule": [],
+  "gradeBook": [],
+  "communityQueue": [
+    {
+      "title": "0 mentor request(s) are active",
+      "detail": "Use the live community board to follow up with learners asking for support.",
+      "status": "Stable"
+    },
+    {
+      "title": "1 study group post(s) are live",
+      "detail": "Review whether the current study circles match the next quiz and skills priorities.",
+      "status": "Open"
+    },
+    {
+      "title": "1 workforce opportunity post(s) are visible",
+      "detail": "Share job-ready learners with facilities when opportunities align.",
+      "status": "Partnership"
+    }
+  ]
+}
