@@ -4,6 +4,7 @@ import {
   getModulesWithProgress,
   getNextLesson,
 } from '../../features/courses';
+import { goToPortalSignup } from './portalActions';
 
 type AppView = 'home' | 'courses' | 'skills' | 'review' | 'community' | 'more';
 
@@ -707,7 +708,12 @@ export function IntegratedAppShell() {
         </div>
         <div className="topbar-actions">
           <span className="status-chip">30-day plan active</span>
-          <button className="profile-chip" type="button" aria-label="Student profile">
+          <button
+            className="profile-chip"
+            type="button"
+            aria-label="Student profile"
+            onClick={() => goToPortalSignup('student')}
+          >
             Student
           </button>
         </div>

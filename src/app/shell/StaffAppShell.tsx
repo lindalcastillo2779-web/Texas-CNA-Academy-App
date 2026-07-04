@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { downloadTextFile, goToPortalSignup } from './portalActions';
 
 type StaffView = 'students' | 'schedule' | 'grades' | 'community' | 'resources';
 
@@ -45,21 +46,80 @@ const RESOURCE_CARDS = [
     title: 'CNA Instructor Handbook',
     copy: 'Official Texas CNA instructor guidelines and standards.',
     cta: 'Download handbook',
+    filename: 'texas-cna-instructor-handbook.txt',
+    content: `Texas CNA Academy - Instructor Handbook
+
+Use this quick reference to keep your teaching workflow aligned:
+- Review the active cohort roster before each teaching block.
+- Focus remediation on low-progress learners and infection control misses.
+- Reinforce skills lab critical steps before high-stakes checkoffs.
+- Pair classroom instruction with coaching, practice, and follow-up communication.
+
+Helpful in-app destinations:
+- Students: monitor progress and last activity
+- Grades: review exam snapshots
+- Community: coordinate mentors, practice labs, and workforce opportunities
+- Resources: keep teaching references easy to reach`,
   },
   {
     title: 'Lesson Plan Templates',
     copy: 'Reusable templates for lecture flow, labs, and skill checkoffs.',
     cta: 'Download templates',
+    filename: 'texas-cna-lesson-plan-template.txt',
+    content: `Texas CNA Academy - Lesson Plan Template
+
+Lesson title:
+Objective:
+Module / domain:
+Materials needed:
+
+Opening (5-10 min):
+- Warm-up or knowledge check
+
+Instruction block (20-30 min):
+- Core concepts
+- Demonstration points
+
+Guided practice (15-20 min):
+- Partner or instructor-led rehearsal
+
+Skills checkoff / assessment:
+- Critical steps
+- Feedback notes
+
+Remediation / homework:
+- Review deck
+- Community or mentor follow-up`,
   },
   {
     title: 'Learner Outreach Scripts',
     copy: 'Ready-to-send nudges for missing work, low readiness, and exam prep.',
     cta: 'Open scripts',
+    filename: 'texas-cna-learner-outreach-scripts.txt',
+    content: `Texas CNA Academy - Learner Outreach Scripts
+
+Missing work:
+"Hi [Learner], I noticed you still have unfinished course work in your current module. Please log in today and complete the next lesson so we can keep you on pace."
+
+Low readiness:
+"Hi [Learner], your recent scores show you may need extra practice in infection control and transfer safety. Let’s schedule a quick review before the next quiz."
+
+Exam prep:
+"Hi [Learner], this is your reminder to finish one review block and one clinical skill practice before your next testing date. Small daily sessions will help you stay ready."`,
   },
   {
     title: 'Clinical Skills Prep',
     copy: 'Quick reminders for high-risk misses before lab assessments.',
     cta: 'Review checklist',
+    filename: 'texas-cna-clinical-skills-checklist.txt',
+    content: `Texas CNA Academy - Clinical Skills Prep Checklist
+
+- Introduce yourself and explain the skill before touching equipment.
+- Wash hands and follow PPE steps in the correct order.
+- Lock wheelchair or bed brakes before transfer movement.
+- Protect privacy and resident dignity during every step.
+- Document readings or results immediately after the skill.
+- Report safety concerns or abnormal findings right away.`,
   },
 ];
 
@@ -234,6 +294,10 @@ function GradesScreen() {
 }
 
 function ResourcesScreen() {
+  const handleResourceAction = (resource: typeof RESOURCE_CARDS[number]) => {
+    downloadTextFile(resource.filename, resource.content);
+  };
+
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -247,7 +311,9 @@ function ResourcesScreen() {
             <h3 className="module-title">{resource.title}</h3>
             <p className="module-copy">{resource.copy}</p>
             <div className="section-actions">
-              <button className="btn btn-secondary" type="button">{resource.cta}</button>
+             <button className="btn btn-secondary" type="button" onClick={() => handleResourceAction(resource)}>
+               {resource.cta}
+             </button>
             </div>
           </article>
         ))}
@@ -367,7 +433,12 @@ export function StaffAppShell() {
         </div>
         <div className="topbar-actions">
           <span className="status-chip">24 active learners</span>
-          <button className="profile-chip" type="button" aria-label="Instructor profile">
+          <button
+            className="profile-chip"
+            type="button"
+            aria-label="Instructor profile"
+            onClick={() => goToPortalSignup('staff')}
+          >
             Instructor
           </button>
         </div>

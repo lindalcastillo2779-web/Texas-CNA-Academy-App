@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { goToPortalSignup, printHtmlReport } from './portalActions';
 
 type AdminView = 'overview' | 'users' | 'courses' | 'community' | 'compliance' | 'reports';
 
@@ -153,7 +154,9 @@ function UsersScreen() {
       <section className="section-card">
         <SectionHeader eyebrow="Users" title="Manage people and organizations" copy="See who is active and where follow-up is needed." />
         <div className="section-actions">
-          <button className="btn btn-primary" type="button">Add user</button>
+          <button className="btn btn-primary" type="button" onClick={() => goToPortalSignup('student')}>
+            Add user
+          </button>
         </div>
         <div className="table-wrap">
           <table className="data-table">
@@ -261,6 +264,33 @@ function CommunityScreen() {
 }
 
 function ReportsScreen() {
+  const handleReport = (reportTitle: string) => {
+    if (reportTitle === 'Monthly enrollment report') {
+      printHtmlReport(reportTitle, [
+        {
+          heading: 'Enrollment snapshot',
+          rows: OVERVIEW_METRICS.map((metric) => `${metric.label}: ${metric.value} — ${metric.detail}`),
+        },
+        {
+          heading: 'Recent activity',
+          rows: RECENT_ACTIVITY.map((item) => `${item.title} (${item.detail})`),
+        },
+      ]);
+      return;
+    }
+
+    printHtmlReport(reportTitle, [
+      {
+        heading: 'Compliance snapshot',
+        rows: COMPLIANCE.map((item) => `${item.label}: ${item.value}`),
+      },
+      {
+        heading: 'Community health',
+        rows: COMMUNITY_HEALTH.map((item) => `${item.label}: ${item.value}`),
+      },
+    ]);
+  };
+
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -273,7 +303,9 @@ function ReportsScreen() {
             <h3 className="module-title">{report.title}</h3>
             <p className="module-copy">{report.copy}</p>
             <div className="section-actions">
-              <button className="btn btn-secondary" type="button">{report.cta}</button>
+              <button className="btn btn-secondary" type="button" onClick={() => handleReport(report.title)}>
+                {report.cta}
+              </button>
             </div>
           </article>
         ))}
@@ -355,7 +387,12 @@ export function AdminAppShell() {
         </div>
         <div className="topbar-actions">
           <span className="status-chip">7 reviews pending</span>
-          <button className="profile-chip" type="button" aria-label="Admin profile">
+          <button
+            className="profile-chip"
+            type="button"
+            aria-label="Admin profile"
+            onClick={() => goToPortalSignup('admin')}
+          >
             Admin
           </button>
         </div>
