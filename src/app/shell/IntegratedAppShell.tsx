@@ -56,7 +56,7 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'more', label: 'More', icon: '⋯' },
 ];
 
-const FALLBACK_TASKS: TaskItem[] = [
+const FALLBACK_TASKS: StudyPlanTask[] = [
   {
     title: 'Resume communication module',
     detail: 'Finish the next lesson and keep your study streak active.',
@@ -391,7 +391,7 @@ function CoursesScreen({
               <button
                 className="btn btn-secondary"
                 type="button"
-                disabled={!module.isUnlocked || module.progress.percentComplete >= 100 || syncingModuleId === module.moduleId}
+                disabled={!module.isUnlocked || module.progress.status === 'completed' || syncingModuleId === module.moduleId}
                 onClick={() => onMarkLessonComplete(module)}
               >
                 {syncingModuleId === module.moduleId ? 'Syncing progress…' : 'Mark next lesson complete'}
@@ -767,7 +767,7 @@ export function IntegratedAppShell() {
   const communityActions = portalStudent?.community.recommendedActions ?? [];
   const studyTasks = useMemo<TaskItem[]>(
     () =>
-      (portalStudent?.studyPlan?.length ? portalStudent.studyPlan : FALLBACK_TASKS).map((task: StudyPlanTask | TaskItem) => ({
+      (portalStudent?.studyPlan?.length ? portalStudent.studyPlan : FALLBACK_TASKS).map((task: StudyPlanTask) => ({
         title: task.title,
         detail: task.detail,
         status: task.status,
@@ -854,7 +854,7 @@ export function IntegratedAppShell() {
   };
 
   const handleMarkLessonComplete = async (module: DashboardModule) => {
-    if (!portalStudent || !module.isUnlocked) {
+    if (!portalStudent || !module.isUnlocked || module.progress.status === 'completed') {
       return;
     }
     const nextCompletedLessons = Math.min(module.progress.totalLessons, module.progress.completedLessons + 1);

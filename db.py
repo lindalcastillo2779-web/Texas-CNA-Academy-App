@@ -51,6 +51,7 @@ _COURSE_MODULE_IDS = [module_id for module_id, _, _, _ in _COURSE_MODULES]
 _COURSE_MODULE_TITLES = {module_id: title for module_id, title, _, _ in _COURSE_MODULES}
 _COURSE_MODULE_LESSON_COUNTS = {module_id: lesson_count for module_id, _, lesson_count, _ in _COURSE_MODULES}
 _COURSE_MODULE_DOMAINS = {module_id: domain for module_id, _, _, domain in _COURSE_MODULES}
+_ROLES_WITH_CEU_REQUIREMENTS = {"cna", "don", "instructor"}
 
 
 @contextmanager
@@ -1218,6 +1219,8 @@ def _build_completed_lesson_ids(module_id: str, completed_lessons: int) -> list[
 
 
 def _coerce_completed_lessons(module_id: str, completed_lessons: int | float) -> int:
+    if module_id not in _COURSE_MODULE_LESSON_COUNTS:
+        raise ValueError(f"Unknown module ID: {module_id}")
     max_lessons = _COURSE_MODULE_LESSON_COUNTS[module_id]
     return max(0, min(max_lessons, int(completed_lessons)))
 
@@ -1239,6 +1242,8 @@ def get_course_progress_snapshot(user_id: int) -> dict:
 
     for module_id in _COURSE_MODULE_IDS:
         total_lessons = _COURSE_MODULE_LESSON_COUNTS[module_id]
+        if total_lessons <= 0:
+            raise ValueError(f"Module {module_id} must define at least one lesson.")
         row = by_module.get(module_id)
         completed_lessons = _coerce_completed_lessons(
             module_id,
@@ -1329,7 +1334,7 @@ def get_personalized_study_plan(user: dict, course_progress: dict, weakest_domai
         }
     )
 
-    if ceu_remaining > 0 and user.get("role") in {"cna", "don", "instructor"}:
+    if ceu_remaining > 0 and user.get("role") in _ROLES_WITH_CEU_REQUIREMENTS:
         tasks.append(
             {
                 "title": "Protect your renewal timeline",
