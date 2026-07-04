@@ -31,6 +31,26 @@ _PORTAL_DOMAIN_KEY_BY_NAME = {
     "Psychosocial Care Skills": "PSYCHOSOCIAL",
     "Physical Care Skills": "SKILLS",
 }
+_COURSE_MODULES = [
+    ("M01", "Role of the Nurse Aide", 6, "ROLE"),
+    ("M02", "Legal & Ethical Behavior", 7, "LEGAL"),
+    ("M03", "Communication & Interpersonal Skills", 8, "COMM"),
+    ("M04", "Infection Control", 8, "INFECT"),
+    ("M05", "Safety & Emergency Procedures", 9, "SAFETY"),
+    ("M06", "Resident Rights", 7, "ELDERCARE"),
+    ("M07", "Personal Care Skills", 10, "PERSONAL"),
+    ("M08", "Basic Nursing Skills", 11, "VITALS"),
+    ("M09", "Nutrition & Hydration", 7, "NUTRITION"),
+    ("M10", "Elimination", 7, "ELIMINATION"),
+    ("M11", "Restorative Skills", 8, "RESTORATIVE"),
+    ("M12", "Psychosocial Care", 9, "PSYCHOSOCIAL"),
+    ("M13", "Spiritual & Cultural Care", 6, "SPIRITUAL"),
+    ("M14", "Prometric Exam Preparation", 14, "SKILLS"),
+]
+_COURSE_MODULE_IDS = [module_id for module_id, _, _, _ in _COURSE_MODULES]
+_COURSE_MODULE_TITLES = {module_id: title for module_id, title, _, _ in _COURSE_MODULES}
+_COURSE_MODULE_LESSON_COUNTS = {module_id: lesson_count for module_id, _, lesson_count, _ in _COURSE_MODULES}
+_COURSE_MODULE_DOMAINS = {module_id: domain for module_id, _, _, domain in _COURSE_MODULES}
 
 
 @contextmanager
@@ -160,6 +180,19 @@ CREATE INDEX IF NOT EXISTS idx_portal_sessions_user_id
 
 CREATE INDEX IF NOT EXISTS idx_portal_sessions_expires_at
     ON portal_sessions(expires_at);
+
+CREATE TABLE IF NOT EXISTS course_progress (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id             INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    module_id           TEXT NOT NULL,
+    completed_lessons   INTEGER NOT NULL DEFAULT 0,
+    total_lessons       INTEGER NOT NULL,
+    updated_at          TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(user_id, module_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_course_progress_user_id
+    ON course_progress(user_id);
 """
 
 
@@ -1171,11 +1204,152 @@ def _get_last_user_activity(user_id: int, created_at: str | None) -> str | None:
                 SELECT updated_at FROM community_profiles WHERE user_id = ?
                 UNION ALL
                 SELECT created_at FROM community_posts WHERE user_id = ?
+                UNION ALL
+                SELECT updated_at FROM course_progress WHERE user_id = ?
             )
             """,
-            (user_id, user_id, user_id, user_id, user_id),
+            (user_id, user_id, user_id, user_id, user_id, user_id),
         ).fetchone()
     return (row["last_activity"] if row and row["last_activity"] else None) or created_at
+
+
+def _build_completed_lesson_ids(module_id: str, completed_lessons: int) -> list[str]:
+    return [f"{module_id}-L{index:02d}" for index in range(1, completed_lessons + 1)]
+
+
+def _coerce_completed_lessons(module_id: str, completed_lessons: int | float) -> int:
+    max_lessons = _COURSE_MODULE_LESSON_COUNTS[module_id]
+    return max(0, min(max_lessons, int(completed_lessons)))
+
+
+def get_course_progress_snapshot(user_id: int) -> dict:
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT module_id, completed_lessons, total_lessons, updated_at
+            FROM course_progress
+            WHERE user_id = ?
+            """,
+            (user_id,),
+        ).fetchall()
+
+    by_module = {str(row["module_id"]).upper(): row for row in rows}
+    module_progress: dict[str, dict] = {}
+    completed_module_ids: list[str] = []
+
+    for module_id in _COURSE_MODULE_IDS:
+        total_lessons = _COURSE_MODULE_LESSON_COUNTS[module_id]
+        row = by_module.get(module_id)
+        completed_lessons = _coerce_completed_lessons(
+            module_id,
+            row["completed_lessons"] if row is not None else 0,
+        )
+        percent_complete = round((completed_lessons / total_lessons) * 100, 1) if total_lessons else 0.0
+        if completed_lessons >= total_lessons:
+            status = "completed"
+            completed_module_ids.append(module_id)
+        elif completed_lessons > 0:
+            status = "in-progress"
+        else:
+            status = "not-started"
+
+        module_progress[module_id] = {
+            "moduleId": module_id,
+            "completedLessonIds": _build_completed_lesson_ids(module_id, completed_lessons),
+            "totalLessons": total_lessons,
+            "completedLessons": completed_lessons,
+            "percentComplete": percent_complete,
+            "lastAccessedAt": row["updated_at"] if row is not None else None,
+            "status": status,
+        }
+
+    return {
+        "completedModuleIds": completed_module_ids,
+        "moduleProgress": module_progress,
+    }
+
+
+def upsert_course_progress(user_id: int, module_id: str, completed_lessons: int) -> dict:
+    normalized_module_id = str(module_id).upper().strip()
+    if normalized_module_id not in _COURSE_MODULE_LESSON_COUNTS:
+        raise ValueError("Unknown module ID.")
+
+    normalized_completed_lessons = _coerce_completed_lessons(normalized_module_id, completed_lessons)
+    total_lessons = _COURSE_MODULE_LESSON_COUNTS[normalized_module_id]
+
+    with get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO course_progress (user_id, module_id, completed_lessons, total_lessons, updated_at)
+            VALUES (?, ?, ?, ?, datetime('now'))
+            ON CONFLICT(user_id, module_id) DO UPDATE SET
+                completed_lessons = excluded.completed_lessons,
+                total_lessons = excluded.total_lessons,
+                updated_at = datetime('now')
+            """,
+            (user_id, normalized_module_id, normalized_completed_lessons, total_lessons),
+        )
+
+    return get_course_progress_snapshot(user_id)
+
+
+def get_personalized_study_plan(user: dict, course_progress: dict, weakest_domain_key: str, ceu_remaining: float) -> list[dict]:
+    module_progress = course_progress.get("moduleProgress", {})
+    next_module_id = next(
+        (
+            module_id
+            for module_id in _COURSE_MODULE_IDS
+            if float(module_progress.get(module_id, {}).get("percentComplete", 0)) < 100
+        ),
+        None,
+    )
+
+    tasks: list[dict] = []
+    if next_module_id:
+        progress = module_progress.get(next_module_id, {})
+        next_lesson_number = min(
+            _COURSE_MODULE_LESSON_COUNTS[next_module_id],
+            int(progress.get("completedLessons", 0)) + 1,
+        )
+        tasks.append(
+            {
+                "title": "Continue your course path",
+                "detail": f"Pick up {_COURSE_MODULE_TITLES[next_module_id]} and finish lesson {next_lesson_number}.",
+                "status": f"Lesson {next_lesson_number}",
+                "view": "courses",
+            }
+        )
+
+    tasks.append(
+        {
+            "title": "Review your weakest domain",
+            "detail": f"Run an adaptive review block focused on {weakest_domain_key}.",
+            "status": "Exam focus",
+            "view": "review",
+        }
+    )
+
+    if ceu_remaining > 0 and user.get("role") in {"cna", "don", "instructor"}:
+        tasks.append(
+            {
+                "title": "Protect your renewal timeline",
+                "detail": f"Log CEU completion evidence and close your remaining {ceu_remaining:.1f} hours.",
+                "status": f"{ceu_remaining:.1f} hrs left",
+                "view": "more",
+            }
+        )
+    else:
+        next_domain = _COURSE_MODULE_DOMAINS.get(next_module_id or "M04", "SKILLS")
+        tasks.append(
+            {
+                "title": "Practice one clinical skill",
+                "detail": f"Complete one simulation tied to {next_domain} and compare readiness trends.",
+                "status": "Skill check",
+                "view": "skills",
+            }
+        )
+
+    return tasks[:3]
 
 
 def _build_student_portal_record(user: dict) -> dict:
@@ -1188,6 +1362,7 @@ def _build_student_portal_record(user: dict) -> dict:
     readiness_score = _calculate_readiness_score(quiz_stats)
     weakest_stat = min(quiz_stats, key=lambda stat: float(stat.get("avg_pct") or 0)) if quiz_stats else None
     strongest_stat = max(quiz_stats, key=lambda stat: float(stat.get("avg_pct") or 0)) if quiz_stats else None
+    course_progress = get_course_progress_snapshot(user_id)
 
     if access["subscribed"]:
         status_chip = "Subscription active"
@@ -1207,6 +1382,8 @@ def _build_student_portal_record(user: dict) -> dict:
         if strongest_stat is not None
         else "ROLE"
     )
+    ceu_remaining = round(max(0.0, RENEWAL_HOURS_REQUIRED - earned_hours), 1)
+    study_plan = get_personalized_study_plan(user, course_progress, weakest_domain_key, ceu_remaining)
 
     return {
         "id": user_id,
@@ -1218,7 +1395,7 @@ def _build_student_portal_record(user: dict) -> dict:
         "ceu": {
             "earnedHours": round(earned_hours, 1),
             "requiredHours": RENEWAL_HOURS_REQUIRED,
-            "remainingHours": round(max(0.0, RENEWAL_HOURS_REQUIRED - earned_hours), 1),
+            "remainingHours": ceu_remaining,
             "recentRecords": ceu_records[:5],
         },
         "quiz": {
@@ -1250,6 +1427,8 @@ def _build_student_portal_record(user: dict) -> dict:
             "mentorMatches": get_mentor_matches(user_id),
             "recommendedPosts": get_recommended_posts_for_user(user_id),
         },
+        "courseProgress": course_progress,
+        "studyPlan": study_plan,
     }
 
 

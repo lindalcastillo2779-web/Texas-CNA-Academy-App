@@ -10,9 +10,12 @@ import {
   getPortalDisplayName,
   loadPortalSession,
   loadStudentPortalRecord,
+  syncCourseProgress,
+  type CourseModuleProgress,
   signOutPortalSession,
   type PortalProfile,
   type PortalSessionUser,
+  type StudyPlanTask,
   type StudentPortalRecord,
 } from './portalData';
 
@@ -31,21 +34,6 @@ type TaskItem = {
   view: AppView;
 };
 
-type LearnerModuleProgress = {
-  moduleId: string;
-  completedLessonIds: string[];
-  totalLessons: number;
-  completedLessons: number;
-  percentComplete: number;
-  lastAccessedAt: string;
-  status: 'completed' | 'in-progress' | 'not-started';
-};
-
-type DemoLearnerState = {
-  completedModuleIds: string[];
-  moduleProgress: Record<string, LearnerModuleProgress>;
-};
-
 type DashboardModule = {
   moduleId: string;
   moduleNumber: number;
@@ -56,7 +44,7 @@ type DashboardModule = {
   primaryDomain: string;
   status: string;
   isUnlocked: boolean;
-  progress: LearnerModuleProgress;
+  progress: CourseModuleProgress;
 };
 
 const NAV_ITEMS: NavItem[] = [
@@ -68,49 +56,7 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'more', label: 'More', icon: '⋯' },
 ];
 
-const DEMO_LEARNER_STATE: DemoLearnerState = {
-  completedModuleIds: ['M01', 'M02'],
-  moduleProgress: {
-    M01: {
-      moduleId: 'M01',
-      completedLessonIds: ['M01-L01', 'M01-L02', 'M01-L03', 'M01-L04', 'M01-L05', 'M01-L06'],
-      totalLessons: 6,
-      completedLessons: 6,
-      percentComplete: 100,
-      lastAccessedAt: '2026-06-28T08:30:00Z',
-      status: 'completed',
-    },
-    M02: {
-      moduleId: 'M02',
-      completedLessonIds: ['M02-L01', 'M02-L02', 'M02-L03', 'M02-L04', 'M02-L05', 'M02-L06', 'M02-L07'],
-      totalLessons: 7,
-      completedLessons: 7,
-      percentComplete: 100,
-      lastAccessedAt: '2026-06-29T14:15:00Z',
-      status: 'completed',
-    },
-    M03: {
-      moduleId: 'M03',
-      completedLessonIds: ['M03-L01', 'M03-L02', 'M03-L03', 'M03-L04'],
-      totalLessons: 8,
-      completedLessons: 4,
-      percentComplete: 50,
-      lastAccessedAt: '2026-07-02T18:00:00Z',
-      status: 'in-progress',
-    },
-    M04: {
-      moduleId: 'M04',
-      completedLessonIds: ['M04-L01', 'M04-L02'],
-      totalLessons: 8,
-      completedLessons: 2,
-      percentComplete: 25,
-      lastAccessedAt: '2026-07-01T09:45:00Z',
-      status: 'in-progress',
-    },
-  },
-};
-
-const TODAY_TASKS: TaskItem[] = [
+const FALLBACK_TASKS: TaskItem[] = [
   {
     title: 'Resume communication module',
     detail: 'Finish the next lesson and keep your study streak active.',
@@ -277,6 +223,7 @@ function HomeScreen({
   weakestDomainKey,
   examReadiness,
   ceuCompletion,
+  studyTasks,
 }: {
   onNavigate: (view: AppView) => void;
   courseworkCompletion: number;
@@ -286,6 +233,7 @@ function HomeScreen({
   weakestDomainKey: string;
   examReadiness: number;
   ceuCompletion: number;
+  studyTasks: TaskItem[];
 }) {
   const weakestDomain = getDomainLabel(weakestDomainKey as Parameters<typeof getDomainLabel>[0]);
 
@@ -344,7 +292,7 @@ function HomeScreen({
         <article className="section-card">
           <SectionHeader eyebrow="Today" title="Priority tasks" copy="One clear plan for the next study session." />
           <div className="task-list">
-            {TODAY_TASKS.map((task) => (
+            {studyTasks.map((task) => (
               <button key={task.title} type="button" className="task-item" onClick={() => onNavigate(task.view)}>
                 <div className="task-copy">
                   <span className="task-kicker">{task.status}</span>
@@ -396,9 +344,13 @@ function HomeScreen({
 function CoursesScreen({
   modules,
   nextLessonSummary,
+  syncingModuleId,
+  onMarkLessonComplete,
 }: {
   modules: DashboardModule[];
   nextLessonSummary: string;
+  syncingModuleId: string | null;
+  onMarkLessonComplete: (module: DashboardModule) => void;
 }) {
   return (
     <div className="screen-stack">
@@ -434,6 +386,16 @@ function CoursesScreen({
               <span>{module.estimatedMinutes} min</span>
               <span>{module.clinicalSkillsCount} skills</span>
               <span>{module.primaryDomain}</span>
+            </div>
+            <div className="hero-actions">
+              <button
+                className="btn btn-secondary"
+                type="button"
+                disabled={!module.isUnlocked || module.progress.percentComplete >= 100 || syncingModuleId === module.moduleId}
+                onClick={() => onMarkLessonComplete(module)}
+              >
+                {syncingModuleId === module.moduleId ? 'Syncing progress…' : 'Mark next lesson complete'}
+              </button>
             </div>
           </article>
         ))}
@@ -634,6 +596,8 @@ function MoreScreen() {
 
 function renderView(view: AppView, args: {
   onNavigate: (view: AppView) => void;
+  onMarkLessonComplete: (module: DashboardModule) => void;
+  syncingModuleId: string | null;
   courseworkCompletion: number;
   completedModules: number;
   nextLessonSummary: string;
@@ -646,6 +610,7 @@ function renderView(view: AppView, args: {
   communityMatches: typeof COMMUNITY_MATCHES;
   communityPosts: typeof COMMUNITY_POSTS;
   communityActions: string[];
+  studyTasks: TaskItem[];
 }) {
   switch (view) {
     case 'home':
@@ -659,10 +624,18 @@ function renderView(view: AppView, args: {
           weakestDomainKey={args.weakestDomainKey}
           examReadiness={args.examReadiness}
           ceuCompletion={args.ceuCompletion}
+          studyTasks={args.studyTasks}
         />
       );
     case 'courses':
-      return <CoursesScreen modules={args.modules} nextLessonSummary={args.nextLessonSummary} />;
+      return (
+        <CoursesScreen
+          modules={args.modules}
+          nextLessonSummary={args.nextLessonSummary}
+          syncingModuleId={args.syncingModuleId}
+          onMarkLessonComplete={args.onMarkLessonComplete}
+        />
+      );
     case 'skills':
       return <SkillsScreen />;
     case 'review':
@@ -688,9 +661,17 @@ export function IntegratedAppShell() {
   const [portalProfile, setPortalProfile] = useState<PortalProfile | null>(null);
   const [portalStudent, setPortalStudent] = useState<StudentPortalRecord | null>(null);
   const [sessionUser, setSessionUser] = useState<PortalSessionUser | null>(null);
+  const [syncingModuleId, setSyncingModuleId] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<'loading' | 'ready' | 'unauthenticated' | 'error'>('loading');
   const [loadMessage, setLoadMessage] = useState('Checking your portal session.');
-  const learnerState = DEMO_LEARNER_STATE as unknown as Parameters<typeof getModulesWithProgress>[0];
+  const learnerState = useMemo(
+    () =>
+      (portalStudent?.courseProgress ?? {
+        completedModuleIds: [],
+        moduleProgress: {},
+      }) as Parameters<typeof getModulesWithProgress>[0],
+    [portalStudent]
+  );
 
   const modulesWithProgress = useMemo(
     () => getModulesWithProgress(learnerState).filter((module) => module.status === 'available') as DashboardModule[],
@@ -784,6 +765,16 @@ export function IntegratedAppShell() {
   }, [portalStudent]);
 
   const communityActions = portalStudent?.community.recommendedActions ?? [];
+  const studyTasks = useMemo<TaskItem[]>(
+    () =>
+      (portalStudent?.studyPlan?.length ? portalStudent.studyPlan : FALLBACK_TASKS).map((task: StudyPlanTask | TaskItem) => ({
+        title: task.title,
+        detail: task.detail,
+        status: task.status,
+        view: task.view,
+      })),
+    [portalStudent]
+  );
 
   useEffect(() => {
     const syncFromHash = () => {
@@ -862,6 +853,20 @@ export function IntegratedAppShell() {
     goToPortalSignup('student', 'login');
   };
 
+  const handleMarkLessonComplete = async (module: DashboardModule) => {
+    if (!portalStudent || !module.isUnlocked) {
+      return;
+    }
+    const nextCompletedLessons = Math.min(module.progress.totalLessons, module.progress.completedLessons + 1);
+    setSyncingModuleId(module.moduleId);
+    try {
+      const courseProgress = await syncCourseProgress(module.moduleId, nextCompletedLessons);
+      setPortalStudent((previous) => (previous ? { ...previous, courseProgress } : previous));
+    } finally {
+      setSyncingModuleId(null);
+    }
+  };
+
   if (loadState === 'loading') {
     return (
       <PortalAccessNotice
@@ -926,6 +931,8 @@ export function IntegratedAppShell() {
       <main id="main-content" className="main-content">
         {renderView(currentView, {
           onNavigate: navigate,
+          onMarkLessonComplete: handleMarkLessonComplete,
+          syncingModuleId,
           courseworkCompletion,
           completedModules,
           nextLessonSummary,
@@ -938,6 +945,7 @@ export function IntegratedAppShell() {
           communityMatches,
           communityPosts,
           communityActions,
+          studyTasks,
         })}
       </main>
 
