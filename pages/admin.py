@@ -18,8 +18,8 @@ def show() -> None:
 
     st.success("✅ Authenticated as administrator")
 
-    tab_users, tab_questions, tab_quiz_log, tab_db = st.tabs(
-        ["👥 Users", "❓ Questions", "📊 Quiz Log", "🗄️ Database"]
+    tab_users, tab_questions, tab_quiz_log, tab_community, tab_db = st.tabs(
+        ["👥 Users", "❓ Questions", "📊 Quiz Log", "🤝 Community", "🗄️ Database"]
     )
 
     # ------------------------------------------------------------------ Users
@@ -110,12 +110,78 @@ def show() -> None:
         else:
             st.info("No quiz attempts recorded yet.")
 
+    # -------------------------------------------------------- Community hub
+    with tab_community:
+        st.subheader("Community Hub Moderation")
+        counts = db.get_community_dashboard_counts()
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Mentors", counts["mentors"])
+        col2.metric("Mentees", counts["mentees"])
+        col3.metric("Study Groups", counts["study_groups"])
+        col4.metric("Active Posts", counts["active_posts"])
+
+        profiles = db.list_community_profiles(limit=100)
+        if profiles:
+            st.markdown("**Active community profiles**")
+            profile_df = pd.DataFrame(profiles)[
+                ["name", "role", "city", "organization", "can_mentor", "wants_mentor", "open_to_opportunities", "interest_areas", "availability"]
+            ]
+            profile_df.columns = [
+                "Name",
+                "Role",
+                "City",
+                "Organization",
+                "Mentor",
+                "Wants Mentor",
+                "Open to Opportunities",
+                "Interest Areas",
+                "Availability",
+            ]
+            st.dataframe(profile_df, use_container_width=True, hide_index=True)
+        else:
+            st.info("No community profiles yet.")
+
+        posts = db.get_community_posts(status=None, limit=200)
+        st.markdown("**Community posts**")
+        if posts:
+            post_df = pd.DataFrame(posts)[
+                ["id", "post_type", "title", "author_name", "author_role", "location", "status", "created_at"]
+            ]
+            post_df.columns = ["ID", "Type", "Title", "Author", "Role", "Location", "Status", "Created"]
+            st.dataframe(post_df, use_container_width=True, hide_index=True)
+
+            post_ids = [post["id"] for post in posts]
+            selected_post_id = st.selectbox("Select post to moderate", options=post_ids)
+            selected_post = next((post for post in posts if post["id"] == selected_post_id), None)
+            if selected_post:
+                st.write(selected_post["description"])
+                new_status = st.selectbox(
+                    "Status",
+                    options=["active", "archived"],
+                    index=0 if selected_post["status"] == "active" else 1,
+                    key=f"community_status_{selected_post_id}",
+                )
+                if st.button("Save post status", key=f"save_community_status_{selected_post_id}"):
+                    db.set_community_post_status(selected_post_id, new_status)
+                    st.success("Community post updated.")
+                    st.rerun()
+        else:
+            st.info("No community posts recorded yet.")
+
     # ---------------------------------------------------------- Database info
     with tab_db:
         st.subheader("Database Info")
         st.code(f"DB_PATH = {db.DB_PATH}")
         _KNOWN_TABLES = frozenset(
-            ["users", "ceu_records", "exam_questions", "quiz_attempts", "staff_records"]
+            [
+                "users",
+                "ceu_records",
+                "exam_questions",
+                "quiz_attempts",
+                "staff_records",
+                "community_profiles",
+                "community_posts",
+            ]
         )
         with db.get_conn() as conn:
             for table in sorted(_KNOWN_TABLES):

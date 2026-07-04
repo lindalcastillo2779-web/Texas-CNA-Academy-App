@@ -8,6 +8,7 @@ This project is designed to support Texas nurse aide education, training readine
 
 - exam-preparation tools for nurse aide students
 - **interactive Clinical Skills Lab** for hands-on skill simulation (Prometric/NATCEP-aligned)
+- **Community Mentor + Workforce Hub** for mentoring, study circles, practice partners, and local opportunities
 - renewal and continuing education tracking support
 - staffing and compliance support tools
 - access to important Texas CNA and NATCEP-related forms and references
@@ -66,13 +67,14 @@ You can use this project in several ways:
 
 1. **Students** can use it to prepare for nurse aide exams and track progress.
 2. **CNAs** can use it to monitor renewal readiness and CEU-related information.
-3. **Instructors and program leaders** can use it to organize training support materials and documentation.
-4. **Facilities and administrators** can use it to support staffing and compliance workflows.
+3. **Instructors and program leaders** can use it to organize training support materials, study groups, and mentoring.
+4. **Facilities and administrators** can use it to support staffing, workforce outreach, and compliance workflows.
 
 ### Typical uses
 
 - sign in and access learning or tracking tools
 - review exam-prep materials
+- connect with mentors, practice partners, and local workforce opportunities
 - track CEUs and renewal-related progress
 - manage staffing and compliance information
 - reference Texas nurse aide documents and related materials
@@ -169,11 +171,12 @@ pages/
   courses.py              # NATCEP course roadmap and curriculum browser
   exam_prep.py            # Practice quiz tools
   clinical_skills_lab.py  # Clinical Skills Lab – interactive CNA skill simulations
+  community_hub.py        # Mentor matching, community board, and workforce opportunities
   ceu_tracker.py          # CEU logging and progress
   renewal_check.py        # Renewal readiness dashboard
   staffing.py             # Staffing compliance log
   buddy.py                # Buddy AI chatbot page
-  admin.py                # Admin panel
+  admin.py                # Admin panel + community moderation
 knowledge/
   curriculum/             # Curriculum docs (.md / .txt / .pdf)
   media/                  # Central media registry for Streamlit pages and lessons

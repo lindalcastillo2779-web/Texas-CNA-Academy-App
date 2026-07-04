@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-type AdminView = 'overview' | 'users' | 'courses' | 'compliance' | 'reports';
+type AdminView = 'overview' | 'users' | 'courses' | 'community' | 'compliance' | 'reports';
 
 type AdminNavItem = {
   key: AdminView;
@@ -12,6 +12,7 @@ const NAV_ITEMS: AdminNavItem[] = [
   { key: 'overview', label: 'Overview', icon: '📊' },
   { key: 'users', label: 'Users', icon: '👤' },
   { key: 'courses', label: 'Courses', icon: '📘' },
+  { key: 'community', label: 'Community', icon: '🤝' },
   { key: 'compliance', label: 'Compliance', icon: '✅' },
   { key: 'reports', label: 'Reports', icon: '📄' },
 ];
@@ -51,6 +52,18 @@ const COMPLIANCE = [
 const REPORTS = [
   { title: 'Monthly enrollment report', copy: 'June 2026 enrollment data and trend summary.', cta: 'Generate PDF' },
   { title: 'State compliance report', copy: 'Texas Board of Nursing compliance summary.', cta: 'Generate PDF' },
+];
+
+const COMMUNITY_HEALTH = [
+  { label: 'Mentor profiles', value: '34', tone: 'is-success' },
+  { label: 'Posts awaiting moderation', value: '5', tone: 'is-warning' },
+  { label: 'Facility opportunities live', value: '12', tone: 'is-muted' },
+];
+
+const COMMUNITY_REVIEW_QUEUE = [
+  { title: 'Review new mentor offer', detail: 'Verify experience summary and posting quality before approval.', tone: 'is-warning' },
+  { title: 'Approve facility hiring event', detail: 'Confirm details for next week’s workforce event post.', tone: 'is-success' },
+  { title: 'Archive outdated practice partner request', detail: 'Post is over 30 days old and no longer active.', tone: 'is-muted' },
 ];
 
 function SectionHeader({
@@ -213,6 +226,40 @@ function ComplianceScreen() {
   );
 }
 
+function CommunityScreen() {
+  return (
+    <div className="screen-stack">
+      <section className="section-card">
+        <SectionHeader eyebrow="Community hub" title="Moderate the mentor and workforce network" copy="Keep mentoring, study support, and facility opportunities trusted and useful." />
+      </section>
+
+      <section className="metric-grid">
+        {COMMUNITY_HEALTH.map((item) => (
+          <article key={item.label} className={`metric-card metric-card-${item.tone}`}>
+            <span className="metric-label">{item.label}</span>
+            <strong className="metric-value">{item.value}</strong>
+          </article>
+        ))}
+      </section>
+
+      <section className="section-card">
+        <SectionHeader eyebrow="Moderation" title="Community review queue" copy="Prioritize safety, freshness, and value before posts stay visible." />
+        <div className="timeline-list">
+          {COMMUNITY_REVIEW_QUEUE.map((item) => (
+            <article key={item.title} className="timeline-item">
+              <div className={`timeline-dot ${item.tone}`} />
+              <div className="timeline-copy">
+                <strong>{item.title}</strong>
+                <p>{item.detail}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function ReportsScreen() {
   return (
     <div className="screen-stack">
@@ -243,6 +290,8 @@ function renderView(view: AdminView, onNavigate: (view: AdminView) => void) {
       return <UsersScreen />;
     case 'courses':
       return <CoursesScreen />;
+    case 'community':
+      return <CommunityScreen />;
     case 'compliance':
       return <ComplianceScreen />;
     case 'reports':
@@ -281,6 +330,8 @@ export function AdminAppShell() {
         return 'User management';
       case 'courses':
         return 'Course oversight';
+      case 'community':
+        return 'Community moderation';
       case 'compliance':
         return 'Compliance tracker';
       case 'reports':
@@ -314,7 +365,7 @@ export function AdminAppShell() {
         {renderView(currentView, navigate)}
       </main>
 
-      <nav className="bottom-nav" aria-label="Primary">
+      <nav className="bottom-nav bottom-nav-6" aria-label="Primary">
         {NAV_ITEMS.map((item) => {
           const isActive = item.key === currentView;
 

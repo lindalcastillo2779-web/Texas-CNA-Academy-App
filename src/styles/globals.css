@@ -620,6 +620,10 @@ a {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.bottom-nav-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
 .bottom-nav-item {
   display: grid;
   justify-items: center;

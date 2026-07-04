@@ -95,6 +95,36 @@ CREATE TABLE IF NOT EXISTS staff_records (
     notes         TEXT,
     created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS community_profiles (
+    user_id                 INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    city                    TEXT,
+    organization            TEXT,
+    can_mentor              INTEGER NOT NULL DEFAULT 0,
+    wants_mentor            INTEGER NOT NULL DEFAULT 0,
+    open_to_opportunities   INTEGER NOT NULL DEFAULT 1,
+    interest_areas          TEXT,
+    availability            TEXT,
+    bio                     TEXT,
+    created_at              TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at              TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS community_posts (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    post_type       TEXT NOT NULL CHECK (
+        post_type IN ('mentor_request', 'mentor_offer', 'study_group', 'practice_partner', 'opportunity')
+    ),
+    title           TEXT NOT NULL,
+    description     TEXT NOT NULL,
+    location        TEXT,
+    contact_info    TEXT,
+    tags            TEXT,
+    audience_roles  TEXT,
+    status          TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
 """
 
 
@@ -104,6 +134,7 @@ def init_db() -> None:
         conn.executescript(_DDL)
         _migrate_user_subscription_fields(conn)
         _seed_questions(conn)
+        _seed_community_posts(conn)
 
 
 def _migrate_user_subscription_fields(conn: sqlite3.Connection) -> None:
@@ -214,6 +245,74 @@ def _seed_questions(conn: sqlite3.Connection) -> None:
            VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
         _SAMPLE_QUESTIONS,
     )
+
+
+_SAMPLE_COMMUNITY_POSTS = [
+    (
+        None,
+        "mentor_offer",
+        "Experienced CNA mentor available for exam-readiness coaching",
+        "Get practical guidance on exam pacing, hand hygiene, transfer safety, and how to stay calm on test day.",
+        "Dallas / Virtual",
+        "Introduce yourself in the Community Hub and mention your goal.",
+        "exam prep, infection control, skills lab",
+        "student,cna",
+        "active",
+    ),
+    (
+        None,
+        "study_group",
+        "Weekly infection control study circle",
+        "Small-group review for PPE, isolation precautions, and safety questions with accountability check-ins.",
+        "Houston / Virtual",
+        "Use the Community Hub board to request the next session invite.",
+        "infection control, quiz review, study group",
+        "student,instructor",
+        "active",
+    ),
+    (
+        None,
+        "practice_partner",
+        "Practice partner search for Prometric clinical skills",
+        "Pair up to rehearse vital signs, transfer setup, communication scripts, and step sequencing before lab day.",
+        "San Antonio",
+        "Post your availability window and preferred practice skill.",
+        "clinical skills, transfer, vital signs",
+        "student,cna",
+        "active",
+    ),
+    (
+        None,
+        "opportunity",
+        "Facility shadow day and entry-level hiring event",
+        "Meet facility leaders, learn workflow expectations, and explore openings for motivated CNA candidates.",
+        "Fort Worth",
+        "Bring your CNA documents and a short introduction about your goals.",
+        "workforce, hiring, facility",
+        "student,cna,facility",
+        "active",
+    ),
+]
+
+
+def _seed_community_posts(conn: sqlite3.Connection) -> None:
+    count = conn.execute("SELECT COUNT(*) FROM community_posts").fetchone()[0]
+    if count > 0:
+        return
+    conn.executemany(
+        """INSERT INTO community_posts
+           (user_id, post_type, title, description, location, contact_info, tags, audience_roles, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        _SAMPLE_COMMUNITY_POSTS,
+    )
+
+
+def _split_tokens(value: str | None) -> set[str]:
+    return {
+        token.strip().lower()
+        for token in (value or "").split(",")
+        if token.strip()
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -453,3 +552,301 @@ def get_staff_records(facility: str | None = None) -> list:
                 "SELECT * FROM staff_records ORDER BY shift_date DESC"
             ).fetchall()
         return [dict(r) for r in rows]
+
+
+def get_staff_demand_summary(limit: int = 5) -> list[dict]:
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT
+                facility_name,
+                COUNT(*) AS shifts_logged,
+                SUM(CASE WHEN compliant = 0 THEN 1 ELSE 0 END) AS non_compliant_shifts,
+                MAX(shift_date) AS latest_shift_date
+            FROM staff_records
+            GROUP BY facility_name
+            ORDER BY shifts_logged DESC, latest_shift_date DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_community_profile(user_id: int) -> dict | None:
+    with get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT cp.*, u.name, u.role
+            FROM community_profiles cp
+            JOIN users u ON u.id = cp.user_id
+            WHERE cp.user_id = ?
+            """,
+            (user_id,),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def upsert_community_profile(
+    user_id: int,
+    city: str = "",
+    organization: str = "",
+    can_mentor: bool = False,
+    wants_mentor: bool = False,
+    open_to_opportunities: bool = True,
+    interest_areas: str = "",
+    availability: str = "",
+    bio: str = "",
+) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO community_profiles
+                (user_id, city, organization, can_mentor, wants_mentor, open_to_opportunities,
+                 interest_areas, availability, bio, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+            ON CONFLICT(user_id) DO UPDATE SET
+                city = excluded.city,
+                organization = excluded.organization,
+                can_mentor = excluded.can_mentor,
+                wants_mentor = excluded.wants_mentor,
+                open_to_opportunities = excluded.open_to_opportunities,
+                interest_areas = excluded.interest_areas,
+                availability = excluded.availability,
+                bio = excluded.bio,
+                updated_at = datetime('now')
+            """,
+            (
+                user_id,
+                city.strip(),
+                organization.strip(),
+                int(can_mentor),
+                int(wants_mentor),
+                int(open_to_opportunities),
+                interest_areas.strip(),
+                availability.strip(),
+                bio.strip(),
+            ),
+        )
+
+
+def list_community_profiles(
+    exclude_user_id: int | None = None,
+    mentors_only: bool = False,
+    limit: int = 20,
+) -> list[dict]:
+    clauses = []
+    params: list[object] = []
+    if exclude_user_id is not None:
+        clauses.append("cp.user_id != ?")
+        params.append(exclude_user_id)
+    if mentors_only:
+        clauses.append("cp.can_mentor = 1")
+    where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+    query = f"""
+        SELECT cp.*, u.name, u.role
+        FROM community_profiles cp
+        JOIN users u ON u.id = cp.user_id
+        {where}
+        ORDER BY cp.updated_at DESC
+        LIMIT ?
+    """
+    params.append(limit)
+    with get_conn() as conn:
+        rows = conn.execute(query, tuple(params)).fetchall()
+        return [dict(r) for r in rows]
+
+
+def create_community_post(
+    user_id: int | None,
+    post_type: str,
+    title: str,
+    description: str,
+    location: str = "",
+    contact_info: str = "",
+    tags: str = "",
+    audience_roles: str = "",
+) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO community_posts
+                (user_id, post_type, title, description, location, contact_info, tags, audience_roles)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                user_id,
+                post_type,
+                title.strip(),
+                description.strip(),
+                location.strip(),
+                contact_info.strip(),
+                tags.strip(),
+                audience_roles.strip(),
+            ),
+        )
+
+
+def get_community_posts(
+    post_type: str | None = None,
+    status: str | None = "active",
+    limit: int = 50,
+) -> list[dict]:
+    clauses = []
+    params: list[object] = []
+    if post_type:
+        clauses.append("cp.post_type = ?")
+        params.append(post_type)
+    if status:
+        clauses.append("cp.status = ?")
+        params.append(status)
+    where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+    query = f"""
+        SELECT
+            cp.*,
+            u.name AS author_name,
+            u.role AS author_role
+        FROM community_posts cp
+        LEFT JOIN users u ON u.id = cp.user_id
+        {where}
+        ORDER BY cp.created_at DESC
+        LIMIT ?
+    """
+    params.append(limit)
+    with get_conn() as conn:
+        rows = conn.execute(query, tuple(params)).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_user_community_posts(user_id: int, limit: int = 20) -> list[dict]:
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT * FROM community_posts
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (user_id, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def set_community_post_status(post_id: int, status: str) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE community_posts SET status = ? WHERE id = ?",
+            (status, post_id),
+        )
+
+
+def get_community_dashboard_counts() -> dict:
+    with get_conn() as conn:
+        mentors = conn.execute(
+            "SELECT COUNT(*) FROM community_profiles WHERE can_mentor = 1"
+        ).fetchone()[0]
+        mentees = conn.execute(
+            "SELECT COUNT(*) FROM community_profiles WHERE wants_mentor = 1"
+        ).fetchone()[0]
+        opportunities = conn.execute(
+            "SELECT COUNT(*) FROM community_posts WHERE post_type = 'opportunity' AND status = 'active'"
+        ).fetchone()[0]
+        study_groups = conn.execute(
+            "SELECT COUNT(*) FROM community_posts WHERE post_type = 'study_group' AND status = 'active'"
+        ).fetchone()[0]
+        total_posts = conn.execute(
+            "SELECT COUNT(*) FROM community_posts WHERE status = 'active'"
+        ).fetchone()[0]
+    return {
+        "mentors": int(mentors),
+        "mentees": int(mentees),
+        "opportunities": int(opportunities),
+        "study_groups": int(study_groups),
+        "active_posts": int(total_posts),
+    }
+
+
+def get_mentor_matches(user_id: int, limit: int = 4) -> list[dict]:
+    user = get_user_by_id(user_id)
+    if not user:
+        return []
+    profile = get_community_profile(user_id) or {}
+    weak_domains = {
+        stat["domain"].lower()
+        for stat in get_quiz_stats_by_domain(user_id)
+        if float(stat.get("avg_pct") or 0) < 75
+    }
+    learner_interests = _split_tokens(profile.get("interest_areas"))
+    matches: list[tuple[int, dict]] = []
+    for candidate in list_community_profiles(exclude_user_id=user_id, mentors_only=True, limit=25):
+        score = 1
+        candidate_interests = _split_tokens(candidate.get("interest_areas"))
+        score += len(weak_domains & candidate_interests) * 3
+        score += len(learner_interests & candidate_interests) * 2
+        if candidate.get("role") in {"cna", "instructor", "don"}:
+            score += 2
+        if profile.get("wants_mentor"):
+            score += 2
+        matches.append((score, candidate))
+    matches.sort(key=lambda item: (-item[0], item[1].get("updated_at", "")), reverse=False)
+    return [candidate for _, candidate in matches[:limit]]
+
+
+def get_recommended_posts_for_user(user_id: int, limit: int = 6) -> list[dict]:
+    user = get_user_by_id(user_id)
+    if not user:
+        return []
+    profile = get_community_profile(user_id) or {}
+    preferred_tokens = _split_tokens(profile.get("interest_areas"))
+    weak_domains = {
+        stat["domain"].lower()
+        for stat in get_quiz_stats_by_domain(user_id)
+        if float(stat.get("avg_pct") or 0) < 75
+    }
+    preferred_tokens.update(weak_domains)
+    posts = get_community_posts(status="active", limit=40)
+    ranked: list[tuple[int, dict]] = []
+    for post in posts:
+        score = 1
+        post_tags = _split_tokens(post.get("tags"))
+        audience_roles = _split_tokens(post.get("audience_roles"))
+        if post["post_type"] == "opportunity" and profile.get("open_to_opportunities", 1):
+            score += 3
+        if post["post_type"] == "mentor_offer" and (profile.get("wants_mentor") or user["role"] == "student"):
+            score += 3
+        if post["post_type"] == "study_group" and user["role"] in {"student", "instructor"}:
+            score += 2
+        if not audience_roles or user["role"].lower() in audience_roles:
+            score += 2
+        score += len(preferred_tokens & post_tags) * 2
+        ranked.append((score, post))
+    ranked.sort(key=lambda item: (-item[0], item[1].get("created_at", "")), reverse=False)
+    return [post for _, post in ranked[:limit]]
+
+
+def get_recommended_community_actions(user_id: int) -> list[str]:
+    user = get_user_by_id(user_id)
+    if not user:
+        return []
+    profile = get_community_profile(user_id) or {}
+    weak_domains = [
+        stat["domain"]
+        for stat in get_quiz_stats_by_domain(user_id)
+        if float(stat.get("avg_pct") or 0) < 75
+    ]
+    ceu_remaining = max(0.0, 24.0 - total_ceu_hours(user_id))
+    posts = get_user_community_posts(user_id, limit=5)
+    actions: list[str] = []
+    if user["role"] == "student" and weak_domains:
+        actions.append(f"Ask for mentoring in {weak_domains[0]} to turn your weakest quiz area into a study plan.")
+    if not profile:
+        actions.append("Complete your Community Hub profile so mentors, instructors, and facilities can find the right fit.")
+    if profile and not profile.get("wants_mentor") and user["role"] == "student":
+        actions.append("Turn on mentor matching to get support from experienced CNAs or instructors.")
+    if ceu_remaining > 0 and user["role"] in {"cna", "don", "instructor"}:
+        actions.append(f"You still need {ceu_remaining:.1f} CEU hours — follow opportunity posts that include renewal-friendly training.")
+    if not posts:
+        actions.append("Create your first post so the community can respond with practice, study, or workforce support.")
+    if not actions:
+        actions.append("Review a mentor match or opportunity post today to keep your network active.")
+    return actions[:4]

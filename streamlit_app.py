@@ -9,6 +9,7 @@ Sections
 • 🎓 Courses       – NATCEP study roadmap and module content
 • 📚 Exam Prep     – Practice quizzes (NATCEP domains)
 • 🧪 Clinical Skills Lab – Interactive Prometric-aligned skill simulations
+• 🤝 Community Hub – Mentor matching, study circles, and workforce opportunities
 • 📋 CEU Tracker   – Log & track continuing-education hours
 • ✅ Renewal Check – Renewal readiness summary
 • 🏥 Staffing      – Facility staffing compliance log
@@ -154,6 +155,7 @@ PAGES = {
     "📚 Exam Prep": "exam_prep",
     "📊 My Progress": "progress",
     "🧪 Clinical Skills Lab": "clinical_skills_lab",
+    "🤝 Community Hub": "community_hub",
     "📋 CEU Tracker": "ceu_tracker",
     "✅ Renewal Check": "renewal_check",
     "🏥 Staffing Log": "staffing",
@@ -218,6 +220,8 @@ elif page == "progress":
     from pages import progress as _page
 elif page == "clinical_skills_lab":
     from pages import clinical_skills_lab as _page
+elif page == "community_hub":
+    from pages import community_hub as _page
 elif page == "ceu_tracker":
     from pages import ceu_tracker as _page
 elif page == "renewal_check":
