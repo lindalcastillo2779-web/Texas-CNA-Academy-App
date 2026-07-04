@@ -377,7 +377,7 @@ export function StaffAppShell() {
         {renderView(currentView, navigate)}
       </main>
 
-      <nav className="bottom-nav" aria-label="Primary">
+      <nav className="bottom-nav bottom-nav-5" aria-label="Primary">
         {NAV_ITEMS.map((item) => {
           const isActive = item.key === currentView;
 

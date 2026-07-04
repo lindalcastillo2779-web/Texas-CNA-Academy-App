@@ -98,7 +98,7 @@ def _render_profile_tab(user_id: int, role: str, profile: dict) -> None:
         with col2:
             wants_mentor = st.checkbox(
                 "I want a mentor",
-                value=bool(profile.get("wants_mentor", 0) or role == "student"),
+                value=bool(profile.get("wants_mentor", 1 if role == "student" else 0)),
             )
         with col3:
             open_to_opportunities = st.checkbox(
