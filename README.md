@@ -1,5 +1,7 @@
 # Texas CNA Academy 
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?logo=github-sponsors)](https://github.com/sponsors/lindalcastillo2779-web)
+
 Texas CNA Academy is a mobile-friendly training and resource platform for Texas nurse aide students, active CNAs, instructors, DONs, and healthcare facilities. This project supports exam preparation, renewal readiness, CEU tracking, staffing compliance, and access to important Texas CNA-related references and forms.
 
 ## What this project is about
@@ -386,3 +388,29 @@ Add the following to your Render environment variables:
 | `OPENAI_MODEL` | Model name (default: `gpt-4o-mini`) |
 
 Azure variables (`AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_DEPLOYMENT`, `AZURE_OPENAI_API_VERSION`) are only needed when `LLM_PROVIDER=AZURE_OPENAI`.
+
+## Sponsoring this project
+
+Texas CNA Academy is an open-source project. Everything here — study materials, skill checklists, curriculum templates, exam-prep tools, and compliance workflows — is free to use, share, and build on.
+
+If this project saves you time, helps your students pass their exam, or makes your program run smoother, please consider supporting its continued development.
+
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?logo=github-sponsors&style=for-the-badge)](https://github.com/sponsors/lindalcastillo2779-web)
+
+### What your support funds
+
+- New NATCEP curriculum modules and study materials
+- Skill simulation scenario development (Clinical Skills Lab)
+- Maintenance, bug fixes, and security updates
+- Hosting and infrastructure costs
+- Community features: mentor matching, workforce hub, peer study circles
+
+### How to sponsor
+
+GitHub Sponsors supports both **monthly** and **one-time** contributions — individuals and organizations are both welcome.
+
+1. Click the **Sponsor** button at the top of this repository page, or visit [github.com/sponsors/lindalcastillo2779-web](https://github.com/sponsors/lindalcastillo2779-web).
+2. Choose a tier (or enter a custom amount for a one-time gift).
+3. Complete checkout through GitHub — payments are processed securely by GitHub/Stripe.
+
+All sponsors are recognized in the GitHub Sponsors section of this repository. Corporate sponsors interested in a higher-visibility acknowledgment are welcome to open a discussion.
