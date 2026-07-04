@@ -788,7 +788,7 @@ def get_mentor_matches(user_id: int, limit: int = 4) -> list[dict]:
         if profile.get("wants_mentor"):
             score += 2
         matches.append((score, candidate))
-    matches.sort(key=lambda item: (-item[0], item[1].get("updated_at", "")), reverse=False)
+    matches.sort(key=lambda item: (-item[0], item[1].get("updated_at", "")))
     return [candidate for _, candidate in matches[:limit]]
 
 
@@ -820,7 +820,7 @@ def get_recommended_posts_for_user(user_id: int, limit: int = 6) -> list[dict]:
             score += 2
         score += len(preferred_tokens & post_tags) * 2
         ranked.append((score, post))
-    ranked.sort(key=lambda item: (-item[0], item[1].get("created_at", "")), reverse=False)
+    ranked.sort(key=lambda item: (-item[0], item[1].get("created_at", "")))
     return [post for _, post in ranked[:limit]]
 
 
