@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { downloadTextFile, goToPortalSignup } from './portalActions';
+import { formatRelativeDate, loadStaffPortalSnapshot, type StaffPortalSnapshot } from './portalData';
 
 type StaffView = 'students' | 'schedule' | 'grades' | 'community' | 'resources';
 
@@ -157,7 +158,15 @@ function SectionHeader({
   );
 }
 
-function StudentsScreen({ onNavigate }: { onNavigate: (view: StaffView) => void }) {
+function StudentsScreen({
+  onNavigate,
+  studentMetrics,
+  studentRoster,
+}: {
+  onNavigate: (view: StaffView) => void;
+  studentMetrics: typeof STUDENT_METRICS;
+  studentRoster: typeof STUDENT_ROSTER;
+}) {
   return (
     <div className="screen-stack">
       <section className="hero-card">
@@ -192,7 +201,7 @@ function StudentsScreen({ onNavigate }: { onNavigate: (view: StaffView) => void 
       </section>
 
       <section className="metric-grid">
-        {STUDENT_METRICS.map((metric) => (
+        {studentMetrics.map((metric) => (
           <article key={metric.label} className="metric-card">
             <span className="metric-label">{metric.label}</span>
             <strong className="metric-value">{metric.value}</strong>
@@ -214,7 +223,7 @@ function StudentsScreen({ onNavigate }: { onNavigate: (view: StaffView) => void 
               </tr>
             </thead>
             <tbody>
-              {STUDENT_ROSTER.map((student) => (
+              {studentRoster.map((student) => (
                 <tr key={student.name}>
                   <td>{student.name}</td>
                   <td>
@@ -239,20 +248,20 @@ function StudentsScreen({ onNavigate }: { onNavigate: (view: StaffView) => void 
   );
 }
 
-function ScheduleScreen() {
+function ScheduleScreen({ weeklySchedule }: { weeklySchedule: typeof WEEKLY_SCHEDULE }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
         <SectionHeader eyebrow="Schedule" title="This week at a glance" copy="Keep labs, lectures, and review time aligned with student needs." />
         <div className="timeline-list">
-          {WEEKLY_SCHEDULE.map((event) => (
+          {weeklySchedule.map((event) => (
             <article key={`${event.day}-${event.title}`} className="timeline-item">
               <div className="timeline-day">{event.day}</div>
               <div className="timeline-copy">
                 <strong>{event.title}</strong>
                 <p>{event.detail}</p>
               </div>
-              <span className={`status-pill ${event.status === 'Confirmed' ? 'is-success' : 'is-muted'}`}>{event.status}</span>
+              <span className={`status-pill ${event.status === 'Confirmed' || event.status === 'Compliant' ? 'is-success' : 'is-muted'}`}>{event.status}</span>
             </article>
           ))}
         </div>
@@ -261,7 +270,7 @@ function ScheduleScreen() {
   );
 }
 
-function GradesScreen() {
+function GradesScreen({ gradeBook }: { gradeBook: typeof GRADE_BOOK }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -277,7 +286,7 @@ function GradesScreen() {
               </tr>
             </thead>
             <tbody>
-              {GRADE_BOOK.map((student) => (
+              {gradeBook.map((student) => (
                 <tr key={student.name}>
                   <td>{student.name}</td>
                   <td>{student.exam1}</td>
@@ -322,7 +331,7 @@ function ResourcesScreen() {
   );
 }
 
-function CommunityScreen() {
+function CommunityScreen({ communityQueue }: { communityQueue: typeof COMMUNITY_QUEUE }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -330,7 +339,7 @@ function CommunityScreen() {
       </section>
 
       <section className="timeline-list">
-        {COMMUNITY_QUEUE.map((item) => (
+        {communityQueue.map((item) => (
           <article key={item.title} className="timeline-item">
             <div className="timeline-day">NOW</div>
             <div className="timeline-copy">
@@ -364,16 +373,32 @@ function CommunityScreen() {
   );
 }
 
-function renderView(view: StaffView, onNavigate: (view: StaffView) => void) {
+function renderView(
+  view: StaffView,
+  onNavigate: (view: StaffView) => void,
+  snapshot: {
+    studentMetrics: typeof STUDENT_METRICS;
+    studentRoster: typeof STUDENT_ROSTER;
+    weeklySchedule: typeof WEEKLY_SCHEDULE;
+    gradeBook: typeof GRADE_BOOK;
+    communityQueue: typeof COMMUNITY_QUEUE;
+  }
+) {
   switch (view) {
     case 'students':
-      return <StudentsScreen onNavigate={onNavigate} />;
+      return (
+        <StudentsScreen
+          onNavigate={onNavigate}
+          studentMetrics={snapshot.studentMetrics}
+          studentRoster={snapshot.studentRoster}
+        />
+      );
     case 'schedule':
-      return <ScheduleScreen />;
+      return <ScheduleScreen weeklySchedule={snapshot.weeklySchedule} />;
     case 'grades':
-      return <GradesScreen />;
+      return <GradesScreen gradeBook={snapshot.gradeBook} />;
     case 'community':
-      return <CommunityScreen />;
+      return <CommunityScreen communityQueue={snapshot.communityQueue} />;
     case 'resources':
       return <ResourcesScreen />;
     default:
@@ -383,6 +408,18 @@ function renderView(view: StaffView, onNavigate: (view: StaffView) => void) {
 
 export function StaffAppShell() {
   const [currentView, setCurrentView] = useState<StaffView>('students');
+  const [portalSnapshot, setPortalSnapshot] = useState<StaffPortalSnapshot | null>(null);
+
+  const studentMetrics = portalSnapshot?.studentMetrics ?? STUDENT_METRICS;
+  const studentRoster = portalSnapshot?.studentRoster.map((student) => ({
+    name: student.name,
+    progress: student.progress,
+    lastActive: formatRelativeDate(student.lastActiveAt),
+    status: student.status,
+  })) ?? STUDENT_ROSTER;
+  const weeklySchedule = portalSnapshot?.facilitySchedule.length ? portalSnapshot.facilitySchedule : WEEKLY_SCHEDULE;
+  const gradeBook = portalSnapshot?.gradeBook ?? GRADE_BOOK;
+  const communityQueue = portalSnapshot?.communityQueue ?? COMMUNITY_QUEUE;
 
   useEffect(() => {
     const syncFromHash = () => {
@@ -395,6 +432,26 @@ export function StaffAppShell() {
     syncFromHash();
     window.addEventListener('hashchange', syncFromHash);
     return () => window.removeEventListener('hashchange', syncFromHash);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    loadStaffPortalSnapshot()
+      .then((snapshot) => {
+        if (isMounted) {
+          setPortalSnapshot(snapshot);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setPortalSnapshot(null);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const navigate = (view: StaffView) => {
@@ -432,7 +489,7 @@ export function StaffAppShell() {
           <p className="topbar-subtitle">A unified instructor portal for coaching, grading, scheduling, and teaching support.</p>
         </div>
         <div className="topbar-actions">
-          <span className="status-chip">24 active learners</span>
+          <span className="status-chip">{studentMetrics[0]?.value ?? '0'} active learners</span>
           <button
             className="profile-chip"
             type="button"
@@ -445,7 +502,13 @@ export function StaffAppShell() {
       </header>
 
       <main id="main-content" className="main-content">
-        {renderView(currentView, navigate)}
+        {renderView(currentView, navigate, {
+          studentMetrics,
+          studentRoster,
+          weeklySchedule,
+          gradeBook,
+          communityQueue,
+        })}
       </main>
 
       <nav className="bottom-nav bottom-nav-5" aria-label="Primary">
