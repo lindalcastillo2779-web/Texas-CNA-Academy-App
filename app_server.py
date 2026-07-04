@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import hmac
+import json
 import os
 import subprocess
 import sys
 from contextlib import asynccontextmanager
 from contextlib import suppress
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +25,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from db import (
+    apply_stripe_entitlement_update,
     authenticate_user,
     build_admin_portal_payload,
     build_staff_portal_payload,
@@ -28,10 +33,12 @@ from db import (
     create_or_claim_user_account,
     create_portal_session,
     delete_portal_session,
+    get_billing_entitlement,
     get_portal_dashboard_path,
     get_portal_profile,
     get_user_by_session_token,
     init_db,
+    is_active_license_status,
     is_admin_role,
     is_staff_role,
     normalize_email,
@@ -52,6 +59,20 @@ STREAMLIT_PORT = int(os.environ.get("STREAMLIT_INTERNAL_PORT", "8501"))
 STREAMLIT_BASE_PATH = os.environ.get("STREAMLIT_BASE_PATH", "app").strip("/") or "app"
 STREAMLIT_HTTP_BASE = f"http://{STREAMLIT_HOST}:{STREAMLIT_PORT}"
 STREAMLIT_WS_BASE = f"ws://{STREAMLIT_HOST}:{STREAMLIT_PORT}"
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+STRIPE_WEBHOOK_TOLERANCE_SECONDS = int(
+    os.environ.get("STRIPE_WEBHOOK_TOLERANCE_SECONDS", "300")
+)
+STRIPE_CORE_PRICE_IDS = {
+    price_id.strip()
+    for price_id in os.environ.get("STRIPE_CORE_PRICE_IDS", "").split(",")
+    if price_id.strip()
+}
+STRIPE_PRO_PRICE_IDS = {
+    price_id.strip()
+    for price_id in os.environ.get("STRIPE_PRO_PRICE_IDS", "").split(",")
+    if price_id.strip()
+}
 init_db()
 
 
@@ -118,6 +139,175 @@ def _portal_session_payload(user: Any) -> dict[str, Any]:
 
 def _json_error(message: str, status_code: int) -> JSONResponse:
     return JSONResponse({"error": message}, status_code=status_code)
+
+
+def _stripe_sql_timestamp(unix_seconds: int | None) -> str | None:
+    if not unix_seconds:
+        return None
+    return datetime.fromtimestamp(int(unix_seconds), tz=timezone.utc).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+
+def _tier_from_price_id(price_id: str | None) -> str | None:
+    if not price_id:
+        return None
+    if price_id in STRIPE_PRO_PRICE_IDS:
+        return "pro"
+    if price_id in STRIPE_CORE_PRICE_IDS:
+        return "core"
+    return None
+
+
+def _determine_tier(metadata: dict[str, Any], price_id: str | None) -> str | None:
+    metadata_tier = str(metadata.get("subscription_tier", "")).strip().lower()
+    return metadata_tier or _tier_from_price_id(price_id)
+
+
+def _checkout_is_active(payment_status: str, checkout_status: str) -> bool:
+    # Stripe checkout session is treated as active once payment is settled
+    # (`payment_status=paid`) or the session status is complete.
+    return payment_status == "paid" or checkout_status == "complete"
+
+
+def _stripe_price_ids(payload: dict[str, Any]) -> list[str]:
+    items = payload.get("items")
+    data: list[Any] = []
+    if isinstance(items, dict):
+        data_value = items.get("data")
+        if isinstance(data_value, list):
+            data = data_value
+    price_ids: list[str] = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        price = item.get("price")
+        if isinstance(price, dict):
+            price_id = str(price.get("id", "")).strip()
+            if price_id:
+                price_ids.append(price_id)
+    if not price_ids:
+        direct_price = payload.get("price")
+        if isinstance(direct_price, dict):
+            price_id = str(direct_price.get("id", "")).strip()
+            if price_id:
+                price_ids.append(price_id)
+    return price_ids
+
+
+def _verify_stripe_signature(payload: bytes, signature_header: str) -> bool:
+    parts = [part.strip() for part in signature_header.split(",") if part.strip()]
+    signed_timestamp = ""
+    signatures: list[str] = []
+    for part in parts:
+        if "=" not in part:
+            continue
+        key, value = part.split("=", 1)
+        if key == "t":
+            signed_timestamp = value
+        elif key == "v1":
+            signatures.append(value)
+    if not signed_timestamp or not signatures:
+        return False
+
+    try:
+        timestamp_int = int(signed_timestamp)
+    except ValueError:
+        return False
+
+    now_utc = int(datetime.now(timezone.utc).timestamp())
+    if timestamp_int > now_utc:
+        return False
+    if now_utc - timestamp_int > STRIPE_WEBHOOK_TOLERANCE_SECONDS:
+        return False
+
+    signed_payload = f"{signed_timestamp}.".encode("utf-8") + payload
+    expected = hmac.new(
+        STRIPE_WEBHOOK_SECRET.encode("utf-8"),
+        signed_payload,
+        hashlib.sha256,
+    ).hexdigest()
+    return any(hmac.compare_digest(expected, signature) for signature in signatures)
+
+
+def _handle_stripe_checkout_completed(payload: dict[str, Any]) -> dict[str, object]:
+    metadata = payload.get("metadata") or {}
+    customer_details = payload.get("customer_details") or {}
+    email = (
+        str(customer_details.get("email", "")).strip()
+        or str(payload.get("customer_email", "")).strip()
+        or str(metadata.get("email", "")).strip()
+    )
+    price_ids = _stripe_price_ids(payload)
+    price_id = price_ids[0] if price_ids else None
+    tier = _determine_tier(metadata, price_id)
+    payment_status = str(payload.get("payment_status", "")).strip().lower()
+    status = str(payload.get("status", "")).strip().lower()
+    is_active = _checkout_is_active(payment_status, status)
+
+    return apply_stripe_entitlement_update(
+        email=email or None,
+        stripe_customer_id=str(payload.get("customer", "")).strip() or None,
+        stripe_subscription_id=str(payload.get("subscription", "")).strip() or None,
+        stripe_price_id=price_id,
+        subscription_active=is_active,
+        subscription_tier=tier or None,
+        license_status="active" if is_active else "incomplete",
+    )
+
+
+def _handle_stripe_subscription_event(payload: dict[str, Any]) -> dict[str, object]:
+    metadata = payload.get("metadata") or {}
+    status = str(payload.get("status", "")).strip().lower()
+    is_active = is_active_license_status(status)
+    price_ids = _stripe_price_ids(payload)
+    price_id = price_ids[0] if price_ids else None
+    tier = _determine_tier(metadata, price_id)
+    subscription_end = _stripe_sql_timestamp(payload.get("current_period_end"))
+
+    return apply_stripe_entitlement_update(
+        email=str(metadata.get("email", "")).strip() or None,
+        stripe_customer_id=str(payload.get("customer", "")).strip() or None,
+        stripe_subscription_id=str(payload.get("id", "")).strip() or None,
+        stripe_price_id=price_id,
+        subscription_active=is_active,
+        subscription_tier=tier or None,
+        subscription_expires_at=subscription_end,
+        license_status=status or "active",
+    )
+
+
+def _handle_stripe_invoice_event(payload: dict[str, Any], paid: bool) -> dict[str, object]:
+    subscription_id = str(payload.get("subscription", "")).strip() or None
+    customer_id = str(payload.get("customer", "")).strip() or None
+    customer_email = str(payload.get("customer_email", "")).strip() or None
+    period_end = _stripe_sql_timestamp(payload.get("period_end"))
+    return apply_stripe_entitlement_update(
+        email=customer_email,
+        stripe_customer_id=customer_id,
+        stripe_subscription_id=subscription_id,
+        subscription_active=paid,
+        subscription_expires_at=period_end,
+        license_status="active" if paid else "past_due",
+    )
+
+
+def _handle_stripe_subscription_deleted(payload: dict[str, Any]) -> dict[str, object]:
+    metadata = payload.get("metadata") or {}
+    price_ids = _stripe_price_ids(payload)
+    price_id = price_ids[0] if price_ids else None
+    return apply_stripe_entitlement_update(
+        email=str(metadata.get("email", "")).strip() or None,
+        stripe_customer_id=str(payload.get("customer", "")).strip() or None,
+        stripe_subscription_id=str(payload.get("id", "")).strip() or None,
+        stripe_price_id=price_id,
+        subscription_active=False,
+        subscription_tier=_determine_tier(metadata, price_id),
+        subscription_expires_at=_stripe_sql_timestamp(
+            payload.get("canceled_at") or payload.get("ended_at")
+        ),
+        license_status="canceled",
+    )
 
 
 async def _read_json(request: Request) -> dict[str, Any]:
@@ -265,6 +455,62 @@ async def admin_portal(request: Request) -> JSONResponse:
     if not is_admin_role(user["role"]):
         return _json_error("This account does not have admin portal access.", 403)
     return JSONResponse(build_admin_portal_payload())
+
+
+async def current_entitlement(request: Request) -> JSONResponse:
+    try:
+        user = _require_user(request)
+    except PermissionError as exc:
+        return _json_error(str(exc), 401)
+
+    entitlement = get_billing_entitlement(int(user["id"]))
+    if entitlement is None:
+        return _json_error("Unable to load entitlement for this account.", 404)
+    return JSONResponse({"ok": True, "entitlement": entitlement})
+
+
+async def stripe_webhook(request: Request) -> JSONResponse:
+    if not STRIPE_WEBHOOK_SECRET:
+        return _json_error("Stripe webhook is not configured.", 503)
+
+    signature_header = request.headers.get("stripe-signature", "")
+    if not signature_header:
+        return _json_error("Missing Stripe signature header.", 400)
+
+    payload_bytes = await request.body()
+    if not _verify_stripe_signature(payload_bytes, signature_header):
+        return _json_error("Invalid Stripe signature.", 400)
+
+    try:
+        event = json.loads(payload_bytes.decode("utf-8"))
+    except UnicodeDecodeError:
+        return _json_error("Invalid encoding in Stripe payload.", 400)
+    except json.JSONDecodeError:
+        return _json_error("Malformed JSON in Stripe payload.", 400)
+
+    event_type = str(event.get("type", "")).strip()
+    data_object = event.get("data", {}).get("object", {})
+    if not isinstance(data_object, dict):
+        return _json_error("Invalid Stripe event data.", 400)
+
+    if event_type == "checkout.session.completed":
+        result = _handle_stripe_checkout_completed(data_object)
+    elif event_type in {"customer.subscription.created", "customer.subscription.updated"}:
+        result = _handle_stripe_subscription_event(data_object)
+    elif event_type == "customer.subscription.deleted":
+        result = _handle_stripe_subscription_deleted(data_object)
+    elif event_type == "invoice.paid":
+        result = _handle_stripe_invoice_event(data_object, paid=True)
+    elif event_type == "invoice.payment_failed":
+        result = _handle_stripe_invoice_event(data_object, paid=False)
+    else:
+        return JSONResponse({"ok": True, "ignored": True, "eventType": event_type})
+
+    if not result.get("updated"):
+        return JSONResponse(
+            {"ok": True, "eventType": event_type, "result": result, "applied": False}
+        )
+    return JSONResponse({"ok": True, "eventType": event_type, "result": result})
 
 
 def _html_file(path: Path) -> FileResponse:
@@ -470,6 +716,8 @@ routes = [
     Route("/api/portal/course-progress", sync_course_progress, methods=["POST"]),
     Route("/api/portal/staff", staff_portal, methods=["GET"]),
     Route("/api/portal/admin", admin_portal, methods=["GET"]),
+    Route("/api/billing/entitlement", current_entitlement, methods=["GET"]),
+    Route("/api/billing/stripe/webhook", stripe_webhook, methods=["POST"]),
     Route(f"/{STREAMLIT_BASE_PATH}", root_redirect),
     Route(f"/{STREAMLIT_BASE_PATH}/{{path:path}}", proxy_streamlit_http, methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]),
     WebSocketRoute(f"/{STREAMLIT_BASE_PATH}/{{path:path}}", proxy_streamlit_websocket),
