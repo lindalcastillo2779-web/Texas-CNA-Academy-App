@@ -1,0 +1,4 @@
+learner_id,name,track,level,status
+L001,Sample Learner A,Foundation,L1,in_progress
+L002,Sample Learner B,Builder,L2,complete
+L003,Sample Learner C,Operator,L3,in_progress

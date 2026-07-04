@@ -1,0 +1,13 @@
+{
+  "tiers": ["preview", "core", "pro"],
+  "products": {
+    "codealong_core_monthly": "core",
+    "codealong_pro_monthly": "pro"
+  },
+  "required_fields": [
+    "subscription_active",
+    "subscription_tier",
+    "subscription_expires_at",
+    "license_status"
+  ]
+}

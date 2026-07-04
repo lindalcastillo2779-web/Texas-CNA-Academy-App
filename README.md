@@ -414,3 +414,16 @@ GitHub Sponsors supports both **monthly** and **one-time** contributions — ind
 3. Complete checkout through GitHub — payments are processed securely by GitHub/Stripe.
 
 All sponsors are recognized in the GitHub Sponsors section of this repository. Corporate sponsors interested in a higher-visibility acknowledgment are welcome to open a discussion.
+
+## Code-Along Educational Package
+
+A sellable code-along package scaffold now exists in `./educational-package/` with:
+
+- product scope and audience definition
+- free-vs-paid access tiers
+- onboarding and progression path (`START_HERE.md`)
+- standardized module templates + MVP module (M01)
+- tutorials/study-guides/templates/sample-data/instructor-notes structure
+- legal, support, release, feedback, and trust-signal documentation
+
+Start with `./educational-package/START_HERE.md`.
