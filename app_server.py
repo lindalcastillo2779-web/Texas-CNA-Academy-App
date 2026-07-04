@@ -494,13 +494,24 @@ async def create_checkout_session(request: Request) -> JSONResponse:
     if not price_id:
         return _json_error("price_id is required.", 400)
 
+    # Validate the price_id against the configured sets when they are populated.
+    # This prevents users from triggering checkout with arbitrary price IDs.
+    allowed_price_ids = STRIPE_CORE_PRICE_IDS | STRIPE_PRO_PRICE_IDS
+    if allowed_price_ids and price_id not in allowed_price_ids:
+        return _json_error("The requested price is not available.", 400)
+
+    # Stripe requires absolute URLs; convert relative paths using the request base.
+    base = str(request.base_url).rstrip("/")
+    success_url = STRIPE_SUCCESS_URL if STRIPE_SUCCESS_URL.startswith("http") else base + STRIPE_SUCCESS_URL
+    cancel_url = STRIPE_CANCEL_URL if STRIPE_CANCEL_URL.startswith("http") else base + STRIPE_CANCEL_URL
+
     # Build the Stripe Checkout Session parameters (form-encoded).
     params: list[tuple[str, str]] = [
         ("mode", "subscription"),
         ("line_items[0][price]", price_id),
         ("line_items[0][quantity]", "1"),
-        ("success_url", STRIPE_SUCCESS_URL),
-        ("cancel_url", STRIPE_CANCEL_URL),
+        ("success_url", success_url),
+        ("cancel_url", cancel_url),
         ("client_reference_id", str(user["id"])),
     ]
 
@@ -527,10 +538,17 @@ async def create_checkout_session(request: Request) -> JSONResponse:
         return _json_error(f"Failed to reach Stripe: {exc}", 502)
 
     if response.status_code != 200:
-        stripe_error = response.json().get("error", {}).get("message", "Unknown error")
+        try:
+            stripe_error = response.json().get("error", {}).get("message", "Unknown error")
+        except Exception:
+            stripe_error = "Unknown error"
         return _json_error(f"Stripe error: {stripe_error}", 502)
 
-    session_data = response.json()
+    try:
+        session_data = response.json()
+    except Exception:
+        return _json_error("Invalid response from Stripe.", 502)
+
     checkout_url = session_data.get("url")
     if not checkout_url:
         return _json_error("Stripe did not return a checkout URL.", 502)
