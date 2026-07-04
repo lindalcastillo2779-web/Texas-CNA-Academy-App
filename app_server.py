@@ -36,6 +36,7 @@ from db import (
     is_staff_role,
     normalize_email,
     normalize_role,
+    upsert_course_progress,
 )
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -217,6 +218,33 @@ async def student_portal(request: Request) -> JSONResponse:
     if payload is None:
         return _json_error("Unable to load portal data for this account.", 404)
     return JSONResponse(payload)
+
+
+async def sync_course_progress(request: Request) -> JSONResponse:
+    try:
+        user = _require_user(request)
+    except PermissionError as exc:
+        return _json_error(str(exc), 401)
+    if is_staff_role(user["role"]):
+        return _json_error("This account does not have student portal access.", 403)
+
+    payload = await _read_json(request)
+    module_id = str(payload.get("moduleId", "")).strip().upper()
+    completed_lessons_raw = payload.get("completedLessons")
+
+    if not module_id:
+        return _json_error("moduleId is required.", 400)
+    try:
+        completed_lessons = int(completed_lessons_raw)
+    except (TypeError, ValueError):
+        return _json_error("completedLessons must be an integer.", 400)
+
+    try:
+        course_progress = upsert_course_progress(int(user["id"]), module_id, completed_lessons)
+    except ValueError as exc:
+        return _json_error(str(exc), 400)
+
+    return JSONResponse({"ok": True, "courseProgress": course_progress})
 
 
 async def staff_portal(request: Request) -> JSONResponse:
@@ -439,6 +467,7 @@ routes = [
     Route("/api/auth/login", login, methods=["POST"]),
     Route("/api/auth/logout", logout, methods=["POST"]),
     Route("/api/portal/student", student_portal, methods=["GET"]),
+    Route("/api/portal/course-progress", sync_course_progress, methods=["POST"]),
     Route("/api/portal/staff", staff_portal, methods=["GET"]),
     Route("/api/portal/admin", admin_portal, methods=["GET"]),
     Route(f"/{STREAMLIT_BASE_PATH}", root_redirect),

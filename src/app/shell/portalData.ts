@@ -13,6 +13,28 @@ export type PortalSessionUser = PortalProfile & {
   dashboardPath: string;
 };
 
+export type CourseModuleProgress = {
+  moduleId: string;
+  completedLessonIds: string[];
+  totalLessons: number;
+  completedLessons: number;
+  percentComplete: number;
+  lastAccessedAt: string | null;
+  status: 'completed' | 'in-progress' | 'not-started';
+};
+
+export type CourseProgressSnapshot = {
+  completedModuleIds: string[];
+  moduleProgress: Record<string, CourseModuleProgress>;
+};
+
+export type StudyPlanTask = {
+  title: string;
+  detail: string;
+  status: string;
+  view: 'courses' | 'review' | 'skills' | 'more';
+};
+
 export type StudentPortalRecord = {
   id: number;
   name: string;
@@ -72,6 +94,8 @@ export type StudentPortalRecord = {
       post_type: string;
     }>;
   };
+  courseProgress: CourseProgressSnapshot;
+  studyPlan: StudyPlanTask[];
 };
 
 export type StaffPortalSnapshot = {
@@ -205,6 +229,14 @@ export async function signOutPortalSession(): Promise<void> {
 
 export async function loadStudentPortalRecord(): Promise<StudentPortalPayload> {
   return fetchApi<StudentPortalPayload>('/api/portal/student');
+}
+
+export async function syncCourseProgress(moduleId: string, completedLessons: number): Promise<CourseProgressSnapshot> {
+  const payload = await fetchApi<{ ok: boolean; courseProgress: CourseProgressSnapshot }>('/api/portal/course-progress', {
+    method: 'POST',
+    body: JSON.stringify({ moduleId, completedLessons }),
+  });
+  return payload.courseProgress;
 }
 
 export async function loadStaffPortalSnapshot(): Promise<StaffPortalSnapshot> {
