@@ -52,6 +52,17 @@ _COURSE_MODULE_TITLES = {module_id: title for module_id, title, _, _ in _COURSE_
 _COURSE_MODULE_LESSON_COUNTS = {module_id: lesson_count for module_id, _, lesson_count, _ in _COURSE_MODULES}
 _COURSE_MODULE_DOMAINS = {module_id: domain for module_id, _, _, domain in _COURSE_MODULES}
 _ROLES_WITH_CEU_REQUIREMENTS = {"cna", "don", "instructor"}
+_VALID_SUBSCRIPTION_TIERS = {"preview", "core", "pro"}
+_VALID_LICENSE_STATUSES = {
+    "active",
+    "trial",
+    "expired",
+    "canceled",
+    "past_due",
+    "incomplete",
+    "unpaid",
+}
+_ACTIVE_LICENSE_STATUSES = {"active", "trial", "past_due"}
 
 
 @contextmanager
@@ -88,6 +99,12 @@ CREATE TABLE IF NOT EXISTS users (
     facility    TEXT,
     password_hash TEXT,
     subscription_active INTEGER NOT NULL DEFAULT 0,
+    subscription_tier TEXT NOT NULL DEFAULT 'preview',
+    subscription_expires_at TEXT,
+    license_status TEXT NOT NULL DEFAULT 'trial',
+    stripe_customer_id TEXT,
+    stripe_subscription_id TEXT,
+    stripe_price_id TEXT,
     last_login_at TEXT,
     created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );
@@ -202,6 +219,7 @@ def init_db() -> None:
     with get_conn() as conn:
         conn.executescript(_DDL)
         _migrate_user_subscription_fields(conn)
+        _migrate_user_entitlement_fields(conn)
         _migrate_user_auth_fields(conn)
         _seed_questions(conn)
         _seed_community_posts(conn)
@@ -218,6 +236,30 @@ def _migrate_user_subscription_fields(conn: sqlite3.Connection) -> None:
         conn.execute(
             "ALTER TABLE users ADD COLUMN subscription_active INTEGER NOT NULL DEFAULT 0"
         )
+
+
+def _migrate_user_entitlement_fields(conn: sqlite3.Connection) -> None:
+    """Ensure user rows include Stripe entitlement metadata fields."""
+    cols = {
+        row[1]
+        for row in conn.execute("PRAGMA table_info(users)").fetchall()
+    }
+    if "subscription_tier" not in cols:
+        conn.execute(
+            "ALTER TABLE users ADD COLUMN subscription_tier TEXT NOT NULL DEFAULT 'preview'"
+        )
+    if "subscription_expires_at" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN subscription_expires_at TEXT")
+    if "license_status" not in cols:
+        conn.execute(
+            "ALTER TABLE users ADD COLUMN license_status TEXT NOT NULL DEFAULT 'trial'"
+        )
+    if "stripe_customer_id" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN stripe_customer_id TEXT")
+    if "stripe_subscription_id" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN stripe_subscription_id TEXT")
+    if "stripe_price_id" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN stripe_price_id TEXT")
 
 
 def _migrate_user_auth_fields(conn: sqlite3.Connection) -> None:
@@ -416,6 +458,29 @@ def normalize_email(email: str) -> str:
 
 def normalize_role(role: str | None) -> str:
     return (role or "student").strip().lower() or "student"
+
+
+def normalize_subscription_tier(tier: str | None) -> str:
+    normalized = (tier or "preview").strip().lower() or "preview"
+    return normalized if normalized in _VALID_SUBSCRIPTION_TIERS else "preview"
+
+
+def normalize_license_status(status: str | None) -> str:
+    normalized = (status or "").strip().lower()
+    if not normalized:
+        return "trial"
+    aliases = {
+        "trialing": "trial",
+        "incomplete_expired": "expired",
+        "canceled": "canceled",
+        "cancelled": "canceled",
+    }
+    canonical = aliases.get(normalized, normalized)
+    return canonical if canonical in _VALID_LICENSE_STATUSES else "trial"
+
+
+def is_active_license_status(status: str | None) -> bool:
+    return normalize_license_status(status) in _ACTIVE_LICENSE_STATUSES
 
 
 def split_name(name: str) -> tuple[str, str]:
@@ -671,6 +736,179 @@ def set_subscription_active(user_id: int, active: bool) -> None:
     _export_portal_snapshots()
 
 
+def update_user_entitlement(
+    user_id: int,
+    *,
+    subscription_active: bool | None = None,
+    subscription_tier: str | None = None,
+    subscription_expires_at: str | None = None,
+    license_status: str | None = None,
+    stripe_customer_id: str | None = None,
+    stripe_subscription_id: str | None = None,
+    stripe_price_id: str | None = None,
+) -> sqlite3.Row | None:
+    allowed_columns = (
+        "subscription_active",
+        "subscription_tier",
+        "subscription_expires_at",
+        "license_status",
+        "stripe_customer_id",
+        "stripe_subscription_id",
+        "stripe_price_id",
+    )
+    updates: dict[str, object] = {}
+    if subscription_active is not None:
+        updates["subscription_active"] = int(subscription_active)
+    if subscription_tier is not None:
+        updates["subscription_tier"] = normalize_subscription_tier(subscription_tier)
+    if subscription_expires_at is not None:
+        updates["subscription_expires_at"] = (
+            subscription_expires_at.strip()
+            if isinstance(subscription_expires_at, str)
+            else subscription_expires_at
+        ) or None
+    if license_status is not None:
+        updates["license_status"] = normalize_license_status(license_status)
+    if stripe_customer_id is not None:
+        updates["stripe_customer_id"] = (
+            stripe_customer_id.strip()
+            if isinstance(stripe_customer_id, str)
+            else stripe_customer_id
+        ) or None
+    if stripe_subscription_id is not None:
+        updates["stripe_subscription_id"] = (
+            stripe_subscription_id.strip()
+            if isinstance(stripe_subscription_id, str)
+            else stripe_subscription_id
+        ) or None
+    if stripe_price_id is not None:
+        updates["stripe_price_id"] = (
+            stripe_price_id.strip() if isinstance(stripe_price_id, str) else stripe_price_id
+        ) or None
+
+    if not updates:
+        return get_user_by_id(user_id)
+
+    assignment_columns = [column for column in allowed_columns if column in updates]
+    assignments = ", ".join(f"{column} = ?" for column in assignment_columns)
+    values = [updates[column] for column in assignment_columns]
+    values.append(user_id)
+    with get_conn() as conn:
+        conn.execute(
+            f"UPDATE users SET {assignments} WHERE id = ?",
+            values,
+        )
+    _export_portal_snapshots()
+    return get_user_by_id(user_id)
+
+
+def apply_stripe_entitlement_update(
+    *,
+    email: str | None = None,
+    stripe_customer_id: str | None = None,
+    stripe_subscription_id: str | None = None,
+    stripe_price_id: str | None = None,
+    subscription_active: bool | None = None,
+    subscription_tier: str | None = None,
+    subscription_expires_at: str | None = None,
+    license_status: str | None = None,
+) -> dict[str, object]:
+    normalized_email = normalize_email(email or "") if email else ""
+    normalized_customer = (stripe_customer_id or "").strip()
+    user = None
+
+    with get_conn() as conn:
+        if normalized_customer:
+            user = conn.execute(
+                "SELECT * FROM users WHERE stripe_customer_id = ?",
+                (normalized_customer,),
+            ).fetchone()
+        if user is None and normalized_email:
+            user = conn.execute(
+                "SELECT * FROM users WHERE email = ?",
+                (normalized_email,),
+            ).fetchone()
+
+    if user is None:
+        return {"updated": False, "reason": "user_not_found"}
+
+    normalized_status = (
+        normalize_license_status(license_status)
+        if license_status is not None
+        else normalize_license_status(user["license_status"])
+    )
+    active = (
+        bool(subscription_active)
+        if subscription_active is not None
+        else normalized_status in _ACTIVE_LICENSE_STATUSES
+    )
+    tier = (
+        normalize_subscription_tier(subscription_tier)
+        if subscription_tier is not None
+        else normalize_subscription_tier(user["subscription_tier"])
+    )
+
+    updated = update_user_entitlement(
+        int(user["id"]),
+        subscription_active=active,
+        subscription_tier=tier,
+        subscription_expires_at=subscription_expires_at,
+        license_status=normalized_status,
+        stripe_customer_id=normalized_customer or user["stripe_customer_id"],
+        stripe_subscription_id=(
+            stripe_subscription_id
+            if stripe_subscription_id is not None
+            else user["stripe_subscription_id"]
+        ),
+        stripe_price_id=(
+            stripe_price_id if stripe_price_id is not None else user["stripe_price_id"]
+        ),
+    )
+    return {
+        "updated": updated is not None,
+        "user_id": int(user["id"]),
+        "email": user["email"],
+        "subscription_active": active,
+        "subscription_tier": tier,
+        "license_status": normalized_status,
+    }
+
+
+def get_billing_entitlement(user_id: int) -> dict[str, object] | None:
+    user = get_user_by_id(user_id)
+    if user is None:
+        return None
+
+    access = get_access_status(user_id)
+    return {
+        "subscriptionActive": bool(user["subscription_active"]),
+        "subscriptionTier": normalize_subscription_tier(user["subscription_tier"]),
+        "subscriptionExpiresAt": user["subscription_expires_at"],
+        "licenseStatus": normalize_license_status(user["license_status"]),
+        "stripeCustomerId": user["stripe_customer_id"],
+        "stripeSubscriptionId": user["stripe_subscription_id"],
+        "stripePriceId": user["stripe_price_id"],
+        "access": access,
+    }
+
+
+def _mark_subscription_expired(user_id: int) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            """
+            UPDATE users
+            SET subscription_active = 0,
+                license_status = CASE
+                    WHEN lower(COALESCE(license_status, '')) IN (?, ?, ?)
+                    THEN 'expired'
+                    ELSE license_status
+                END
+            WHERE id = ?
+            """,
+            ("active", "trial", "past_due", user_id),
+        )
+
+
 def get_access_status(user_id: int, trial_days: int = 30) -> dict:
     """Return access details.
 
@@ -706,12 +944,32 @@ def get_access_status(user_id: int, trial_days: int = 30) -> dict:
     now = datetime.now(timezone.utc)
     trial_ends = created_at + timedelta(days=trial_days)
     subscribed = bool(user["subscription_active"])
+    subscription_tier = normalize_subscription_tier(user["subscription_tier"])
+    license_status = normalize_license_status(user["license_status"])
+    subscription_expires_at = user["subscription_expires_at"] or None
+    if subscription_expires_at:
+        try:
+            expires_at = datetime.fromisoformat(subscription_expires_at.replace(" ", "T"))
+            if expires_at.tzinfo is None:
+                expires_at = expires_at.replace(tzinfo=timezone.utc)
+            else:
+                expires_at = expires_at.astimezone(timezone.utc)
+            if now > expires_at and subscribed:
+                _mark_subscription_expired(user_id)
+                subscribed = False
+                if is_active_license_status(license_status):
+                    license_status = "expired"
+        except ValueError:
+            pass
     trial_active = created_valid and now <= trial_ends
     days_left = max((trial_ends.date() - now.date()).days, 0)
 
     return {
         "allowed": subscribed or trial_active,
         "subscribed": subscribed,
+        "subscription_tier": subscription_tier,
+        "license_status": license_status,
+        "subscription_expires_at": subscription_expires_at,
         "trial_active": trial_active,
         "days_left": days_left,
         "trial_ends_on": trial_ends.date().isoformat(),

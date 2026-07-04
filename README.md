@@ -161,6 +161,10 @@ Configured domain:
 | `SMTP_PASSWORD` | No* | SMTP password or app password |
 | `ADMIN_SECRET` | Yes | Password for the Admin Panel |
 | `STREAMLIT_INTERNAL_PORT` | No | Internal child-process port used by the ASGI server to proxy Streamlit (default: `8501`) |
+| `STRIPE_WEBHOOK_SECRET` | Yes (Stripe) | Stripe webhook signing secret used by `/api/billing/stripe/webhook` |
+| `STRIPE_CORE_PRICE_IDS` | No | Comma-separated Stripe Price IDs that map to the `core` entitlement tier |
+| `STRIPE_PRO_PRICE_IDS` | No | Comma-separated Stripe Price IDs that map to the `pro` entitlement tier |
+| `STRIPE_WEBHOOK_TOLERANCE_SECONDS` | No | Max age for Stripe webhook signatures in seconds (default: `300`) |
 
 \* Email features are skipped when SMTP is not configured.
 
@@ -414,3 +418,16 @@ GitHub Sponsors supports both **monthly** and **one-time** contributions — ind
 3. Complete checkout through GitHub — payments are processed securely by GitHub/Stripe.
 
 All sponsors are recognized in the GitHub Sponsors section of this repository. Corporate sponsors interested in a higher-visibility acknowledgment are welcome to open a discussion.
+
+## Code-Along Educational Package
+
+A sellable code-along package scaffold now exists in `./educational-package/` with:
+
+- product scope and audience definition
+- free-vs-paid access tiers
+- onboarding and progression path (`START_HERE.md`)
+- standardized module templates + MVP module (M01)
+- tutorials/study-guides/templates/sample-data/instructor-notes structure
+- legal, support, release, feedback, and trust-signal documentation
+
+Start with `./educational-package/START_HERE.md`.
