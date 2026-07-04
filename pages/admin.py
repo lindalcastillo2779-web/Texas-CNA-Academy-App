@@ -131,7 +131,7 @@ def show() -> None:
                 "Role",
                 "City",
                 "Organization",
-                "Mentor",
+                "Can Mentor",
                 "Wants Mentor",
                 "Open to Opportunities",
                 "Interest Areas",
