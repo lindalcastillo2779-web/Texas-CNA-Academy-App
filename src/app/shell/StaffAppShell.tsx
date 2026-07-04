@@ -294,7 +294,7 @@ function GradesScreen() {
 }
 
 function ResourcesScreen() {
-  const handleResourceAction = (resource: typeof RESOURCE_CARDS[number]) => {
+  const handleResourceDownload = (resource: typeof RESOURCE_CARDS[number]) => {
     downloadTextFile(resource.filename, resource.content);
   };
 
@@ -311,7 +311,7 @@ function ResourcesScreen() {
             <h3 className="module-title">{resource.title}</h3>
             <p className="module-copy">{resource.copy}</p>
             <div className="section-actions">
-             <button className="btn btn-secondary" type="button" onClick={() => handleResourceAction(resource)}>
+             <button className="btn btn-secondary" type="button" onClick={() => handleResourceDownload(resource)}>
                {resource.cta}
              </button>
             </div>
