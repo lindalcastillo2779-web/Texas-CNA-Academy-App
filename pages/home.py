@@ -15,6 +15,7 @@ DESTINATIONS = [
     ("Exam Prep", "exam_prep"),
     ("My Progress", "progress"),
     ("Clinical Skills Lab", "clinical_skills_lab"),
+    ("Community Hub", "community_hub"),
     ("CEU Tracker", "ceu_tracker"),
     ("Renewal Check", "renewal_check"),
     ("Staffing Log", "staffing"),
@@ -36,6 +37,7 @@ def show() -> None:
         |---|---|
         | NATCEP course roadmap & module library | Students building step-by-step readiness |
         | NATCEP exam practice quizzes | Students preparing for certification |
+        | Community mentor + workforce hub | Learners, mentors, instructors, and facilities building support together |
         | CEU hour tracking & certificates | Active CNAs, renewal candidates |
         | Renewal readiness dashboard | CNAs & DONs |
         | Staffing compliance log | Facilities, DONs |

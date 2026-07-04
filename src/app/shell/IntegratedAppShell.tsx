@@ -5,7 +5,7 @@ import {
   getNextLesson,
 } from '../../features/courses';
 
-type AppView = 'home' | 'courses' | 'skills' | 'review' | 'more';
+type AppView = 'home' | 'courses' | 'skills' | 'review' | 'community' | 'more';
 
 type NavItem = {
   key: AppView;
@@ -53,6 +53,7 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'courses', label: 'Courses', icon: '▣' },
   { key: 'skills', label: 'Skills', icon: '✚' },
   { key: 'review', label: 'Review', icon: '◫' },
+  { key: 'community', label: 'Community', icon: '🤝' },
   { key: 'more', label: 'More', icon: '⋯' },
 ];
 
@@ -139,11 +140,48 @@ const SKILL_TRACKER = [
 
 const TOOL_CARDS = [
   { title: 'Exam Prep', status: 'Live now', copy: 'Use adaptive quizzes by domain and subtopic.' },
+  { title: 'Community Hub', status: 'Available', copy: 'Match with mentors, practice partners, study groups, and local workforce opportunities.' },
   { title: 'CEU Tracker', status: 'Live now', copy: 'Track annual credits and upload proof faster.' },
   { title: 'Renewal Check', status: 'Live now', copy: 'See readiness, deadlines, and missing steps.' },
-  { title: 'Buddy', status: 'Next up', copy: 'Turn chat into study plans, explanations, and reminders.' },
+  { title: 'Buddy', status: 'Next up', copy: 'Turn chat into study plans, explanations, reminders, and community nudges.' },
   { title: 'Document Vault', status: 'Recommended', copy: 'Store certificates, completion records, and forms.' },
   { title: 'Instructor + Admin Portals', status: 'Live now', copy: 'Shared role-specific dashboards now use the same unified portal foundation.' },
+];
+
+const COMMUNITY_MATCHES = [
+  {
+    name: 'Angela R.',
+    role: 'CNA Mentor',
+    focus: 'Transfer safety, infection control, test-day confidence',
+    availability: 'Virtual evenings',
+  },
+  {
+    name: 'Prof. Baker',
+    role: 'Instructor',
+    focus: 'Study planning, remediation, module check-ins',
+    availability: 'Wednesday office hours',
+  },
+];
+
+const COMMUNITY_POSTS = [
+  {
+    title: 'Weekly infection control study circle',
+    meta: 'Houston + virtual · 8 learners waiting',
+    detail: 'Join focused review blocks for PPE, isolation, and common quiz misses.',
+    status: 'Study group',
+  },
+  {
+    title: 'Prometric skills practice partner search',
+    meta: 'San Antonio · transfer + vital signs',
+    detail: 'Pair with someone to rehearse high-risk clinical skill sequences before lab day.',
+    status: 'Practice partner',
+  },
+  {
+    title: 'Facility shadow day + hiring event',
+    meta: 'Fort Worth · entry-level opportunity',
+    detail: 'Meet local facility leaders and learn what they want from new CNA candidates.',
+    status: 'Opportunity',
+  },
 ];
 
 function formatLessonLabel(lessonId: string): string {
@@ -443,6 +481,66 @@ function ReviewScreen() {
   );
 }
 
+function CommunityScreen({ weakestDomainKey }: { weakestDomainKey: string }) {
+  const weakestDomain = getDomainLabel(weakestDomainKey as Parameters<typeof getDomainLabel>[0]);
+
+  return (
+    <div className="screen-stack">
+      <section className="section-card">
+        <SectionHeader
+          eyebrow="Community hub"
+          title="Find mentors, practice partners, and pathways into work"
+          copy="Turn your next weak area into a connection plan with people and opportunities around you."
+        />
+        <div className="focus-banner">
+          <span className="badge badge-accent">Best next match</span>
+          <strong>Ask for help in {weakestDomain.shortLabel}</strong>
+        </div>
+      </section>
+
+      <section className="card-grid">
+        {COMMUNITY_MATCHES.map((match) => (
+          <article key={match.name} className="section-card">
+            <span className="metric-label">{match.role}</span>
+            <h3 className="module-title">{match.name}</h3>
+            <p className="module-copy">{match.focus}</p>
+            <div className="focus-banner">
+              <strong>Availability</strong>
+              <span>{match.availability}</span>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="panel-grid">
+        <article className="section-card">
+          <SectionHeader eyebrow="Recommended" title="Community actions this week" />
+          <ul className="info-list">
+            <li>Post a mentor request tied to your weakest domain: {weakestDomain.shortLabel}.</li>
+            <li>Join one study group before your next quiz attempt.</li>
+            <li>Save one local opportunity so your exam plan also builds career momentum.</li>
+          </ul>
+        </article>
+        <article className="section-card">
+          <SectionHeader eyebrow="Board highlights" title="What people are posting now" />
+          <div className="timeline-list">
+            {COMMUNITY_POSTS.map((post) => (
+              <article key={post.title} className="timeline-item">
+                <div className="timeline-dot is-success" />
+                <div className="timeline-copy">
+                  <strong>{post.title}</strong>
+                  <p>{post.detail}</p>
+                </div>
+                <span className="status-pill is-muted">{post.status}</span>
+              </article>
+            ))}
+          </div>
+        </article>
+      </section>
+    </div>
+  );
+}
+
 function MoreScreen() {
   return (
     <div className="screen-stack">
@@ -496,6 +594,8 @@ function renderView(view: AppView, args: {
       return <SkillsScreen />;
     case 'review':
       return <ReviewScreen />;
+    case 'community':
+      return <CommunityScreen weakestDomainKey={args.weakestDomainKey} />;
     case 'more':
       return <MoreScreen />;
     default:
@@ -584,6 +684,8 @@ export function IntegratedAppShell() {
         return 'Skills mastery';
       case 'review':
         return 'Review center';
+      case 'community':
+        return 'Community hub';
       case 'more':
         return 'More tools';
       default:
@@ -623,7 +725,7 @@ export function IntegratedAppShell() {
         })}
       </main>
 
-      <nav className="bottom-nav" aria-label="Primary">
+      <nav className="bottom-nav bottom-nav-6" aria-label="Primary">
         {NAV_ITEMS.map((item) => {
           const isActive = item.key === currentView;
 

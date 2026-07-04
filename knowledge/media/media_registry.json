@@ -35,6 +35,11 @@
       "caption": "Exam Prep hero placeholder for practice quiz and readiness review content.",
       "video_caption": "Add a short quiz strategy or test-taking confidence video here."
     },
+    "community_hub": {
+      "hero_image": "assets/images/pages/default-page-hero.svg",
+      "caption": "Community hub hero placeholder for mentor matching, study support, and workforce opportunities.",
+      "video_caption": "Add a short overview video that explains how students, mentors, and facilities can connect."
+    },
     "ceu_tracker": {
       "hero_image": "assets/images/pages/ceu-tracker-hero.svg",
       "caption": "CEU Tracker hero placeholder for continuing education logging and progress tracking.",

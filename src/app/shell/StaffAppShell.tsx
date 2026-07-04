@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-type StaffView = 'students' | 'schedule' | 'grades' | 'resources';
+type StaffView = 'students' | 'schedule' | 'grades' | 'community' | 'resources';
 
 type StaffNavItem = {
   key: StaffView;
@@ -12,6 +12,7 @@ const NAV_ITEMS: StaffNavItem[] = [
   { key: 'students', label: 'Students', icon: '👥' },
   { key: 'schedule', label: 'Schedule', icon: '🗓' },
   { key: 'grades', label: 'Grades', icon: '📘' },
+  { key: 'community', label: 'Community', icon: '🤝' },
   { key: 'resources', label: 'Resources', icon: '📄' },
 ];
 
@@ -60,6 +61,12 @@ const RESOURCE_CARDS = [
     copy: 'Quick reminders for high-risk misses before lab assessments.',
     cta: 'Review checklist',
   },
+];
+
+const COMMUNITY_QUEUE = [
+  { title: '3 students requested mentors', detail: 'Most requests focus on infection control and transfer safety.', status: 'Action needed' },
+  { title: 'Saturday practice lab is filling', detail: 'Eight learners want a guided clinical skills rehearsal block.', status: 'Open' },
+  { title: 'Facility partner asked for job-ready referrals', detail: 'Two entry-level openings are available after next month’s cohort checkoff.', status: 'Partnership' },
 ];
 
 function ProgressBar({ value, tone = 'accent' }: { value: number; tone?: 'accent' | 'success' | 'navy' }) {
@@ -249,6 +256,48 @@ function ResourcesScreen() {
   );
 }
 
+function CommunityScreen() {
+  return (
+    <div className="screen-stack">
+      <section className="section-card">
+        <SectionHeader eyebrow="Community hub" title="Mentor, practice, and workforce coordination" copy="Help learners move from weak domains into real support and real opportunities." />
+      </section>
+
+      <section className="timeline-list">
+        {COMMUNITY_QUEUE.map((item) => (
+          <article key={item.title} className="timeline-item">
+            <div className="timeline-day">NOW</div>
+            <div className="timeline-copy">
+              <strong>{item.title}</strong>
+              <p>{item.detail}</p>
+            </div>
+            <span className="status-pill is-warning">{item.status}</span>
+          </article>
+        ))}
+      </section>
+
+      <section className="panel-grid">
+        <article className="section-card">
+          <SectionHeader eyebrow="Best use" title="What instructors can do here" />
+          <ul className="info-list">
+            <li>Match struggling learners with mentor volunteers based on weak domains.</li>
+            <li>Organize study groups and skills-lab practice sessions faster.</li>
+            <li>Route job-ready learners toward trusted facility opportunities.</li>
+          </ul>
+        </article>
+        <article className="section-card">
+          <SectionHeader eyebrow="Outcomes" title="Signals worth watching" />
+          <ul className="info-list">
+            <li>Mentor requests from low-progress learners</li>
+            <li>Study groups filling before high-stakes quizzes</li>
+            <li>Facilities repeatedly posting entry-level opportunities</li>
+          </ul>
+        </article>
+      </section>
+    </div>
+  );
+}
+
 function renderView(view: StaffView, onNavigate: (view: StaffView) => void) {
   switch (view) {
     case 'students':
@@ -257,6 +306,8 @@ function renderView(view: StaffView, onNavigate: (view: StaffView) => void) {
       return <ScheduleScreen />;
     case 'grades':
       return <GradesScreen />;
+    case 'community':
+      return <CommunityScreen />;
     case 'resources':
       return <ResourcesScreen />;
     default:
@@ -293,6 +344,8 @@ export function StaffAppShell() {
         return 'Teaching schedule';
       case 'grades':
         return 'Grade book';
+      case 'community':
+        return 'Community hub';
       case 'resources':
         return 'Instructor resources';
       default:
@@ -324,7 +377,7 @@ export function StaffAppShell() {
         {renderView(currentView, navigate)}
       </main>
 
-      <nav className="bottom-nav bottom-nav-4" aria-label="Primary">
+      <nav className="bottom-nav bottom-nav-5" aria-label="Primary">
         {NAV_ITEMS.map((item) => {
           const isActive = item.key === currentView;
 
