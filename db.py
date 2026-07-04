@@ -393,8 +393,8 @@ def split_name(name: str) -> tuple[str, str]:
     return parts[0], " ".join(parts[1:])
 
 
-def _hash_password(password: str, salt: str | None = None) -> str:
-    password_salt = salt or secrets.token_hex(16)
+def _hash_password(password: str) -> str:
+    password_salt = secrets.token_hex(16)
     derived_key = hashlib.pbkdf2_hmac(
         "sha256",
         password.encode("utf-8"),

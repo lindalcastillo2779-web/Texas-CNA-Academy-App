@@ -60,6 +60,10 @@ def _dashboard_target(role: str | None) -> str:
     return get_portal_dashboard_path(role)
 
 
+def _role_requires_facility(role: str) -> bool:
+    return role in {"staff", "admin"}
+
+
 def _session_cookie_secure(request: Request) -> bool:
     return request.url.scheme == "https" or IS_PRODUCTION
 
@@ -154,7 +158,7 @@ async def register(request: Request) -> JSONResponse:
         return _json_error("Please choose a password with at least 8 characters.", 400)
     if password != confirm_password:
         return _json_error("Passwords do not match.", 400)
-    if role in {"staff", "admin"} and not facility:
+    if _role_requires_facility(role) and not facility:
         return _json_error("Facility or organization name is required for this role.", 400)
 
     auth_fields = {"password": password}
@@ -345,8 +349,11 @@ async def proxy_streamlit_websocket(websocket: WebSocket) -> None:
         for task in pending:
             task.cancel()
         for task in done:
-            with suppress(asyncio.CancelledError, WebSocketDisconnect):
-                await task
+            if task.cancelled():
+                continue
+            exception = task.exception()
+            if exception and not isinstance(exception, WebSocketDisconnect):
+                raise exception
 
     with suppress(RuntimeError, WebSocketDisconnect):
         await websocket.close()
