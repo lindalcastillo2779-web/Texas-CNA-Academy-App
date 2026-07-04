@@ -140,7 +140,7 @@ const SKILL_TRACKER = [
 
 const TOOL_CARDS = [
   { title: 'Exam Prep', status: 'Live now', copy: 'Use adaptive quizzes by domain and subtopic.' },
-  { title: 'Community Hub', status: 'New', copy: 'Match with mentors, practice partners, study groups, and local workforce opportunities.' },
+  { title: 'Community Hub', status: 'Available', copy: 'Match with mentors, practice partners, study groups, and local workforce opportunities.' },
   { title: 'CEU Tracker', status: 'Live now', copy: 'Track annual credits and upload proof faster.' },
   { title: 'Renewal Check', status: 'Live now', copy: 'See readiness, deadlines, and missing steps.' },
   { title: 'Buddy', status: 'Next up', copy: 'Turn chat into study plans, explanations, reminders, and community nudges.' },

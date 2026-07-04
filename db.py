@@ -776,13 +776,13 @@ def get_mentor_matches(user_id: int, limit: int = 4) -> list[dict]:
         for stat in get_quiz_stats_by_domain(user_id)
         if float(stat.get("avg_pct") or 0) < 75
     }
-    learner_interests = _split_tokens(profile.get("interest_areas"))
+    user_interests = _split_tokens(profile.get("interest_areas"))
     matches: list[tuple[int, dict]] = []
     for candidate in list_community_profiles(exclude_user_id=user_id, mentors_only=True, limit=25):
         score = 1
         candidate_interests = _split_tokens(candidate.get("interest_areas"))
         score += len(weak_domains & candidate_interests) * 3
-        score += len(learner_interests & candidate_interests) * 2
+        score += len(user_interests & candidate_interests) * 2
         if candidate.get("role") in {"cna", "instructor", "don"}:
             score += 2
         if profile.get("wants_mentor"):
