@@ -2,12 +2,12 @@ services:
   - type: web
     name: texas-cna-academy
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && npm ci && npm run build
     startCommand: >
-      streamlit run streamlit_app.py
-      --server.port $PORT
-      --server.address 0.0.0.0
-      --server.headless true
+      python -m uvicorn app_server:app
+      --host 0.0.0.0
+      --port $PORT
+      --proxy-headers
     envVars:
       - key: STREAMLIT_SERVER_HEADLESS
         value: "true"

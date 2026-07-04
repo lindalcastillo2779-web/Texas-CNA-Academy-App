@@ -1,6 +1,9 @@
 """Database initialisation and helper functions for Texas CNA Academy."""
 
+import hashlib
+import json
 import os
+import secrets
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
@@ -15,6 +18,19 @@ else:
     _local_dir = os.path.join(os.path.dirname(__file__), "data")
     os.makedirs(_local_dir, exist_ok=True)
     DB_PATH = os.path.join(_local_dir, "cna_academy.db")
+
+PORTAL_DATA_DIR = os.path.join(os.path.dirname(__file__), "public", "portal-data")
+RENEWAL_HOURS_REQUIRED = 24.0
+COURSE_MODULE_COUNT = 14
+PASSWORD_HASH_ITERATIONS = 600000
+PORTAL_SESSION_DAYS = 7
+_PORTAL_DOMAIN_KEY_BY_NAME = {
+    "Role of the Nurse Aide": "ROLE",
+    "Safety and Emergency": "SAFETY",
+    "Infection Control": "INFECT",
+    "Psychosocial Care Skills": "PSYCHOSOCIAL",
+    "Physical Care Skills": "SKILLS",
+}
 
 
 @contextmanager
@@ -47,7 +63,11 @@ CREATE TABLE IF NOT EXISTS users (
     email       TEXT    NOT NULL UNIQUE,
     role        TEXT    NOT NULL DEFAULT 'student',   -- student | cna | don | instructor | facility
     state_id    TEXT,
+    phone       TEXT,
+    facility    TEXT,
+    password_hash TEXT,
     subscription_active INTEGER NOT NULL DEFAULT 0,
+    last_login_at TEXT,
     created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -125,6 +145,21 @@ CREATE TABLE IF NOT EXISTS community_posts (
     status          TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
     created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS portal_sessions (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id             INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    session_token_hash  TEXT NOT NULL UNIQUE,
+    created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at          TEXT NOT NULL,
+    last_seen_at        TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_portal_sessions_user_id
+    ON portal_sessions(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_portal_sessions_expires_at
+    ON portal_sessions(expires_at);
 """
 
 
@@ -133,8 +168,10 @@ def init_db() -> None:
     with get_conn() as conn:
         conn.executescript(_DDL)
         _migrate_user_subscription_fields(conn)
+        _migrate_user_auth_fields(conn)
         _seed_questions(conn)
         _seed_community_posts(conn)
+    _export_portal_snapshots()
 
 
 def _migrate_user_subscription_fields(conn: sqlite3.Connection) -> None:
@@ -147,6 +184,22 @@ def _migrate_user_subscription_fields(conn: sqlite3.Connection) -> None:
         conn.execute(
             "ALTER TABLE users ADD COLUMN subscription_active INTEGER NOT NULL DEFAULT 0"
         )
+
+
+def _migrate_user_auth_fields(conn: sqlite3.Connection) -> None:
+    """Ensure legacy databases contain required auth/profile fields."""
+    cols = {
+        row[1]
+        for row in conn.execute("PRAGMA table_info(users)").fetchall()
+    }
+    if "phone" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN phone TEXT")
+    if "facility" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN facility TEXT")
+    if "password_hash" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN password_hash TEXT")
+    if "last_login_at" not in cols:
+        conn.execute("ALTER TABLE users ADD COLUMN last_login_at TEXT")
 
 
 # ---------------------------------------------------------------------------
@@ -318,8 +371,77 @@ def _split_tokens(value: str | None) -> set[str]:
 # ---------------------------------------------------------------------------
 # User helpers
 # ---------------------------------------------------------------------------
+def _utc_sql_timestamp(value: datetime | None = None) -> str:
+    current = value or datetime.now(timezone.utc)
+    return current.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def normalize_email(email: str) -> str:
+    return email.strip().lower()
+
+
+def normalize_role(role: str | None) -> str:
+    return (role or "student").strip().lower() or "student"
+
+
+def split_name(name: str) -> tuple[str, str]:
+    parts = [part for part in name.strip().split() if part]
+    if not parts:
+        return "", ""
+    if len(parts) == 1:
+        return parts[0], ""
+    return parts[0], " ".join(parts[1:])
+
+
+def _hash_password(password: str) -> str:
+    password_salt = secrets.token_hex(16)
+    derived_key = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        password_salt.encode("utf-8"),
+        PASSWORD_HASH_ITERATIONS,
+    )
+    return f"pbkdf2_sha256${PASSWORD_HASH_ITERATIONS}${password_salt}${derived_key.hex()}"
+
+
+def verify_password(password: str, password_hash: str | None) -> bool:
+    if not password_hash:
+        _run_dummy_password_check(password)
+        return False
+    try:
+        algorithm, iterations, salt, expected_hash = password_hash.split("$", 3)
+    except ValueError:
+        _run_dummy_password_check(password)
+        return False
+    if algorithm != "pbkdf2_sha256":
+        _run_dummy_password_check(password)
+        return False
+    derived_key = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        salt.encode("utf-8"),
+        int(iterations),
+    ).hex()
+    return secrets.compare_digest(derived_key, expected_hash)
+
+
+def _hash_session_token(session_token: str) -> str:
+    return hashlib.sha256(session_token.encode("utf-8")).hexdigest()
+
+
+def _run_dummy_password_check(password: str) -> None:
+    hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        b"texas-cna-academy-dummy-salt",
+        PASSWORD_HASH_ITERATIONS,
+    )
+
+
 def get_or_create_user(name: str, email: str, role: str = "student") -> int:
     """Return the user-id for *email*, creating the row if needed."""
+    email = normalize_email(email)
+    role = normalize_role(role)
     with get_conn() as conn:
         row = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
         if row:
@@ -328,10 +450,13 @@ def get_or_create_user(name: str, email: str, role: str = "student") -> int:
             "INSERT INTO users (name, email, role) VALUES (?, ?, ?)",
             (name, email, role),
         )
-        return cur.lastrowid
+        user_id = cur.lastrowid
+    _export_portal_snapshots()
+    return user_id
 
 
 def get_user_by_email(email: str):
+    email = normalize_email(email)
     with get_conn() as conn:
         return conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
 
@@ -342,12 +467,174 @@ def get_user_by_id(user_id: int) -> sqlite3.Row | None:
         return conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
 
 
+def create_or_claim_user_account(
+    *,
+    name: str,
+    email: str,
+    password: str,
+    role: str = "student",
+    phone: str = "",
+    facility: str = "",
+) -> sqlite3.Row:
+    email = normalize_email(email)
+    role = normalize_role(role)
+    with get_conn() as conn:
+        existing = conn.execute(
+            "SELECT * FROM users WHERE email = ?",
+            (email,),
+        ).fetchone()
+
+        if existing and existing["password_hash"]:
+            raise ValueError("An account already exists for that email.")
+
+        password_hash = _hash_password(password)
+        normalized_name = name.strip()
+        normalized_phone = phone.strip()
+        normalized_facility = facility.strip()
+
+        if existing:
+            conn.execute(
+                """
+                UPDATE users
+                SET name = ?, role = ?, phone = ?, facility = ?, password_hash = ?
+                WHERE id = ?
+                """,
+                (
+                    normalized_name,
+                    role,
+                    normalized_phone,
+                    normalized_facility,
+                    password_hash,
+                    existing["id"],
+                ),
+            )
+            user_id = int(existing["id"])
+        else:
+            cur = conn.execute(
+                """
+                INSERT INTO users (name, email, role, phone, facility, password_hash)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    normalized_name,
+                    email,
+                    role,
+                    normalized_phone,
+                    normalized_facility,
+                    password_hash,
+                ),
+            )
+            user_id = int(cur.lastrowid)
+
+    _export_portal_snapshots()
+    user = get_user_by_id(user_id)
+    if user is None:
+        raise ValueError("Unable to load the created account.")
+    return user
+
+
+def authenticate_user(email: str, password: str) -> sqlite3.Row | None:
+    user = get_user_by_email(email)
+    if not user or not verify_password(password, user["password_hash"]):
+        return None
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE users SET last_login_at = ? WHERE id = ?",
+            (_utc_sql_timestamp(), user["id"]),
+        )
+    return get_user_by_id(int(user["id"]))
+
+
+def create_portal_session(user_id: int, duration_days: int = PORTAL_SESSION_DAYS) -> str:
+    cleanup_expired_portal_sessions()
+    session_token = secrets.token_urlsafe(32)
+    expires_at = _utc_sql_timestamp(datetime.now(timezone.utc) + timedelta(days=duration_days))
+    with get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO portal_sessions (user_id, session_token_hash, expires_at, last_seen_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (user_id, _hash_session_token(session_token), expires_at, _utc_sql_timestamp()),
+        )
+    return session_token
+
+
+def cleanup_expired_portal_sessions() -> None:
+    with get_conn() as conn:
+        conn.execute("DELETE FROM portal_sessions WHERE expires_at <= datetime('now')")
+
+
+def delete_portal_session(session_token: str) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            "DELETE FROM portal_sessions WHERE session_token_hash = ?",
+            (_hash_session_token(session_token),),
+        )
+
+
+def get_user_by_session_token(session_token: str) -> sqlite3.Row | None:
+    cleanup_expired_portal_sessions()
+    token_hash = _hash_session_token(session_token)
+    with get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT u.*
+            FROM portal_sessions ps
+            JOIN users u ON u.id = ps.user_id
+            WHERE ps.session_token_hash = ? AND ps.expires_at > datetime('now')
+            """,
+            (token_hash,),
+        ).fetchone()
+        if row:
+            conn.execute(
+                "UPDATE portal_sessions SET last_seen_at = ? WHERE session_token_hash = ?",
+                (_utc_sql_timestamp(), token_hash),
+            )
+        return row
+
+
+def get_portal_profile(user: sqlite3.Row | dict) -> dict:
+    first_name, last_name = split_name(str(user["name"]))
+    return {
+        "firstName": first_name,
+        "lastName": last_name,
+        "email": user["email"],
+        "phone": user["phone"] or "",
+        "role": user["role"],
+        "facility": user["facility"] or "",
+        "name": user["name"],
+    }
+
+
+def is_admin_role(role: str | None) -> bool:
+    return normalize_role(role) == "admin"
+
+
+def is_staff_role(role: str | None) -> bool:
+    return normalize_role(role) in {"staff", "instructor", "don", "admin"}
+
+
+def is_student_role(role: str | None) -> bool:
+    return not is_staff_role(role)
+
+
+def get_portal_dashboard_path(role: str | None) -> str:
+    normalized_role = normalize_role(role)
+    if is_admin_role(normalized_role):
+        return "/admin-dashboard.html"
+    if is_staff_role(normalized_role):
+        return "/staff-dashboard.html"
+    return "/dashboard.html"
+
+
 def set_subscription_active(user_id: int, active: bool) -> None:
     with get_conn() as conn:
         conn.execute(
             "UPDATE users SET subscription_active = ? WHERE id = ?",
             (int(active), user_id),
         )
+    _export_portal_snapshots()
 
 
 def get_access_status(user_id: int, trial_days: int = 30) -> dict:
@@ -408,6 +695,7 @@ def add_ceu_record(user_id: int, course_name: str, provider: str,
                VALUES (?, ?, ?, ?, ?, ?)""",
             (user_id, course_name, provider, hours, completed_on, certificate),
         )
+    _export_portal_snapshots()
 
 
 def get_ceu_records(user_id: int) -> list:
@@ -461,6 +749,7 @@ def save_quiz_attempt(user_id: int | None, domain: str | None,
             "INSERT INTO quiz_attempts (user_id, domain, score, total) VALUES (?, ?, ?, ?)",
             (user_id, domain, score, total),
         )
+    _export_portal_snapshots()
 
 
 def get_quiz_history(user_id: int) -> list:
@@ -538,6 +827,7 @@ def add_staff_record(facility: str, cna_name: str, cna_state_id: str,
             (facility, cna_name, cna_state_id, shift_date, shift_type,
              hours, int(compliant), notes),
         )
+    _export_portal_snapshots()
 
 
 def get_staff_records(facility: str | None = None) -> list:
@@ -628,6 +918,7 @@ def upsert_community_profile(
                 bio.strip(),
             ),
         )
+    _export_portal_snapshots()
 
 
 def list_community_profiles(
@@ -685,6 +976,7 @@ def create_community_post(
                 audience_roles.strip(),
             ),
         )
+    _export_portal_snapshots()
 
 
 def get_community_posts(
@@ -738,6 +1030,7 @@ def set_community_post_status(post_id: int, status: str) -> None:
             "UPDATE community_posts SET status = ? WHERE id = ?",
             (status, post_id),
         )
+    _export_portal_snapshots()
 
 
 def get_community_dashboard_counts() -> dict:
@@ -850,3 +1143,483 @@ def get_recommended_community_actions(user_id: int) -> list[str]:
     if not actions:
         actions.append("Review a mentor match or opportunity post today to keep your network active.")
     return actions[:4]
+
+
+def _calculate_readiness_score(stats: list[dict]) -> float:
+    total_questions = sum(int(stat.get("total_questions") or 0) for stat in stats)
+    if total_questions <= 0:
+        return 0.0
+    weighted_sum = sum(
+        float(stat.get("avg_pct") or 0) * int(stat.get("total_questions") or 0)
+        for stat in stats
+    )
+    return round(weighted_sum / total_questions, 1)
+
+
+def _get_last_user_activity(user_id: int, created_at: str | None) -> str | None:
+    with get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT MAX(activity_at) AS last_activity
+            FROM (
+                SELECT created_at AS activity_at FROM users WHERE id = ?
+                UNION ALL
+                SELECT taken_at FROM quiz_attempts WHERE user_id = ?
+                UNION ALL
+                SELECT created_at FROM ceu_records WHERE user_id = ?
+                UNION ALL
+                SELECT updated_at FROM community_profiles WHERE user_id = ?
+                UNION ALL
+                SELECT created_at FROM community_posts WHERE user_id = ?
+            )
+            """,
+            (user_id, user_id, user_id, user_id, user_id),
+        ).fetchone()
+    return (row["last_activity"] if row and row["last_activity"] else None) or created_at
+
+
+def _build_student_portal_record(user: dict) -> dict:
+    user_id = int(user["id"])
+    access = get_access_status(user_id)
+    ceu_records = get_ceu_records(user_id)
+    earned_hours = total_ceu_hours(user_id)
+    quiz_stats = get_quiz_stats_by_domain(user_id)
+    quiz_history = get_quiz_history(user_id)
+    readiness_score = _calculate_readiness_score(quiz_stats)
+    weakest_stat = min(quiz_stats, key=lambda stat: float(stat.get("avg_pct") or 0)) if quiz_stats else None
+    strongest_stat = max(quiz_stats, key=lambda stat: float(stat.get("avg_pct") or 0)) if quiz_stats else None
+
+    if access["subscribed"]:
+        status_chip = "Subscription active"
+    elif access["trial_active"]:
+        unit = "day" if access["days_left"] == 1 else "days"
+        status_chip = f"{access['days_left']} {unit} trial left"
+    else:
+        status_chip = "Subscription required"
+
+    weakest_domain_key = (
+        _PORTAL_DOMAIN_KEY_BY_NAME.get(weakest_stat["domain"], "INFECT")
+        if weakest_stat is not None
+        else "INFECT"
+    )
+    strongest_domain_key = (
+        _PORTAL_DOMAIN_KEY_BY_NAME.get(strongest_stat["domain"], "ROLE")
+        if strongest_stat is not None
+        else "ROLE"
+    )
+
+    return {
+        "id": user_id,
+        "name": user["name"],
+        "email": user["email"],
+        "role": user["role"],
+        "statusChip": status_chip,
+        "access": access,
+        "ceu": {
+            "earnedHours": round(earned_hours, 1),
+            "requiredHours": RENEWAL_HOURS_REQUIRED,
+            "remainingHours": round(max(0.0, RENEWAL_HOURS_REQUIRED - earned_hours), 1),
+            "recentRecords": ceu_records[:5],
+        },
+        "quiz": {
+            "readinessScore": readiness_score,
+            "totalAttempts": len(quiz_history),
+            "totalQuestions": sum(int(stat.get("total_questions") or 0) for stat in quiz_stats),
+            "weakestDomainKey": weakest_domain_key,
+            "strongestDomainKey": strongest_domain_key,
+            "statsByDomain": [
+                {
+                    "domain": stat["domain"],
+                    "avgPct": float(stat.get("avg_pct") or 0),
+                    "bestPct": float(stat.get("best_pct") or 0),
+                    "attempts": int(stat.get("attempts") or 0),
+                }
+                for stat in quiz_stats
+            ],
+            "recentAttempts": [
+                {
+                    "domain": attempt["domain"],
+                    "pct": round((attempt["score"] / attempt["total"]) * 100, 1) if attempt["total"] else 0.0,
+                    "takenAt": attempt["taken_at"],
+                }
+                for attempt in quiz_history[:5]
+            ],
+        },
+        "community": {
+            "recommendedActions": get_recommended_community_actions(user_id),
+            "mentorMatches": get_mentor_matches(user_id),
+            "recommendedPosts": get_recommended_posts_for_user(user_id),
+        },
+    }
+
+
+def build_student_portal_payload(user_id: int) -> dict | None:
+    user = get_user_by_id(user_id)
+    if user is None:
+        return None
+    return {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "profile": get_portal_profile(user),
+        "student": _build_student_portal_record(dict(user)),
+    }
+
+
+def _build_student_portal_snapshot() -> dict:
+    with get_conn() as conn:
+        users = [
+            dict(row)
+            for row in conn.execute(
+                """
+                SELECT id, name, email, role, created_at
+                FROM users
+                WHERE role IN ('student', 'cna', 'don', 'instructor', 'facility')
+                ORDER BY created_at DESC, id DESC
+                """
+            ).fetchall()
+        ]
+    return {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "students": [_build_student_portal_record(user) for user in users],
+    }
+
+
+def build_staff_portal_payload() -> dict:
+    return _build_staff_portal_snapshot()
+
+
+def _build_staff_portal_snapshot() -> dict:
+    with get_conn() as conn:
+        users = [
+            dict(row)
+            for row in conn.execute(
+                """
+                SELECT id, name, email, role, created_at
+                FROM users
+                WHERE role IN ('student', 'cna', 'instructor', 'don')
+                ORDER BY created_at DESC, id DESC
+                """
+            ).fetchall()
+        ]
+        mentor_request_count = conn.execute(
+            "SELECT COUNT(*) FROM community_posts WHERE post_type = 'mentor_request' AND status = 'active'"
+        ).fetchone()[0]
+        study_group_count = conn.execute(
+            "SELECT COUNT(*) FROM community_posts WHERE post_type = 'study_group' AND status = 'active'"
+        ).fetchone()[0]
+        opportunity_count = conn.execute(
+            "SELECT COUNT(*) FROM community_posts WHERE post_type = 'opportunity' AND status = 'active'"
+        ).fetchone()[0]
+
+    learners = [user for user in users if user["role"] in {"student", "cna"}]
+    roster: list[dict] = []
+    grade_book: list[dict] = []
+    readiness_scores: list[float] = []
+    passing_learners = 0
+
+    for learner in learners:
+        learner_record = _build_student_portal_record(learner)
+        readiness = float(learner_record["quiz"]["readinessScore"])
+        attempts = int(learner_record["quiz"]["totalAttempts"])
+        if attempts > 0:
+            readiness_scores.append(readiness)
+            if readiness >= 70:
+                passing_learners += 1
+        roster.append(
+            {
+                "name": learner["name"],
+                "email": learner["email"],
+                "progress": round(readiness),
+                "lastActiveAt": _get_last_user_activity(learner["id"], learner.get("created_at")),
+                "status": "On track" if readiness >= 70 and attempts > 0 else "Needs attention",
+            }
+        )
+        recent_attempts = learner_record["quiz"]["recentAttempts"]
+        percentages = [float(attempt["pct"]) for attempt in recent_attempts[:2]]
+        average = round(sum(percentages) / len(percentages)) if percentages else 0
+        grade_book.append(
+            {
+                "name": learner["name"],
+                "exam1": f"{round(percentages[0])}%" if len(percentages) >= 1 else "—",
+                "exam2": f"{round(percentages[1])}%" if len(percentages) >= 2 else "—",
+                "average": f"{average}%" if percentages else "—",
+            }
+        )
+
+    facility_summary = [
+        {
+            "day": "LIVE",
+            "title": facility["facility_name"],
+            "detail": (
+                f"{facility['shifts_logged']} shifts logged · latest {facility['latest_shift_date']}"
+            ),
+            "status": (
+                "Needs support" if facility["non_compliant_shifts"] else "Compliant"
+            ),
+        }
+        for facility in get_staff_demand_summary(limit=5)
+    ]
+
+    readiness_average = round(sum(readiness_scores) / len(readiness_scores)) if readiness_scores else 0
+    passing_rate = round((passing_learners / len(readiness_scores)) * 100) if readiness_scores else 0
+
+    return {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "studentMetrics": [
+            {
+                "label": "Total students",
+                "value": str(len(learners)),
+                "detail": "Connected learner accounts in the live database.",
+            },
+            {
+                "label": "Passing rate",
+                "value": f"{passing_rate}%",
+                "detail": "Based on learners with recorded quiz attempts.",
+            },
+            {
+                "label": "Average readiness",
+                "value": f"{readiness_average}%",
+                "detail": "Weighted from each learner's quiz history.",
+            },
+        ],
+        "studentRoster": roster[:12],
+        "facilitySchedule": facility_summary,
+        "gradeBook": grade_book[:12],
+        "communityQueue": [
+            {
+                "title": f"{mentor_request_count} mentor request(s) are active",
+                "detail": "Use the live community board to follow up with learners asking for support.",
+                "status": "Action needed" if mentor_request_count else "Stable",
+            },
+            {
+                "title": f"{study_group_count} study group post(s) are live",
+                "detail": "Review whether the current study circles match the next quiz and skills priorities.",
+                "status": "Open" if study_group_count else "Quiet",
+            },
+            {
+                "title": f"{opportunity_count} workforce opportunity post(s) are visible",
+                "detail": "Share job-ready learners with facilities when opportunities align.",
+                "status": "Partnership" if opportunity_count else "Monitor",
+            },
+        ],
+    }
+
+
+def build_admin_portal_payload() -> dict:
+    return _build_admin_portal_snapshot()
+
+
+def _build_admin_recent_activity() -> list[dict]:
+    events: list[dict] = []
+    with get_conn() as conn:
+        for row in conn.execute(
+            "SELECT name, role, created_at FROM users ORDER BY created_at DESC LIMIT 4"
+        ).fetchall():
+            events.append(
+                {
+                    "title": f"New {row['role']} account: {row['name']}",
+                    "detail": row["created_at"],
+                    "tone": "is-success",
+                }
+            )
+        for row in conn.execute(
+            """
+            SELECT course_name, completed_on, hours
+            FROM ceu_records
+            ORDER BY created_at DESC
+            LIMIT 3
+            """
+        ).fetchall():
+            events.append(
+                {
+                    "title": f"CEU logged: {row['course_name']}",
+                    "detail": f"{row['hours']} hour(s) · {row['completed_on']}",
+                    "tone": "is-muted",
+                }
+            )
+        for row in conn.execute(
+            """
+            SELECT title, post_type, created_at
+            FROM community_posts
+            ORDER BY created_at DESC
+            LIMIT 3
+            """
+        ).fetchall():
+            events.append(
+                {
+                    "title": f"Community post: {row['title']}",
+                    "detail": f"{row['post_type']} · {row['created_at']}",
+                    "tone": "is-warning",
+                }
+            )
+    events.sort(key=lambda item: item["detail"], reverse=True)
+    return events[:6]
+
+
+def _build_admin_portal_snapshot() -> dict:
+    with get_conn() as conn:
+        users = [
+            dict(row)
+            for row in conn.execute(
+                "SELECT id, name, email, role, subscription_active, created_at FROM users ORDER BY created_at DESC, id DESC LIMIT 30"
+            ).fetchall()
+        ]
+        total_students = conn.execute(
+            "SELECT COUNT(*) FROM users WHERE role IN ('student', 'cna')"
+        ).fetchone()[0]
+        total_instructors = conn.execute(
+            "SELECT COUNT(*) FROM users WHERE role IN ('instructor', 'don')"
+        ).fetchone()[0]
+        question_count = conn.execute(
+            "SELECT COUNT(*) FROM exam_questions"
+        ).fetchone()[0]
+        active_posts = conn.execute(
+            "SELECT COUNT(*) FROM community_posts WHERE status = 'active'"
+        ).fetchone()[0]
+        mentor_profiles = conn.execute(
+            "SELECT COUNT(*) FROM community_profiles WHERE can_mentor = 1"
+        ).fetchone()[0]
+        non_compliant_shifts = conn.execute(
+            "SELECT COUNT(*) FROM staff_records WHERE compliant = 0"
+        ).fetchone()[0]
+        review_queue = [
+            dict(row)
+            for row in conn.execute(
+                """
+                SELECT title, post_type, status, created_at
+                FROM community_posts
+                ORDER BY created_at DESC
+                LIMIT 3
+                """
+            ).fetchall()
+        ]
+
+    learner_records = [
+        _build_student_portal_record(user)
+        for user in users
+        if user["role"] in {"student", "cna"}
+    ]
+    readiness_scores = [
+        float(record["quiz"]["readinessScore"])
+        for record in learner_records
+        if int(record["quiz"]["totalAttempts"]) > 0
+    ]
+    passing_rate = round(
+        (sum(1 for score in readiness_scores if score >= 70) / len(readiness_scores)) * 100
+    ) if readiness_scores else 0
+    pending_reviews = sum(1 for post in review_queue if post["status"] == "active")
+
+    active_access_count = 0
+    renewal_ready_count = 0
+    renewal_pending_count = 0
+    for user in users:
+        access = get_access_status(user["id"])
+        if access["allowed"]:
+            active_access_count += 1
+        if user["role"] in {"cna", "don", "instructor"}:
+            remaining = max(0.0, RENEWAL_HOURS_REQUIRED - total_ceu_hours(user["id"]))
+            if remaining == 0:
+                renewal_ready_count += 1
+            else:
+                renewal_pending_count += 1
+
+    return {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "overviewMetrics": [
+            {
+                "label": "Total students",
+                "value": str(total_students),
+                "detail": "Student and CNA learner accounts in the live database.",
+            },
+            {
+                "label": "Active instructors",
+                "value": str(total_instructors),
+                "detail": "Instructor and DON accounts currently registered.",
+            },
+            {
+                "label": "Live course modules",
+                "value": str(COURSE_MODULE_COUNT),
+                "detail": "React portals are aligned to the full CNA course roadmap.",
+            },
+            {
+                "label": "Pass rate",
+                "value": f"{passing_rate}%",
+                "detail": "Based on learners with recorded quiz attempts.",
+            },
+            {
+                "label": "Pending reviews",
+                "value": str(pending_reviews),
+                "detail": "Recent community posts still visible in the moderation queue.",
+            },
+        ],
+        "recentActivity": _build_admin_recent_activity(),
+        "users": [
+            {
+                "name": user["name"],
+                "role": str(user["role"]).title(),
+                "email": user["email"],
+                "status": "Active" if get_access_status(user["id"])["allowed"] else "Review",
+            }
+            for user in users[:12]
+        ],
+        "courses": [
+            {
+                "title": "CNA Certification Roadmap",
+                "detail": f"{COURSE_MODULE_COUNT} modules · React student portal connected to live progress signals",
+                "status": "Active",
+                "meta": f"{total_students} learner accounts",
+            },
+            {
+                "title": "Exam Prep Question Bank",
+                "detail": f"{question_count} seeded practice questions in SQLite",
+                "status": "Active",
+                "meta": f"{len(readiness_scores)} learners with quiz history",
+            },
+            {
+                "title": "Community + Workforce Hub",
+                "detail": f"{active_posts} active posts · mentorship and opportunity routing",
+                "status": "Active",
+                "meta": f"{mentor_profiles} mentor profile(s)",
+            },
+        ],
+        "compliance": [
+            {"label": "Accounts with access", "value": str(active_access_count), "tone": "is-success"},
+            {"label": "Renewals pending", "value": str(renewal_pending_count), "tone": "is-warning"},
+            {
+                "label": "Non-compliant shifts",
+                "value": str(non_compliant_shifts),
+                "tone": "is-danger" if non_compliant_shifts else "is-success",
+            },
+        ],
+        "communityHealth": [
+            {"label": "Mentor profiles", "value": str(mentor_profiles), "tone": "is-success"},
+            {"label": "Active posts", "value": str(active_posts), "tone": "is-warning" if active_posts else "is-muted"},
+            {"label": "Renewal-ready pros", "value": str(renewal_ready_count), "tone": "is-muted"},
+        ],
+        "communityReviewQueue": [
+            {
+                "title": post["title"],
+                "detail": f"{post['post_type']} · {post['created_at']}",
+                "tone": "is-warning" if post["status"] == "active" else "is-muted",
+            }
+            for post in review_queue
+        ],
+    }
+
+
+def _write_portal_snapshot(filename: str, payload: dict) -> None:
+    os.makedirs(PORTAL_DATA_DIR, exist_ok=True)
+    path = os.path.join(PORTAL_DATA_DIR, filename)
+    temp_path = f"{path}.tmp"
+    with open(temp_path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2)
+        handle.write("\n")
+    os.replace(temp_path, path)
+
+
+def _export_portal_snapshots() -> None:
+    try:
+        _write_portal_snapshot("student-dashboard.json", _build_student_portal_snapshot())
+        _write_portal_snapshot("staff-dashboard.json", _build_staff_portal_snapshot())
+        _write_portal_snapshot("admin-dashboard.json", _build_admin_portal_snapshot())
+    except Exception as exc:  # pragma: no cover - defensive runtime sync
+        print(f"[portal-data] snapshot export skipped: {exc}")

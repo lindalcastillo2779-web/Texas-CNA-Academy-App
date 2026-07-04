@@ -4,7 +4,7 @@ import os
 
 import streamlit as st
 
-from db import get_access_status, get_or_create_user, get_user_by_email
+from db import authenticate_user, create_or_claim_user_account, get_access_status, get_user_by_email
 from email_utils import send_welcome_email
 from utils.media import render_page_media
 
@@ -86,18 +86,19 @@ def show() -> None:
     with tab_login:
         st.subheader("Sign In")
         email = st.text_input("Email address", key="login_email")
+        password = st.text_input("Password", type="password", key="login_password")
         if st.button("Sign In", key="sign_in_btn"):
-            if not email:
-                st.warning("Please enter your email.")
+            if not email or not password:
+                st.warning("Please enter your email and password.")
             else:
-                user = get_user_by_email(email.strip().lower())
+                user = authenticate_user(email.strip().lower(), password)
                 if user:
                     st.session_state["user_id"] = user["id"]
                     st.session_state["user_name"] = user["name"]
                     st.success(f"Welcome back, {user['name']}!")
                     st.rerun()
                 else:
-                    st.error("No account found for that email. Please register first.")
+                    st.error("Incorrect email or password.")
 
     with tab_register:
         st.subheader("Create an Account")
@@ -105,20 +106,32 @@ def show() -> None:
             r_name  = st.text_input("Full name")
             r_email = st.text_input("Email address")
             r_role  = st.selectbox("Role", ROLES)
+            r_password = st.text_input("Password", type="password")
+            r_password_confirm = st.text_input("Confirm password", type="password")
             submitted = st.form_submit_button("Register")
 
         if submitted:
-            if not r_name or not r_email:
-                st.warning("Name and email are required.")
+            if not r_name or not r_email or not r_password:
+                st.warning("Name, email, and password are required.")
+            elif len(r_password) < 8:
+                st.warning("Please use a password with at least 8 characters.")
+            elif r_password != r_password_confirm:
+                st.warning("Passwords do not match.")
             else:
                 existing = get_user_by_email(r_email.strip().lower())
-                if existing:
+                if existing and existing["password_hash"]:
                     st.info("An account with that email already exists. Please sign in.")
                 else:
-                    uid = get_or_create_user(r_name.strip(), r_email.strip().lower(), r_role)
-                    st.session_state["user_id"] = uid
-                    st.session_state["user_name"] = r_name.strip()
-                    send_welcome_email(r_name.strip(), r_email.strip().lower())
-                    st.success(f"Account created! Welcome, {r_name}.")
+                    auth_fields = {"password": r_password}
+                    user = create_or_claim_user_account(
+                        name=r_name.strip(),
+                        email=r_email.strip().lower(),
+                        role=r_role,
+                        **auth_fields,
+                    )
+                    st.session_state["user_id"] = user["id"]
+                    st.session_state["user_name"] = user["name"]
+                    send_welcome_email(user["name"], user["email"])
+                    st.success(f"Account created! Welcome, {user['name']}.")
                     st.info("You now have a 30-day free trial before subscription is required.")
                     st.rerun()

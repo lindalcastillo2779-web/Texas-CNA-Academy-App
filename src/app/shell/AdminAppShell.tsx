@@ -1,4 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { goToPortalSignup, printHtmlReport } from './portalActions';
+import {
+  PortalApiError,
+  formatRelativeDate,
+  loadAdminPortalSnapshot,
+  loadPortalSession,
+  signOutPortalSession,
+  type AdminPortalSnapshot,
+  type PortalSessionUser,
+} from './portalData';
 
 type AdminView = 'overview' | 'users' | 'courses' | 'community' | 'compliance' | 'reports';
 
@@ -86,7 +96,51 @@ function SectionHeader({
   );
 }
 
-function OverviewScreen({ onNavigate }: { onNavigate: (view: AdminView) => void }) {
+function PortalAccessNotice({
+  title,
+  message,
+  primaryLabel,
+  onPrimary,
+}: {
+  title: string;
+  message: string;
+  primaryLabel: string;
+  onPrimary: () => void;
+}) {
+  return (
+    <div className="app-shell">
+      <main id="main-content" className="main-content">
+        <section className="hero-card">
+          <div className="eyebrow">Admin portal</div>
+          <div className="screen-stack">
+            <div>
+              <h1>{title}</h1>
+              <p className="hero-copy">{message}</p>
+            </div>
+            <div className="hero-actions">
+              <button className="btn btn-primary" type="button" onClick={onPrimary}>
+                {primaryLabel}
+              </button>
+              <button className="btn btn-secondary" type="button" onClick={() => window.location.assign('/index.html')}>
+                Return home
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function OverviewScreen({
+  onNavigate,
+  overviewMetrics,
+  recentActivity,
+}: {
+  onNavigate: (view: AdminView) => void;
+  overviewMetrics: typeof OVERVIEW_METRICS;
+  recentActivity: typeof RECENT_ACTIVITY;
+}) {
   return (
     <div className="screen-stack">
       <section className="hero-card">
@@ -120,7 +174,7 @@ function OverviewScreen({ onNavigate }: { onNavigate: (view: AdminView) => void 
       </section>
 
       <section className="module-grid">
-        {OVERVIEW_METRICS.map((metric) => (
+        {overviewMetrics.map((metric) => (
           <article key={metric.label} className="metric-card">
             <span className="metric-label">{metric.label}</span>
             <strong className="metric-value">{metric.value}</strong>
@@ -132,7 +186,7 @@ function OverviewScreen({ onNavigate }: { onNavigate: (view: AdminView) => void 
       <section className="section-card">
         <SectionHeader eyebrow="Activity" title="Recent platform activity" copy="Keep a quick pulse on enrollment, reminders, and content releases." />
         <div className="timeline-list">
-          {RECENT_ACTIVITY.map((item) => (
+          {recentActivity.map((item) => (
             <article key={item.title} className="timeline-item">
               <div className={`timeline-dot ${item.tone}`} />
               <div className="timeline-copy">
@@ -147,13 +201,15 @@ function OverviewScreen({ onNavigate }: { onNavigate: (view: AdminView) => void 
   );
 }
 
-function UsersScreen() {
+function UsersScreen({ users }: { users: typeof USERS }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
         <SectionHeader eyebrow="Users" title="Manage people and organizations" copy="See who is active and where follow-up is needed." />
         <div className="section-actions">
-          <button className="btn btn-primary" type="button">Add user</button>
+          <button className="btn btn-primary" type="button" onClick={() => goToPortalSignup('student')}>
+            Add user
+          </button>
         </div>
         <div className="table-wrap">
           <table className="data-table">
@@ -166,7 +222,7 @@ function UsersScreen() {
               </tr>
             </thead>
             <tbody>
-              {USERS.map((user) => (
+              {users.map((user) => (
                 <tr key={user.email}>
                   <td>{user.name}</td>
                   <td>{user.role}</td>
@@ -184,7 +240,7 @@ function UsersScreen() {
   );
 }
 
-function CoursesScreen() {
+function CoursesScreen({ courses }: { courses: typeof COURSES }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -192,7 +248,7 @@ function CoursesScreen() {
       </section>
 
       <section className="card-grid">
-        {COURSES.map((course) => (
+        {courses.map((course) => (
           <article key={course.title} className="section-card compact-card">
             <div className="badge-row">
               <span className={`badge ${course.status === 'Active' ? 'badge-success' : 'badge-warning'}`}>{course.status}</span>
@@ -207,7 +263,7 @@ function CoursesScreen() {
   );
 }
 
-function ComplianceScreen() {
+function ComplianceScreen({ compliance }: { compliance: typeof COMPLIANCE }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -215,7 +271,7 @@ function ComplianceScreen() {
       </section>
 
       <section className="metric-grid">
-        {COMPLIANCE.map((item) => (
+        {compliance.map((item) => (
           <article key={item.label} className={`metric-card metric-card-${item.tone}`}>
             <span className="metric-label">{item.label}</span>
             <strong className="metric-value">{item.value}</strong>
@@ -226,7 +282,13 @@ function ComplianceScreen() {
   );
 }
 
-function CommunityScreen() {
+function CommunityScreen({
+  communityHealth,
+  communityReviewQueue,
+}: {
+  communityHealth: typeof COMMUNITY_HEALTH;
+  communityReviewQueue: typeof COMMUNITY_REVIEW_QUEUE;
+}) {
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -234,7 +296,7 @@ function CommunityScreen() {
       </section>
 
       <section className="metric-grid">
-        {COMMUNITY_HEALTH.map((item) => (
+        {communityHealth.map((item) => (
           <article key={item.label} className={`metric-card metric-card-${item.tone}`}>
             <span className="metric-label">{item.label}</span>
             <strong className="metric-value">{item.value}</strong>
@@ -245,7 +307,7 @@ function CommunityScreen() {
       <section className="section-card">
         <SectionHeader eyebrow="Moderation" title="Community review queue" copy="Prioritize safety, freshness, and value before posts stay visible." />
         <div className="timeline-list">
-          {COMMUNITY_REVIEW_QUEUE.map((item) => (
+          {communityReviewQueue.map((item) => (
             <article key={item.title} className="timeline-item">
               <div className={`timeline-dot ${item.tone}`} />
               <div className="timeline-copy">
@@ -260,7 +322,44 @@ function CommunityScreen() {
   );
 }
 
-function ReportsScreen() {
+function ReportsScreen({
+  overviewMetrics,
+  recentActivity,
+  compliance,
+  communityHealth,
+}: {
+  overviewMetrics: typeof OVERVIEW_METRICS;
+  recentActivity: typeof RECENT_ACTIVITY;
+  compliance: typeof COMPLIANCE;
+  communityHealth: typeof COMMUNITY_HEALTH;
+}) {
+  const handleReport = (reportTitle: string) => {
+    if (reportTitle === 'Monthly enrollment report') {
+      printHtmlReport(reportTitle, [
+        {
+          heading: 'Enrollment snapshot',
+          rows: overviewMetrics.map((metric) => `${metric.label}: ${metric.value} — ${metric.detail}`),
+        },
+        {
+          heading: 'Recent activity',
+          rows: recentActivity.map((item) => `${item.title} (${item.detail})`),
+        },
+      ]);
+      return;
+    }
+
+    printHtmlReport(reportTitle, [
+      {
+        heading: 'Compliance snapshot',
+        rows: compliance.map((item) => `${item.label}: ${item.value}`),
+      },
+      {
+        heading: 'Community health',
+        rows: communityHealth.map((item) => `${item.label}: ${item.value}`),
+      },
+    ]);
+  };
+
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -273,7 +372,9 @@ function ReportsScreen() {
             <h3 className="module-title">{report.title}</h3>
             <p className="module-copy">{report.copy}</p>
             <div className="section-actions">
-              <button className="btn btn-secondary" type="button">{report.cta}</button>
+              <button className="btn btn-secondary" type="button" onClick={() => handleReport(report.title)}>
+                {report.cta}
+              </button>
             </div>
           </article>
         ))}
@@ -282,20 +383,50 @@ function ReportsScreen() {
   );
 }
 
-function renderView(view: AdminView, onNavigate: (view: AdminView) => void) {
+function renderView(
+  view: AdminView,
+  onNavigate: (view: AdminView) => void,
+  snapshot: {
+    overviewMetrics: typeof OVERVIEW_METRICS;
+    recentActivity: typeof RECENT_ACTIVITY;
+    users: typeof USERS;
+    courses: typeof COURSES;
+    compliance: typeof COMPLIANCE;
+    communityHealth: typeof COMMUNITY_HEALTH;
+    communityReviewQueue: typeof COMMUNITY_REVIEW_QUEUE;
+  }
+) {
   switch (view) {
     case 'overview':
-      return <OverviewScreen onNavigate={onNavigate} />;
+      return (
+        <OverviewScreen
+          onNavigate={onNavigate}
+          overviewMetrics={snapshot.overviewMetrics}
+          recentActivity={snapshot.recentActivity}
+        />
+      );
     case 'users':
-      return <UsersScreen />;
+      return <UsersScreen users={snapshot.users} />;
     case 'courses':
-      return <CoursesScreen />;
+      return <CoursesScreen courses={snapshot.courses} />;
     case 'community':
-      return <CommunityScreen />;
+      return (
+        <CommunityScreen
+          communityHealth={snapshot.communityHealth}
+          communityReviewQueue={snapshot.communityReviewQueue}
+        />
+      );
     case 'compliance':
-      return <ComplianceScreen />;
+      return <ComplianceScreen compliance={snapshot.compliance} />;
     case 'reports':
-      return <ReportsScreen />;
+      return (
+        <ReportsScreen
+          overviewMetrics={snapshot.overviewMetrics}
+          recentActivity={snapshot.recentActivity}
+          compliance={snapshot.compliance}
+          communityHealth={snapshot.communityHealth}
+        />
+      );
     default:
       return null;
   }
@@ -303,6 +434,24 @@ function renderView(view: AdminView, onNavigate: (view: AdminView) => void) {
 
 export function AdminAppShell() {
   const [currentView, setCurrentView] = useState<AdminView>('overview');
+  const [portalSnapshot, setPortalSnapshot] = useState<AdminPortalSnapshot | null>(null);
+  const [sessionUser, setSessionUser] = useState<PortalSessionUser | null>(null);
+  const [loadState, setLoadState] = useState<'loading' | 'ready' | 'unauthenticated' | 'error'>('loading');
+  const [loadMessage, setLoadMessage] = useState('Checking your admin session.');
+
+  const overviewMetrics = portalSnapshot?.overviewMetrics ?? OVERVIEW_METRICS;
+  const recentActivity = portalSnapshot?.recentActivity.map((item) => ({
+    ...item,
+    detail: formatRelativeDate(item.detail),
+  })) ?? RECENT_ACTIVITY;
+  const users = portalSnapshot?.users ?? USERS;
+  const courses = portalSnapshot?.courses ?? COURSES;
+  const compliance = portalSnapshot?.compliance ?? COMPLIANCE;
+  const communityHealth = portalSnapshot?.communityHealth ?? COMMUNITY_HEALTH;
+  const communityReviewQueue = portalSnapshot?.communityReviewQueue.map((item) => ({
+    ...item,
+    detail: formatRelativeDate(item.detail),
+  })) ?? COMMUNITY_REVIEW_QUEUE;
 
   useEffect(() => {
     const syncFromHash = () => {
@@ -315,6 +464,37 @@ export function AdminAppShell() {
     syncFromHash();
     window.addEventListener('hashchange', syncFromHash);
     return () => window.removeEventListener('hashchange', syncFromHash);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    Promise.all([loadPortalSession(), loadAdminPortalSnapshot()])
+      .then(([session, snapshot]) => {
+        if (isMounted) {
+          setSessionUser(session.user);
+          setPortalSnapshot(snapshot);
+          setLoadState('ready');
+          setLoadMessage('');
+        }
+      })
+      .catch((error: unknown) => {
+        if (isMounted) {
+          setSessionUser(null);
+          setPortalSnapshot(null);
+          if (error instanceof PortalApiError && (error.status === 401 || error.status === 403)) {
+            setLoadState('unauthenticated');
+            setLoadMessage(error.message);
+            return;
+          }
+          setLoadState('error');
+          setLoadMessage('We could not load the admin portal right now.');
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const navigate = (view: AdminView) => {
@@ -341,6 +521,44 @@ export function AdminAppShell() {
     }
   }, [currentView]);
 
+  const handleSignOut = async () => {
+    await signOutPortalSession();
+    goToPortalSignup('admin', 'login');
+  };
+
+  if (loadState === 'loading') {
+    return (
+      <PortalAccessNotice
+        title="Loading your admin portal"
+        message={loadMessage}
+        primaryLabel="Refresh"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
+  if (loadState === 'unauthenticated') {
+    return (
+      <PortalAccessNotice
+        title="Sign in to open the admin portal"
+        message={loadMessage}
+        primaryLabel="Sign in"
+        onPrimary={() => goToPortalSignup('admin', 'login')}
+      />
+    );
+  }
+
+  if (loadState === 'error' || !portalSnapshot) {
+    return (
+      <PortalAccessNotice
+        title="We couldn’t load your admin data"
+        message={loadMessage || 'Please try again in a moment.'}
+        primaryLabel="Try again"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -354,15 +572,31 @@ export function AdminAppShell() {
           <p className="topbar-subtitle">A unified admin portal for operations, compliance, user management, and reporting.</p>
         </div>
         <div className="topbar-actions">
-          <span className="status-chip">7 reviews pending</span>
-          <button className="profile-chip" type="button" aria-label="Admin profile">
-            Admin
+          <span className="status-chip">{overviewMetrics[4]?.value ?? '0'} reviews pending</span>
+          <button className="btn btn-secondary" type="button" onClick={handleSignOut}>
+            Sign out
+          </button>
+          <button
+            className="profile-chip"
+            type="button"
+            aria-label="Admin profile"
+            onClick={() => goToPortalSignup('admin', 'login')}
+          >
+            {sessionUser?.name ?? 'Admin'}
           </button>
         </div>
       </header>
 
       <main id="main-content" className="main-content">
-        {renderView(currentView, navigate)}
+        {renderView(currentView, navigate, {
+          overviewMetrics,
+          recentActivity,
+          users,
+          courses,
+          compliance,
+          communityHealth,
+          communityReviewQueue,
+        })}
       </main>
 
       <nav className="bottom-nav bottom-nav-6" aria-label="Primary">

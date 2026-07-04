@@ -1,4 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { downloadTextFile, goToPortalSignup } from './portalActions';
+import {
+  PortalApiError,
+  formatRelativeDate,
+  loadPortalSession,
+  loadStaffPortalSnapshot,
+  signOutPortalSession,
+  type PortalSessionUser,
+  type StaffPortalSnapshot,
+} from './portalData';
 
 type StaffView = 'students' | 'schedule' | 'grades' | 'community' | 'resources';
 
@@ -45,21 +55,80 @@ const RESOURCE_CARDS = [
     title: 'CNA Instructor Handbook',
     copy: 'Official Texas CNA instructor guidelines and standards.',
     cta: 'Download handbook',
+    filename: 'texas-cna-instructor-handbook.txt',
+    content: `Texas CNA Academy - Instructor Handbook
+
+Use this quick reference to keep your teaching workflow aligned:
+- Review the active cohort roster before each teaching block.
+- Focus remediation on low-progress learners and infection control misses.
+- Reinforce skills lab critical steps before high-stakes checkoffs.
+- Pair classroom instruction with coaching, practice, and follow-up communication.
+
+Helpful in-app destinations:
+- Students: monitor progress and last activity
+- Grades: review exam snapshots
+- Community: coordinate mentors, practice labs, and workforce opportunities
+- Resources: keep teaching references easy to reach`,
   },
   {
     title: 'Lesson Plan Templates',
     copy: 'Reusable templates for lecture flow, labs, and skill checkoffs.',
     cta: 'Download templates',
+    filename: 'texas-cna-lesson-plan-template.txt',
+    content: `Texas CNA Academy - Lesson Plan Template
+
+Lesson title:
+Objective:
+Module / domain:
+Materials needed:
+
+Opening (5-10 min):
+- Warm-up or knowledge check
+
+Instruction block (20-30 min):
+- Core concepts
+- Demonstration points
+
+Guided practice (15-20 min):
+- Partner or instructor-led rehearsal
+
+Skills checkoff / assessment:
+- Critical steps
+- Feedback notes
+
+Remediation / homework:
+- Review deck
+- Community or mentor follow-up`,
   },
   {
     title: 'Learner Outreach Scripts',
     copy: 'Ready-to-send nudges for missing work, low readiness, and exam prep.',
     cta: 'Open scripts',
+    filename: 'texas-cna-learner-outreach-scripts.txt',
+    content: `Texas CNA Academy - Learner Outreach Scripts
+
+Missing work:
+"Hi [Learner], I noticed you still have unfinished course work in your current module. Please log in today and complete the next lesson so we can keep you on pace."
+
+Low readiness:
+"Hi [Learner], your recent scores show you may need extra practice in infection control and transfer safety. Let’s schedule a quick review before the next quiz."
+
+Exam prep:
+"Hi [Learner], this is your reminder to finish one review block and one clinical skill practice before your next testing date. Small daily sessions will help you stay ready."`,
   },
   {
     title: 'Clinical Skills Prep',
     copy: 'Quick reminders for high-risk misses before lab assessments.',
     cta: 'Review checklist',
+    filename: 'texas-cna-clinical-skills-checklist.txt',
+    content: `Texas CNA Academy - Clinical Skills Prep Checklist
+
+- Introduce yourself and explain the skill before touching equipment.
+- Wash hands and follow PPE steps in the correct order.
+- Lock wheelchair or bed brakes before transfer movement.
+- Protect privacy and resident dignity during every step.
+- Document readings or results immediately after the skill.
+- Report safety concerns or abnormal findings right away.`,
   },
 ];
 
@@ -97,7 +166,51 @@ function SectionHeader({
   );
 }
 
-function StudentsScreen({ onNavigate }: { onNavigate: (view: StaffView) => void }) {
+function PortalAccessNotice({
+  title,
+  message,
+  primaryLabel,
+  onPrimary,
+}: {
+  title: string;
+  message: string;
+  primaryLabel: string;
+  onPrimary: () => void;
+}) {
+  return (
+    <div className="app-shell">
+      <main id="main-content" className="main-content">
+        <section className="hero-card">
+          <div className="eyebrow">Instructor portal</div>
+          <div className="screen-stack">
+            <div>
+              <h1>{title}</h1>
+              <p className="hero-copy">{message}</p>
+            </div>
+            <div className="hero-actions">
+              <button className="btn btn-primary" type="button" onClick={onPrimary}>
+                {primaryLabel}
+              </button>
+              <button className="btn btn-secondary" type="button" onClick={() => window.location.assign('/index.html')}>
+                Return home
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function StudentsScreen({
+  onNavigate,
+  studentMetrics,
+  studentRoster,
+}: {
+  onNavigate: (view: StaffView) => void;
+  studentMetrics: typeof STUDENT_METRICS;
+  studentRoster: typeof STUDENT_ROSTER;
+}) {
   return (
     <div className="screen-stack">
       <section className="hero-card">
@@ -132,7 +245,7 @@ function StudentsScreen({ onNavigate }: { onNavigate: (view: StaffView) => void 
       </section>
 
       <section className="metric-grid">
-        {STUDENT_METRICS.map((metric) => (
+        {studentMetrics.map((metric) => (
           <article key={metric.label} className="metric-card">
             <span className="metric-label">{metric.label}</span>
             <strong className="metric-value">{metric.value}</strong>
@@ -154,7 +267,7 @@ function StudentsScreen({ onNavigate }: { onNavigate: (view: StaffView) => void 
               </tr>
             </thead>
             <tbody>
-              {STUDENT_ROSTER.map((student) => (
+              {studentRoster.map((student) => (
                 <tr key={student.name}>
                   <td>{student.name}</td>
                   <td>
@@ -179,20 +292,20 @@ function StudentsScreen({ onNavigate }: { onNavigate: (view: StaffView) => void 
   );
 }
 
-function ScheduleScreen() {
+function ScheduleScreen({ weeklySchedule }: { weeklySchedule: typeof WEEKLY_SCHEDULE }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
         <SectionHeader eyebrow="Schedule" title="This week at a glance" copy="Keep labs, lectures, and review time aligned with student needs." />
         <div className="timeline-list">
-          {WEEKLY_SCHEDULE.map((event) => (
+          {weeklySchedule.map((event) => (
             <article key={`${event.day}-${event.title}`} className="timeline-item">
               <div className="timeline-day">{event.day}</div>
               <div className="timeline-copy">
                 <strong>{event.title}</strong>
                 <p>{event.detail}</p>
               </div>
-              <span className={`status-pill ${event.status === 'Confirmed' ? 'is-success' : 'is-muted'}`}>{event.status}</span>
+              <span className={`status-pill ${event.status === 'Confirmed' || event.status === 'Compliant' ? 'is-success' : 'is-muted'}`}>{event.status}</span>
             </article>
           ))}
         </div>
@@ -201,7 +314,7 @@ function ScheduleScreen() {
   );
 }
 
-function GradesScreen() {
+function GradesScreen({ gradeBook }: { gradeBook: typeof GRADE_BOOK }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -217,7 +330,7 @@ function GradesScreen() {
               </tr>
             </thead>
             <tbody>
-              {GRADE_BOOK.map((student) => (
+              {gradeBook.map((student) => (
                 <tr key={student.name}>
                   <td>{student.name}</td>
                   <td>{student.exam1}</td>
@@ -234,6 +347,10 @@ function GradesScreen() {
 }
 
 function ResourcesScreen() {
+  const handleResourceDownload = (resource: typeof RESOURCE_CARDS[number]) => {
+    downloadTextFile(resource.filename, resource.content);
+  };
+
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -247,7 +364,14 @@ function ResourcesScreen() {
             <h3 className="module-title">{resource.title}</h3>
             <p className="module-copy">{resource.copy}</p>
             <div className="section-actions">
-              <button className="btn btn-secondary" type="button">{resource.cta}</button>
+             <button
+               className="btn btn-secondary"
+               type="button"
+               aria-label={`${resource.cta}: ${resource.title}`}
+               onClick={() => handleResourceDownload(resource)}
+             >
+               {resource.cta}
+             </button>
             </div>
           </article>
         ))}
@@ -256,7 +380,7 @@ function ResourcesScreen() {
   );
 }
 
-function CommunityScreen() {
+function CommunityScreen({ communityQueue }: { communityQueue: typeof COMMUNITY_QUEUE }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -264,7 +388,7 @@ function CommunityScreen() {
       </section>
 
       <section className="timeline-list">
-        {COMMUNITY_QUEUE.map((item) => (
+        {communityQueue.map((item) => (
           <article key={item.title} className="timeline-item">
             <div className="timeline-day">NOW</div>
             <div className="timeline-copy">
@@ -298,16 +422,32 @@ function CommunityScreen() {
   );
 }
 
-function renderView(view: StaffView, onNavigate: (view: StaffView) => void) {
+function renderView(
+  view: StaffView,
+  onNavigate: (view: StaffView) => void,
+  snapshot: {
+    studentMetrics: typeof STUDENT_METRICS;
+    studentRoster: typeof STUDENT_ROSTER;
+    weeklySchedule: typeof WEEKLY_SCHEDULE;
+    gradeBook: typeof GRADE_BOOK;
+    communityQueue: typeof COMMUNITY_QUEUE;
+  }
+) {
   switch (view) {
     case 'students':
-      return <StudentsScreen onNavigate={onNavigate} />;
+      return (
+        <StudentsScreen
+          onNavigate={onNavigate}
+          studentMetrics={snapshot.studentMetrics}
+          studentRoster={snapshot.studentRoster}
+        />
+      );
     case 'schedule':
-      return <ScheduleScreen />;
+      return <ScheduleScreen weeklySchedule={snapshot.weeklySchedule} />;
     case 'grades':
-      return <GradesScreen />;
+      return <GradesScreen gradeBook={snapshot.gradeBook} />;
     case 'community':
-      return <CommunityScreen />;
+      return <CommunityScreen communityQueue={snapshot.communityQueue} />;
     case 'resources':
       return <ResourcesScreen />;
     default:
@@ -317,6 +457,21 @@ function renderView(view: StaffView, onNavigate: (view: StaffView) => void) {
 
 export function StaffAppShell() {
   const [currentView, setCurrentView] = useState<StaffView>('students');
+  const [portalSnapshot, setPortalSnapshot] = useState<StaffPortalSnapshot | null>(null);
+  const [sessionUser, setSessionUser] = useState<PortalSessionUser | null>(null);
+  const [loadState, setLoadState] = useState<'loading' | 'ready' | 'unauthenticated' | 'error'>('loading');
+  const [loadMessage, setLoadMessage] = useState('Checking your instructor session.');
+
+  const studentMetrics = portalSnapshot?.studentMetrics ?? STUDENT_METRICS;
+  const studentRoster = portalSnapshot?.studentRoster.map((student) => ({
+    name: student.name,
+    progress: student.progress,
+    lastActive: formatRelativeDate(student.lastActiveAt),
+    status: student.status,
+  })) ?? STUDENT_ROSTER;
+  const weeklySchedule = portalSnapshot?.facilitySchedule.length ? portalSnapshot.facilitySchedule : WEEKLY_SCHEDULE;
+  const gradeBook = portalSnapshot?.gradeBook ?? GRADE_BOOK;
+  const communityQueue = portalSnapshot?.communityQueue ?? COMMUNITY_QUEUE;
 
   useEffect(() => {
     const syncFromHash = () => {
@@ -329,6 +484,37 @@ export function StaffAppShell() {
     syncFromHash();
     window.addEventListener('hashchange', syncFromHash);
     return () => window.removeEventListener('hashchange', syncFromHash);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    Promise.all([loadPortalSession(), loadStaffPortalSnapshot()])
+      .then(([session, snapshot]) => {
+        if (isMounted) {
+          setSessionUser(session.user);
+          setPortalSnapshot(snapshot);
+          setLoadState('ready');
+          setLoadMessage('');
+        }
+      })
+      .catch((error: unknown) => {
+        if (isMounted) {
+          setSessionUser(null);
+          setPortalSnapshot(null);
+          if (error instanceof PortalApiError && (error.status === 401 || error.status === 403)) {
+            setLoadState('unauthenticated');
+            setLoadMessage(error.message);
+            return;
+          }
+          setLoadState('error');
+          setLoadMessage('We could not load the instructor portal right now.');
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const navigate = (view: StaffView) => {
@@ -353,6 +539,44 @@ export function StaffAppShell() {
     }
   }, [currentView]);
 
+  const handleSignOut = async () => {
+    await signOutPortalSession();
+    goToPortalSignup('staff', 'login');
+  };
+
+  if (loadState === 'loading') {
+    return (
+      <PortalAccessNotice
+        title="Loading your instructor portal"
+        message={loadMessage}
+        primaryLabel="Refresh"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
+  if (loadState === 'unauthenticated') {
+    return (
+      <PortalAccessNotice
+        title="Sign in to open the instructor portal"
+        message={loadMessage}
+        primaryLabel="Sign in"
+        onPrimary={() => goToPortalSignup('staff', 'login')}
+      />
+    );
+  }
+
+  if (loadState === 'error' || !portalSnapshot) {
+    return (
+      <PortalAccessNotice
+        title="We couldn’t load your instructor data"
+        message={loadMessage || 'Please try again in a moment.'}
+        primaryLabel="Try again"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -366,15 +590,29 @@ export function StaffAppShell() {
           <p className="topbar-subtitle">A unified instructor portal for coaching, grading, scheduling, and teaching support.</p>
         </div>
         <div className="topbar-actions">
-          <span className="status-chip">24 active learners</span>
-          <button className="profile-chip" type="button" aria-label="Instructor profile">
-            Instructor
+          <span className="status-chip">{studentMetrics[0]?.value ?? '0'} active learners</span>
+          <button className="btn btn-secondary" type="button" onClick={handleSignOut}>
+            Sign out
+          </button>
+          <button
+            className="profile-chip"
+            type="button"
+            aria-label="Instructor profile"
+            onClick={() => goToPortalSignup('staff', 'login')}
+          >
+            {sessionUser?.name ?? 'Instructor'}
           </button>
         </div>
       </header>
 
       <main id="main-content" className="main-content">
-        {renderView(currentView, navigate)}
+        {renderView(currentView, navigate, {
+          studentMetrics,
+          studentRoster,
+          weeklySchedule,
+          gradeBook,
+          communityQueue,
+        })}
       </main>
 
       <nav className="bottom-nav bottom-nav-5" aria-label="Primary">

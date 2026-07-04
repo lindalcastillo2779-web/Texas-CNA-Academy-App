@@ -4,6 +4,17 @@ import {
   getModulesWithProgress,
   getNextLesson,
 } from '../../features/courses';
+import { goToPortalSignup } from './portalActions';
+import {
+  PortalApiError,
+  getPortalDisplayName,
+  loadPortalSession,
+  loadStudentPortalRecord,
+  signOutPortalSession,
+  type PortalProfile,
+  type PortalSessionUser,
+  type StudentPortalRecord,
+} from './portalData';
 
 type AppView = 'home' | 'courses' | 'skills' | 'review' | 'community' | 'more';
 
@@ -221,20 +232,60 @@ function SectionHeader({
   );
 }
 
+function PortalAccessNotice({
+  title,
+  message,
+  primaryLabel,
+  onPrimary,
+}: {
+  title: string;
+  message: string;
+  primaryLabel: string;
+  onPrimary: () => void;
+}) {
+  return (
+    <div className="app-shell">
+      <main id="main-content" className="main-content">
+        <section className="hero-card">
+          <div className="eyebrow">Student portal</div>
+          <div className="screen-stack">
+            <div>
+              <h1>{title}</h1>
+              <p className="hero-copy">{message}</p>
+            </div>
+            <div className="hero-actions">
+              <button className="btn btn-primary" type="button" onClick={onPrimary}>
+                {primaryLabel}
+              </button>
+              <button className="btn btn-secondary" type="button" onClick={() => window.location.assign('/index.html')}>
+                Return home
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
 function HomeScreen({
   onNavigate,
   courseworkCompletion,
   completedModules,
   nextLessonSummary,
-  renewalDaysLeft,
+  ceuRemainingSummary,
   weakestDomainKey,
+  examReadiness,
+  ceuCompletion,
 }: {
   onNavigate: (view: AppView) => void;
   courseworkCompletion: number;
   completedModules: number;
   nextLessonSummary: string;
-  renewalDaysLeft: number;
+  ceuRemainingSummary: string;
   weakestDomainKey: string;
+  examReadiness: number;
+  ceuCompletion: number;
 }) {
   const weakestDomain = getDomainLabel(weakestDomainKey as Parameters<typeof getDomainLabel>[0]);
 
@@ -279,12 +330,12 @@ function HomeScreen({
         </article>
         <article className="metric-card">
           <span className="metric-label">Exam readiness</span>
-          <strong className="metric-value">78%</strong>
+          <strong className="metric-value">{Math.round(examReadiness)}%</strong>
           <p className="metric-copy">Strong pace overall. Keep drilling infection control and transfer safety.</p>
         </article>
         <article className="metric-card">
-          <span className="metric-label">Renewal countdown</span>
-          <strong className="metric-value">{renewalDaysLeft} days</strong>
+          <span className="metric-label">CEU remaining</span>
+          <strong className="metric-value">{ceuRemainingSummary}</strong>
           <p className="metric-copy">Stay ahead on CEU uploads and renewal proof collection.</p>
         </article>
       </section>
@@ -314,12 +365,12 @@ function HomeScreen({
               <ProgressBar value={courseworkCompletion} tone="navy" />
             </div>
             <div>
-              <div className="progress-meta"><span>Skill confidence</span><span>76%</span></div>
-              <ProgressBar value={76} tone="success" />
+              <div className="progress-meta"><span>Exam readiness</span><span>{Math.round(examReadiness)}%</span></div>
+              <ProgressBar value={examReadiness} tone={examReadiness >= 70 ? 'success' : 'accent'} />
             </div>
             <div>
-              <div className="progress-meta"><span>CEU progress</span><span>50%</span></div>
-              <ProgressBar value={50} />
+              <div className="progress-meta"><span>CEU progress</span><span>{Math.round(ceuCompletion)}%</span></div>
+              <ProgressBar value={ceuCompletion} />
             </div>
           </div>
         </article>
@@ -436,7 +487,7 @@ function SkillsScreen() {
   );
 }
 
-function ReviewScreen() {
+function ReviewScreen({ reviewDecks }: { reviewDecks: typeof REVIEW_DECKS }) {
   return (
     <div className="screen-stack">
       <section className="section-card">
@@ -448,7 +499,7 @@ function ReviewScreen() {
       </section>
 
       <section className="card-grid">
-        {REVIEW_DECKS.map((deck) => (
+        {reviewDecks.map((deck) => (
           <article key={deck.title} className="section-card">
             <span className="metric-label">{deck.due}</span>
             <h3 className="module-title">{deck.title}</h3>
@@ -481,7 +532,17 @@ function ReviewScreen() {
   );
 }
 
-function CommunityScreen({ weakestDomainKey }: { weakestDomainKey: string }) {
+function CommunityScreen({
+  weakestDomainKey,
+  communityMatches,
+  communityPosts,
+  recommendedActions,
+}: {
+  weakestDomainKey: string;
+  communityMatches: typeof COMMUNITY_MATCHES;
+  communityPosts: typeof COMMUNITY_POSTS;
+  recommendedActions: string[];
+}) {
   const weakestDomain = getDomainLabel(weakestDomainKey as Parameters<typeof getDomainLabel>[0]);
 
   return (
@@ -499,7 +560,7 @@ function CommunityScreen({ weakestDomainKey }: { weakestDomainKey: string }) {
       </section>
 
       <section className="card-grid">
-        {COMMUNITY_MATCHES.map((match) => (
+        {communityMatches.map((match) => (
           <article key={match.name} className="section-card">
             <span className="metric-label">{match.role}</span>
             <h3 className="module-title">{match.name}</h3>
@@ -516,15 +577,19 @@ function CommunityScreen({ weakestDomainKey }: { weakestDomainKey: string }) {
         <article className="section-card">
           <SectionHeader eyebrow="Recommended" title="Community actions this week" />
           <ul className="info-list">
-            <li>Post a mentor request tied to your weakest domain: {weakestDomain.shortLabel}.</li>
-            <li>Join one study group before your next quiz attempt.</li>
-            <li>Save one local opportunity so your exam plan also builds career momentum.</li>
+            {(recommendedActions.length ? recommendedActions : [
+              `Post a mentor request tied to your weakest domain: ${weakestDomain.shortLabel}.`,
+              'Join one study group before your next quiz attempt.',
+              'Save one local opportunity so your exam plan also builds career momentum.',
+            ]).map((action) => (
+              <li key={action}>{action}</li>
+            ))}
           </ul>
         </article>
         <article className="section-card">
           <SectionHeader eyebrow="Board highlights" title="What people are posting now" />
           <div className="timeline-list">
-            {COMMUNITY_POSTS.map((post) => (
+            {communityPosts.map((post) => (
               <article key={post.title} className="timeline-item">
                 <div className="timeline-dot is-success" />
                 <div className="timeline-copy">
@@ -572,9 +637,15 @@ function renderView(view: AppView, args: {
   courseworkCompletion: number;
   completedModules: number;
   nextLessonSummary: string;
-  renewalDaysLeft: number;
+  ceuRemainingSummary: string;
   weakestDomainKey: string;
   modules: DashboardModule[];
+  examReadiness: number;
+  ceuCompletion: number;
+  reviewDecks: typeof REVIEW_DECKS;
+  communityMatches: typeof COMMUNITY_MATCHES;
+  communityPosts: typeof COMMUNITY_POSTS;
+  communityActions: string[];
 }) {
   switch (view) {
     case 'home':
@@ -584,8 +655,10 @@ function renderView(view: AppView, args: {
           courseworkCompletion={args.courseworkCompletion}
           completedModules={args.completedModules}
           nextLessonSummary={args.nextLessonSummary}
-          renewalDaysLeft={args.renewalDaysLeft}
+          ceuRemainingSummary={args.ceuRemainingSummary}
           weakestDomainKey={args.weakestDomainKey}
+          examReadiness={args.examReadiness}
+          ceuCompletion={args.ceuCompletion}
         />
       );
     case 'courses':
@@ -593,9 +666,16 @@ function renderView(view: AppView, args: {
     case 'skills':
       return <SkillsScreen />;
     case 'review':
-      return <ReviewScreen />;
+      return <ReviewScreen reviewDecks={args.reviewDecks} />;
     case 'community':
-      return <CommunityScreen weakestDomainKey={args.weakestDomainKey} />;
+      return (
+        <CommunityScreen
+          weakestDomainKey={args.weakestDomainKey}
+          communityMatches={args.communityMatches}
+          communityPosts={args.communityPosts}
+          recommendedActions={args.communityActions}
+        />
+      );
     case 'more':
       return <MoreScreen />;
     default:
@@ -605,6 +685,11 @@ function renderView(view: AppView, args: {
 
 export function IntegratedAppShell() {
   const [currentView, setCurrentView] = useState<AppView>('home');
+  const [portalProfile, setPortalProfile] = useState<PortalProfile | null>(null);
+  const [portalStudent, setPortalStudent] = useState<StudentPortalRecord | null>(null);
+  const [sessionUser, setSessionUser] = useState<PortalSessionUser | null>(null);
+  const [loadState, setLoadState] = useState<'loading' | 'ready' | 'unauthenticated' | 'error'>('loading');
+  const [loadMessage, setLoadMessage] = useState('Checking your portal session.');
   const learnerState = DEMO_LEARNER_STATE as unknown as Parameters<typeof getModulesWithProgress>[0];
 
   const modulesWithProgress = useMemo(
@@ -650,11 +735,55 @@ export function IntegratedAppShell() {
     [modulesWithProgress]
   );
 
-  const renewalDaysLeft = useMemo(() => {
-    const target = new Date('2026-12-31T00:00:00Z').getTime();
-    const today = Date.now();
-    return Math.max(0, Math.ceil((target - today) / (1000 * 60 * 60 * 24)));
-  }, []);
+  const examReadiness = portalStudent?.quiz.readinessScore ?? 78;
+  const ceuCompletion = portalStudent
+    ? Math.round((portalStudent.ceu.earnedHours / Math.max(1, portalStudent.ceu.requiredHours)) * 100)
+    : 50;
+  const ceuRemainingSummary = portalStudent ? `${portalStudent.ceu.remainingHours.toFixed(1)} hrs` : '12.0 hrs';
+
+  const reviewDecks = useMemo(() => {
+    if (!portalStudent?.quiz.statsByDomain.length) {
+      return REVIEW_DECKS;
+    }
+
+    return [...portalStudent.quiz.statsByDomain]
+      .sort((left, right) => left.avgPct - right.avgPct)
+      .slice(0, 3)
+      .map((stat) => ({
+        title: stat.domain,
+        due: `${stat.attempts} quiz attempt${stat.attempts === 1 ? '' : 's'} logged`,
+        mastery: Math.round(stat.avgPct),
+        action: stat.bestPct >= 85 ? 'Keep this domain warm with light review.' : 'Prioritize this domain in your next review block.',
+      }));
+  }, [portalStudent]);
+
+  const communityMatches = useMemo(() => {
+    if (!portalStudent?.community.mentorMatches.length) {
+      return COMMUNITY_MATCHES;
+    }
+
+    return portalStudent.community.mentorMatches.slice(0, 4).map((match) => ({
+      name: match.name,
+      role: match.role.toUpperCase(),
+      focus: match.interest_areas || 'Mentoring, exam prep, and learner support',
+      availability: match.availability || match.city || 'Availability not listed',
+    }));
+  }, [portalStudent]);
+
+  const communityPosts = useMemo(() => {
+    if (!portalStudent?.community.recommendedPosts.length) {
+      return COMMUNITY_POSTS;
+    }
+
+    return portalStudent.community.recommendedPosts.slice(0, 4).map((post) => ({
+      title: post.title,
+      meta: `${post.location || 'Texas CNA Academy'} · ${post.post_type.replaceAll('_', ' ')}`,
+      detail: post.description,
+      status: post.post_type.replaceAll('_', ' '),
+    }));
+  }, [portalStudent]);
+
+  const communityActions = portalStudent?.community.recommendedActions ?? [];
 
   useEffect(() => {
     const syncFromHash = () => {
@@ -667,6 +796,41 @@ export function IntegratedAppShell() {
     syncFromHash();
     window.addEventListener('hashchange', syncFromHash);
     return () => window.removeEventListener('hashchange', syncFromHash);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    Promise.all([loadPortalSession(), loadStudentPortalRecord()])
+      .then(([session, result]) => {
+        if (!isMounted) {
+          return;
+        }
+        setSessionUser(session.user);
+        setPortalProfile(result.profile);
+        setPortalStudent(result.student);
+        setLoadState('ready');
+        setLoadMessage('');
+      })
+      .catch((error: unknown) => {
+        if (!isMounted) {
+          return;
+        }
+        setSessionUser(null);
+        setPortalProfile(null);
+        setPortalStudent(null);
+        if (error instanceof PortalApiError && (error.status === 401 || error.status === 403)) {
+          setLoadState('unauthenticated');
+          setLoadMessage(error.message);
+          return;
+        }
+        setLoadState('error');
+        setLoadMessage('We could not load your student portal right now.');
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const navigate = (view: AppView) => {
@@ -693,6 +857,44 @@ export function IntegratedAppShell() {
     }
   }, [currentView]);
 
+  const handleSignOut = async () => {
+    await signOutPortalSession();
+    goToPortalSignup('student', 'login');
+  };
+
+  if (loadState === 'loading') {
+    return (
+      <PortalAccessNotice
+        title="Loading your student portal"
+        message={loadMessage}
+        primaryLabel="Refresh"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
+  if (loadState === 'unauthenticated') {
+    return (
+      <PortalAccessNotice
+        title="Sign in to open your student portal"
+        message={loadMessage}
+        primaryLabel="Sign in"
+        onPrimary={() => goToPortalSignup('student', 'login')}
+      />
+    );
+  }
+
+  if (loadState === 'error' || !portalStudent) {
+    return (
+      <PortalAccessNotice
+        title="We couldn’t load your portal data"
+        message={loadMessage || 'Please try again in a moment.'}
+        primaryLabel="Try again"
+        onPrimary={() => window.location.reload()}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -706,9 +908,17 @@ export function IntegratedAppShell() {
           <p className="topbar-subtitle">A unified student portal for courses, readiness, skills, and renewal support.</p>
         </div>
         <div className="topbar-actions">
-          <span className="status-chip">30-day plan active</span>
-          <button className="profile-chip" type="button" aria-label="Student profile">
-            Student
+          <span className="status-chip">{portalStudent.statusChip}</span>
+          <button className="btn btn-secondary" type="button" onClick={handleSignOut}>
+            Sign out
+          </button>
+          <button
+            className="profile-chip"
+            type="button"
+            aria-label="Student profile"
+            onClick={() => goToPortalSignup('student', 'login')}
+          >
+            {getPortalDisplayName(sessionUser ?? portalProfile)}
           </button>
         </div>
       </header>
@@ -719,9 +929,15 @@ export function IntegratedAppShell() {
           courseworkCompletion,
           completedModules,
           nextLessonSummary,
-          renewalDaysLeft,
+          ceuRemainingSummary,
           weakestDomainKey,
           modules: modulesWithProgress,
+          examReadiness,
+          ceuCompletion,
+          reviewDecks,
+          communityMatches,
+          communityPosts,
+          communityActions,
         })}
       </main>
 
