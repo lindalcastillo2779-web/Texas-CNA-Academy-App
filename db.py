@@ -925,6 +925,17 @@ def _build_student_portal_record(user: dict) -> dict:
     else:
         status_chip = "Subscription required"
 
+    weakest_domain_key = (
+        _PORTAL_DOMAIN_KEY_BY_NAME.get(weakest_stat["domain"], "INFECT")
+        if weakest_stat is not None
+        else "INFECT"
+    )
+    strongest_domain_key = (
+        _PORTAL_DOMAIN_KEY_BY_NAME.get(strongest_stat["domain"], "ROLE")
+        if strongest_stat is not None
+        else "ROLE"
+    )
+
     return {
         "id": user_id,
         "name": user["name"],
@@ -942,12 +953,8 @@ def _build_student_portal_record(user: dict) -> dict:
             "readinessScore": readiness_score,
             "totalAttempts": len(quiz_history),
             "totalQuestions": sum(int(stat.get("total_questions") or 0) for stat in quiz_stats),
-            "weakestDomainKey": _PORTAL_DOMAIN_KEY_BY_NAME.get(
-                weakest_stat["domain"], "INFECT"
-            ) if weakest_stat else "INFECT",
-            "strongestDomainKey": _PORTAL_DOMAIN_KEY_BY_NAME.get(
-                strongest_stat["domain"], "ROLE"
-            ) if strongest_stat else "ROLE",
+            "weakestDomainKey": weakest_domain_key,
+            "strongestDomainKey": strongest_domain_key,
             "statsByDomain": [
                 {
                     "domain": stat["domain"],

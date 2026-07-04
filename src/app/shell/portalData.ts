@@ -108,7 +108,7 @@ export type AdminPortalSnapshot = {
   communityReviewQueue: Array<{ title: string; detail: string; tone: string }>;
 };
 
-type StudentPortalSnapshot = {
+type StudentDashboardSnapshot = {
   generatedAt: string;
   students: StudentPortalRecord[];
 };
@@ -176,7 +176,7 @@ export async function loadStudentPortalRecord(): Promise<{
   student: StudentPortalRecord | null;
 }> {
   const profile = readPortalProfile();
-  const snapshot = await fetchSnapshot<StudentPortalSnapshot>('/portal-data/student-dashboard.json');
+  const snapshot = await fetchSnapshot<StudentDashboardSnapshot>('/portal-data/student-dashboard.json');
   const requestedEmail = profile?.email?.trim().toLowerCase();
   const student =
     snapshot?.students.find((candidate) => candidate.email.trim().toLowerCase() === requestedEmail) ??
