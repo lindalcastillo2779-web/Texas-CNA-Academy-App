@@ -2,25 +2,30 @@
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?logo=github-sponsors)](https://github.com/sponsors/lindalcastillo2779-web)
 
-Texas CNA Academy is a mobile-friendly training and resource platform for Texas nurse aide students, active CNAs, instructors, DONs, and healthcare facilities. This project supports exam preparation, renewal readiness, CEU tracking, staffing compliance, and access to important Texas CNA-related references and forms.
+Texas CNA Academy is a mobile-friendly training and resource platform for Texas nurse aide students, active CNAs, instructors, DONs, and healthcare facilities. This project supports exam preparation, renewal readiness, CEU tracking, staffing compliance, access to important Texas CNA-related references and forms, and Texas-focused compliance-support workflows. [code_file:3][code_file:148]
+
+Texas CNA Academy is an independent education and compliance-support platform. It is not operated by Texas Health and Human Services Commission (HHSC), TULIP, SEMARC, Prometric, the Nurse Aide Registry, or the Texas Board of Nursing, and official determinations remain the responsibility of the appropriate agencies and systems. [code_file:147][web:52][web:138]
 
 ## What this project is about
 
-This project is designed to support Texas nurse aide education, training readiness, and program organization. It brings together:
+This project is designed to support Texas nurse aide education, training readiness, program organization, and selected compliance-awareness workflows. It brings together:
 
 - exam-preparation tools for nurse aide students
 - **interactive Clinical Skills Lab** for hands-on skill simulation (Prometric/NATCEP-aligned)
 - **Community Mentor + Workforce Hub** for mentoring, study circles, practice partners, and local opportunities
 - renewal and continuing education tracking support
 - staffing and compliance support tools
+- compliance guidance and regulatory update monitoring
+- role-based workflow dashboards for students, instructors, DONs, and administrators
+- instructor SEMARC workflow training and acknowledgment support
 - access to important Texas CNA and NATCEP-related forms and references
-- a central location for curriculum, planning, and operational resources
+- a central location for curriculum, planning, operational, and workflow-support resources
 
-The goal is to provide a practical, organized, and easy-to-use platform that supports both learning and program administration.
+The goal is to provide a practical, organized, and easy-to-use platform that supports both learning and program administration. Recent revisions also add built-in compliance guidance, a regulatory updates monitor, Form 5497 and Form 5498 workflow support, and modular Streamlit page architecture for easier maintenance. [code_file:3][code_file:148][code_file:150][code_file:151][code_file:152]
 
 ## Clinical Skills Lab
 
-The **🧪 Clinical Skills Lab** is an interactive, Prometric- and NATCEP-aligned simulation section where CNA students can practice and self-assess the hands-on skills evaluated on the Texas CNA skills examination.
+The ** Clinical Skills Lab** is an interactive, Prometric- and NATCEP-aligned simulation section where CNA students can practice and self-assess the hands-on skills evaluated on the Texas CNA skills examination.
 
 ### Overview
 
@@ -30,8 +35,8 @@ Each scenario walks you through a skill using the same checklist format examiner
 
 | Mode | Best used for | Hints | Feedback timing |
 |------|---------------|-------|-----------------|
-| 🏋️ **Coach Mode** | First-time practice, learning rationale | Full hints + rationale | Immediate after every step |
-| 🎓 **Exam Mode** | Self-assessment, exam-readiness check | None — mirrors real exam | Summary only after completion |
+| **Coach Mode** | First-time practice, learning rationale | Full hints + rationale | Immediate after every step |
+| **Exam Mode** | Self-assessment, exam-readiness check | None — mirrors real exam | Summary only after completion |
 
 **Recommended workflow:**
 1. Run each scenario in **Coach Mode** first to understand the correct sequence and rationale.
@@ -42,10 +47,10 @@ Each scenario walks you through a skill using the same checklist format examiner
 
 | Score | Weight | Meaning |
 |-------|--------|---------|
-| ✅ Checklist Score | 40 % | Percentage of non-critical technique steps answered correctly |
-| 🚨 Critical-Step Score | 40 % | Percentage of critical steps passed — **must be 100 %** (any miss = automatic Prometric failure) |
-| 💬 Communication Score | 20 % | Communication and professionalism checkpoint completion |
-| 🎯 Overall Score | — | Weighted composite of all three components |
+| Checklist Score | 40 % | Percentage of non-critical technique steps answered correctly |
+| Critical-Step Score | 40 % | Percentage of critical steps passed — **must be 100 %** (any miss = automatic Prometric failure) |
+| Communication Score | 20 % | Communication and professionalism checkpoint completion |
+| Overall Score | — | Weighted composite of all three components |
 
 **Passing:** Overall ≥ 75 % AND all critical steps correct.
 
@@ -53,9 +58,9 @@ Each scenario walks you through a skill using the same checklist format examiner
 
 | Scenario | Key skills covered | Prometric skill |
 |----------|--------------------|-----------------|
-| 🧼 Hand Hygiene & PPE | Hand-washing technique, donning/doffing sequence | Handwashing |
-| 🦽 Transfer: Bed ↔ Wheelchair | Environment prep, gait belt, brakes, body mechanics | Transfer from Bed to Wheelchair |
-| 🩺 Vital Signs & Documentation | Temp, pulse, respirations, BP, normal ranges, reporting | Measuring and Recording Vital Signs |
+| Hand Hygiene & PPE | Hand-washing technique, donning/doffing sequence | Handwashing |
+| Transfer: Bed ↔ Wheelchair | Environment prep, gait belt, brakes, body mechanics | Transfer from Bed to Wheelchair |
+| Vital Signs & Documentation | Temp, pulse, respirations, BP, normal ranges, reporting | Measuring and Recording Vital Signs |
 
 ### Where to add new scenarios
 
@@ -69,8 +74,8 @@ You can use this project in several ways:
 
 1. **Students** can use it to prepare for nurse aide exams and track progress.
 2. **CNAs** can use it to monitor renewal readiness and CEU-related information.
-3. **Instructors and program leaders** can use it to organize training support materials, study groups, and mentoring.
-4. **Facilities and administrators** can use it to support staffing, workforce outreach, and compliance workflows.
+3. **Instructors and program leaders** can use it to organize training support materials, study groups, mentoring, compliance reminders, and internal workflow support.
+4. **Facilities and administrators** can use it to support staffing, workforce outreach, regulatory update review, staff workflow tracking, and compliance workflows. [code_file:148][code_file:150][code_file:151][code_file:152]
 
 ### Typical uses
 
@@ -79,6 +84,8 @@ You can use this project in several ways:
 - connect with mentors, practice partners, and local workforce opportunities
 - track CEUs and renewal-related progress
 - manage staffing and compliance information
+- review regulatory update logs and workflow notices
+- use role-based dashboards and training workflow pages
 - reference Texas nurse aide documents and related materials
 
 ## Important resources
@@ -89,9 +96,23 @@ Key resources connected to this project may include:
 - **Texas Workforce Commission (TWC)**
 - **Prometric Nurse Aide resources**
 - **TULIP**
+- **SEMARC**
 - **Texas Nurse Aide Performance Record – Form 5497-NATCEP**
+- **Texas Nurse Aide Daily Sign-In Sheet – Form 5498-NATCEP**
 - **Texas NATCEP requirement mapping documents**
 - **training program waiver and related planning resources**
+- **official provider letters and training notices related to NAR and SEMARC employability workflows** [web:59][web:138]
+
+## New compliance and workflow pages
+
+The revised app now includes additional built-in pages and tools to support Texas-specific program organization and workflow awareness:
+
+- **Compliance Guidance** – Texas-focused reminders for renewal, NATCEP records, and employability-related workflow boundaries. [code_file:148]
+- **Regulatory Updates Monitor** – Tracks selected official-source items, review dates, and internal action reminders. [code_file:150]
+- **Role Workflows & Dashboards** – Provides role-specific views for Student, Instructor, DON, and Admin users, including Form 5497 and Form 5498 workflow support. [code_file:151]
+- **Instructor SEMARC Training** – Provides internal training content, a short quiz, confidentiality reminders, and acknowledgment checkboxes for staff-facing SEMARC workflow education. [code_file:152]
+
+These additions are intended to support internal organization and awareness. They do not replace official HHSC, TULIP, NAR, SEMARC, or Prometric processes. [code_file:147][web:52][web:131][web:59]
 
 ## Local development
 
@@ -172,6 +193,7 @@ Configured domain:
 
 ```text
 streamlit_app.py          # Main entry-point and navigation
+app_utils.py              # Shared footer/disclaimer helpers for modular pages
 db.py                     # SQLite schema, initialization, and helpers
 auth.py                   # Admin authentication
 email_utils.py            # SMTP email helpers
@@ -180,6 +202,10 @@ buddy_service.py          # Buddy chatbot logic and RAG pipeline
 knowledge_loader.py       # Document ingestion, chunking, and FAISS indexing
 pages/
   home.py                 # Welcome and registration page
+  compliance.py           # Texas-focused compliance guidance
+  regulatory_updates.py   # Regulatory updates monitor
+  role_dashboards.py      # Role-based dashboards + Form 5497/5498 workflow support
+  semarc_training.py      # Instructor SEMARC training module and SOP acknowledgment support
   courses.py              # NATCEP course roadmap and curriculum browser
   exam_prep.py            # Practice quiz tools
   clinical_skills_lab.py  # Clinical Skills Lab – interactive CNA skill simulations
@@ -280,6 +306,10 @@ Available page keys in the current Streamlit app are:
 - `staffing`
 - `buddy`
 - `admin`
+- `compliance`
+- `regulatory_updates`
+- `role_dashboards`
+- `semarc_training`
 
 ### 3. Register module media
 
@@ -364,7 +394,7 @@ No code changes are required — Buddy switches providers automatically.
 
 Add your documents (`.md`, `.txt`, or `.pdf`) to the appropriate subfolders under `knowledge/`:
 
-```
+```text
 knowledge/curriculum/   ← NATCEP curriculum docs
 knowledge/tulip/        ← TULIP guidance
 knowledge/twc/          ← TWC workforce resources
@@ -408,6 +438,7 @@ If this project saves you time, helps your students pass their exam, or makes yo
 - Maintenance, bug fixes, and security updates
 - Hosting and infrastructure costs
 - Community features: mentor matching, workforce hub, peer study circles
+- Compliance-support workflows, regulatory monitoring, and instructor training tools
 
 ### How to sponsor
 
@@ -431,3 +462,17 @@ A sellable code-along package scaffold now exists in `./educational-package/` wi
 - legal, support, release, feedback, and trust-signal documentation
 
 Start with `./educational-package/START_HERE.md`.
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+  
