@@ -723,6 +723,42 @@
             .preview-card { flex: 0 0 calc(100% - 0px); min-width: 0; }
             .preview-tab-btn { padding: 9px 14px; font-size: 0.85rem; }
         }
+        /* Testimonials carousel sizing */
+        #track-testimonials .testimonial-card {
+            flex: 0 0 calc(33.333% - 14px);
+            min-width: 280px;
+        }
+        @media (max-width: 900px) { #track-testimonials .testimonial-card { flex: 0 0 calc(50% - 10px); } }
+        @media (max-width: 620px) { #track-testimonials .testimonial-card { flex: 0 0 100%; min-width: 0; } }
+        /* Scroll reveal transitions */
+        .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.65s ease, transform 0.65s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .carousel-track { transition: none; }
+        }
+        /* Back to top */
+        .back-to-top {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: none;
+            background: var(--navy);
+            color: var(--gold-vivid);
+            font-size: 1.15rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(11,29,53,0.35);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+            z-index: 300;
+        }
+        .back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-to-top:hover { background: var(--red); color: #fff; }
     </style>
 </head>
 <body>
@@ -781,6 +817,7 @@
                         <a href="resources.html"                        class="dropdown-item" role="menuitem">&#128279; Verified Resources</a>
                         <a href="#mission"                               class="dropdown-item" role="menuitem">&#10024; Our Mission</a>
                         <a href="#values"                                class="dropdown-item" role="menuitem">&#127775; Core Values</a>
+                        <a href="#testimonials"                          class="dropdown-item" role="menuitem">&#11088; Testimonials</a>
                         <a href="mailto:support@texascnaacademyapp.com" class="dropdown-item" role="menuitem">&#128140; Contact Us</a>
                     </div>
                 </div>
@@ -800,6 +837,7 @@
             <h1>Texas CNA Academy</h1>
             <p style="font-size: 1.15rem; margin: 16px 0 28px; opacity: 0.95; max-width: 700px; margin-left: auto; margin-right: auto;">Texas CNA Academy provides comprehensive training, exam preparation, and renewal support for nurse aide students, active CNAs, instructors, and healthcare facilities across Texas.</p>
             <a href="signup.html?role=student" class="btn btn-primary" style="background-color: var(--red); color: white; padding: 14px 32px; font-size: 1.05rem;">Get Started</a>
+            <a href="#preview" class="btn hero-btn-outline" style="padding: 14px 32px; font-size: 1.05rem;">Explore the Platform</a>
         </div>
     </section>
 
@@ -1407,9 +1445,11 @@
                 <h2 class="section-title">What Our Students Say</h2>
                 <p class="section-desc">Real stories from nurse aides and students who've trained with Texas CNA Academy.</p>
             </div>
-            <div class="testimonials-grid">
+            <div class="carousel-wrapper" data-carousel="testimonials" style="margin-top: 48px;">
+                <div class="carousel-track-outer">
+                    <div class="carousel-track" id="track-testimonials">
                 <div class="testimonial-card">
-                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="stars" role="img" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <div class="testimonial-quote">&ldquo;</div>
                     <p class="testimonial-text">Texas CNA Academy made studying for my certification exam so much easier. The practice questions were spot-on with the actual exam and the mobile-friendly platform let me study from anywhere. I passed on my first try!</p>
                     <div class="testimonial-author">
@@ -1421,7 +1461,7 @@
                     </div>
                 </div>
                 <div class="testimonial-card">
-                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="stars" role="img" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <div class="testimonial-quote">&ldquo;</div>
                     <p class="testimonial-text">As an instructor, I needed a platform that kept all my students organized and on track. The instructor portal is incredibly intuitive. I can monitor progress, flag struggling students, and manage coursework — all in one place.</p>
                     <div class="testimonial-author">
@@ -1433,7 +1473,7 @@
                     </div>
                 </div>
                 <div class="testimonial-card">
-                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="stars" role="img" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <div class="testimonial-quote">&ldquo;</div>
                     <p class="testimonial-text">Managing staff certifications for our facility used to be a nightmare. Now we get automatic renewal alerts and a compliance dashboard that keeps us ahead of every deadline. It has saved us countless hours.</p>
                     <div class="testimonial-author">
@@ -1445,7 +1485,7 @@
                     </div>
                 </div>
                 <div class="testimonial-card">
-                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="stars" role="img" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <div class="testimonial-quote">&ldquo;</div>
                     <p class="testimonial-text">I was so nervous about my renewal after being out of work for two years. The renewal support resources helped me understand exactly what I needed to do, and the study materials refreshed everything quickly. Highly recommend!</p>
                     <div class="testimonial-author">
@@ -1457,7 +1497,7 @@
                     </div>
                 </div>
                 <div class="testimonial-card">
-                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="stars" role="img" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <div class="testimonial-quote">&ldquo;</div>
                     <p class="testimonial-text">I was working full-time while studying for my CNA exam. Being able to study on my phone during breaks made all the difference. The bite-sized lessons and clear explanations helped me stay confident throughout the process.</p>
                     <div class="testimonial-author">
@@ -1469,7 +1509,7 @@
                     </div>
                 </div>
                 <div class="testimonial-card">
-                    <div class="stars" role="img" aria-label="5 out of 5 stars"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>#9733;</div>
+                    <div class="stars" role="img" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <div class="testimonial-quote">&ldquo;</div>
                     <p class="testimonial-text">The AI study buddy feature helped me understand complex topics in plain language. It was like having a tutor available at midnight when I needed it most. This platform truly understands what CNA students need.</p>
                     <div class="testimonial-author">
@@ -1480,7 +1520,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                    </div><!-- /.carousel-track -->
+                </div><!-- /.carousel-track-outer -->
+                <div class="carousel-nav">
+                    <div class="carousel-dots" id="dots-testimonials" aria-hidden="true"></div>
+                    <div class="carousel-arrows">
+                        <button class="carousel-arrow" id="prev-testimonials" aria-label="Previous testimonials">&#8592;</button>
+                        <button class="carousel-arrow" id="next-testimonials" aria-label="Next testimonials">&#8594;</button>
+                    </div>
+                </div>
+            </div><!-- /.carousel-wrapper -->
         </div>
     </section>
 
@@ -1683,6 +1732,88 @@
             initCarousel('modules');
             initCarousel('skills');
             initCarousel('flashcards');
+        }());
+
+        // Testimonials carousel (auto-playing)
+        (function() {
+            var track   = document.getElementById('track-testimonials');
+            var prevBtn = document.getElementById('prev-testimonials');
+            var nextBtn = document.getElementById('next-testimonials');
+            var dotsEl  = document.getElementById('dots-testimonials');
+            if (!track || !prevBtn || !nextBtn) return;
+            var cards = track.querySelectorAll('.testimonial-card');
+            var total = cards.length;
+            var current = 0;
+            var timer;
+            function visibleCount() {
+                var w = track.parentElement.offsetWidth;
+                if (w < 620) return 1;
+                if (w < 900) return 2;
+                return 3;
+            }
+            function pageCount() { return Math.max(1, total - visibleCount() + 1); }
+            function goTo(index) {
+                var pages = pageCount();
+                current = (index + pages) % pages;
+                var gap = parseInt(getComputedStyle(track).gap) || 20;
+                var cardWidth = cards[0] ? (cards[0].offsetWidth + gap) : 0;
+                track.style.transform = 'translateX(-' + (current * cardWidth) + 'px)';
+                var dots = dotsEl.querySelectorAll('.carousel-dot');
+                dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
+            }
+            function buildDots() {
+                dotsEl.innerHTML = '';
+                for (var i = 0; i < pageCount(); i++) {
+                    (function(idx) {
+                        var d = document.createElement('button');
+                        d.className = 'carousel-dot' + (idx === current ? ' active' : '');
+                        d.setAttribute('aria-label', 'Go to testimonial slide ' + (idx + 1));
+                        d.addEventListener('click', function() { goTo(idx); restart(); });
+                        dotsEl.appendChild(d);
+                    }(i));
+                }
+            }
+            function restart() { clearInterval(timer); timer = setInterval(function() { goTo(current + 1); }, 5000); }
+            prevBtn.addEventListener('click', function() { goTo(current - 1); restart(); });
+            nextBtn.addEventListener('click', function() { goTo(current + 1); restart(); });
+            track.addEventListener('mouseenter', function() { clearInterval(timer); });
+            track.addEventListener('mouseleave', restart);
+            var rt;
+            window.addEventListener('resize', function() {
+                clearTimeout(rt);
+                rt = setTimeout(function() { current = 0; buildDots(); goTo(0); }, 120);
+            });
+            buildDots();
+            goTo(0);
+            restart();
+        }());
+
+        // Scroll-reveal transitions
+        (function() {
+            if (!('IntersectionObserver' in window)) return;
+            var targets = document.querySelectorAll('.section-title, .section-desc, .values-grid, .testimonials-section .carousel-wrapper, .program-grid, .grid-3, .mission-section .container, .renewal-card, .preview-header, .preview-tabs, .trust-items');
+            var obs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12 });
+            targets.forEach(function(el) { el.classList.add('reveal'); obs.observe(el); });
+        }());
+
+        // Back to top button
+        (function() {
+            var btn = document.createElement('button');
+            btn.className = 'back-to-top';
+            btn.setAttribute('aria-label', 'Back to top');
+            btn.innerHTML = '&#8593;';
+            document.body.appendChild(btn);
+            btn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+            window.addEventListener('scroll', function() {
+                btn.classList.toggle('show', window.scrollY > 600);
+            });
         }());
     </script>
 </body>
