@@ -4,19 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal | Texas CNA Academy</title>
-    <meta
-        name="description"
-        content="Personalized Texas CNA Academy student portal with study planning, course progress, skills readiness, and review guidance."
-    >
+    <meta name="description" content="Personalized Texas CNA Academy student portal with study planning, course progress, skills readiness, and review guidance.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-warm:#F5EDE0; --navy:#0B1D35; --gold:#9E6C00; --gold-vivid:#C8971A; --red:#5A0C1A; --card:#FEFBF5; --border:#D4C3A8; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg-warm); color:#1C2B3A; min-height:100vh; }
+        .fb-header { background:var(--navy); border-bottom:3px solid var(--gold); padding:14px 24px; }
+        .fb-logo { font-family:'Playfair Display',Georgia,serif; font-size:1.35rem; font-weight:700; color:var(--gold-vivid); text-decoration:none; }
+        .fb-main { display:flex; align-items:center; justify-content:center; padding:64px 24px; }
+        .fb-card { background:var(--card); border:1px solid var(--border); border-top:4px solid var(--gold); border-radius:6px; max-width:520px; width:100%; padding:44px 36px; text-align:center; box-shadow:0 6px 24px rgba(11,29,53,0.10); }
+        .fb-icon { font-size:2.6rem; margin-bottom:14px; }
+        .fb-card h1 { font-family:'Playfair Display',Georgia,serif; color:var(--navy); font-size:1.6rem; margin-bottom:10px; }
+        .fb-card p { color:#4A5568; font-size:0.95rem; line-height:1.7; margin-bottom:8px; }
+        .fb-spinner { width:34px; height:34px; margin:18px auto 6px; border:3px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin 0.9s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .fb-actions { display:none; margin-top:22px; }
+        .fb-actions.show { display:flex; flex-direction:column; gap:10px; }
+        .fb-btn { display:block; padding:12px 24px; border-radius:4px; font-weight:600; font-size:0.95rem; text-decoration:none; transition:all 0.2s; }
+        .fb-btn-primary { background:var(--red); color:#fff; }
+        .fb-btn-primary:hover { background:#400813; }
+        .fb-btn-outline { border:2px solid var(--navy); color:var(--navy); }
+        .fb-btn-outline:hover { background:var(--navy); color:#fff; }
+        @media (prefers-reduced-motion: reduce) { .fb-spinner { animation:none; } }
+    </style>
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app">
+        <header class="fb-header"><a class="fb-logo" href="/">Texas CNA Academy</a></header>
+        <main class="fb-main">
+            <div class="fb-card">
+                <div class="fb-icon" aria-hidden="true">&#127891;</div>
+                <h1>Student Portal</h1>
+                <p id="fb-status">Loading your personalized study portal&hellip;</p>
+                <div class="fb-spinner" id="fb-spinner" aria-hidden="true"></div>
+                <div class="fb-actions" id="fb-actions">
+                    <a class="fb-btn fb-btn-primary" href="signup.html?role=student">Create Your Account</a>
+                    <a class="fb-btn fb-btn-outline" href="/">Return to Homepage</a>
+                    <a class="fb-btn fb-btn-outline" href="mailto:support@texascnaacademyapp.com">Contact Support</a>
+                </div>
+            </div>
+        </main>
+    </div>
     <noscript>
         <main style="padding: 32px; font-family: Inter, Arial, sans-serif;">
             <h1 style="font-family: 'Playfair Display', Georgia, serif;">Texas CNA Academy Student Portal</h1>
@@ -24,6 +55,18 @@
             <p><a href="/index.html">Return to Texas CNA Academy homepage</a></p>
         </main>
     </noscript>
+    <script>
+        setTimeout(function() {
+            var s = document.getElementById('fb-status');
+            var sp = document.getElementById('fb-spinner');
+            var a = document.getElementById('fb-actions');
+            if (s && a) {
+                s.textContent = 'The portal is taking longer than expected to load. You can refresh the page, or use the options below.';
+                if (sp) sp.style.display = 'none';
+                a.classList.add('show');
+            }
+        }, 6000);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
