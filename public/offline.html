@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline | Texas CNA Academy</title>
+  <meta name="theme-color" content="#0B1D35">
+  <style>
+    :root {
+      --bg-warm: #F5EDE0;
+      --navy: #0B1D35;
+      --gold: #9E6C00;
+      --card-bg: #FEFBF5;
+      --border-light: #D4C3A8;
+      --text-body: #1C2B3A;
+      --text-muted: #4A5568;
+      --red: #5A0C1A;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--bg-warm);
+      color: var(--text-body);
+      font-family: Inter, Arial, sans-serif;
+    }
+    .card {
+      width: min(680px, 100%);
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(11,29,53,0.08);
+    }
+    h1 {
+      margin: 0 0 12px;
+      color: var(--navy);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      line-height: 1.15;
+    }
+    p { line-height: 1.7; color: var(--text-body); }
+    .muted { color: var(--text-muted); }
+    .badge {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #F0E4C8;
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .actions { margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-secondary { background: var(--navy); color: #fff; }
+    .small { margin-top: 20px; font-size: 0.92rem; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="badge">Offline mode</div>
+    <h1>You're offline right now.</h1>
+    <p>You may still be able to open parts of the Texas CNA Academy home experience, but live tools need an internet connection.</p>
+    <p class="muted">Clinical practice tools, Buddy, account features, and live compliance or regulatory updates may not load until you reconnect.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="/">Back to home</a>
+      <a class="btn btn-secondary" href="/resources.html">Resources</a>
+    </div>
+    <p class="small muted">Texas CNA Academy is an independent education and compliance-support platform. It is not operated by HHSC, TULIP, SEMARC, Prometric, the Nurse Aide Registry, or the Texas Board of Nursing.</p>
+  </main>
+</body>
+</html>
