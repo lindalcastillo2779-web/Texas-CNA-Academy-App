@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-04T05:23:09.119183+00:00",
+  "generatedAt": "2026-07-22T20:18:37.122218+00:00",
   "overviewMetrics": [
     {
       "label": "Total students",
@@ -30,17 +30,17 @@
   "recentActivity": [
     {
       "title": "Community post: Weekly infection control study circle",
-      "detail": "study_group \u00b7 2026-07-04 05:23:01",
+      "detail": "study_group \u00b7 2026-07-22 20:18:15",
       "tone": "is-warning"
     },
     {
       "title": "Community post: Practice partner search for Prometric clinical skills",
-      "detail": "practice_partner \u00b7 2026-07-04 05:23:01",
+      "detail": "practice_partner \u00b7 2026-07-22 20:18:15",
       "tone": "is-warning"
     },
     {
       "title": "Community post: Experienced CNA mentor available for exam-readiness coaching",
-      "detail": "mentor_offer \u00b7 2026-07-04 05:23:01",
+      "detail": "mentor_offer \u00b7 2026-07-22 20:18:15",
       "tone": "is-warning"
     }
   ],
@@ -102,17 +102,17 @@
   "communityReviewQueue": [
     {
       "title": "Experienced CNA mentor available for exam-readiness coaching",
-      "detail": "mentor_offer \u00b7 2026-07-04 05:23:01",
+      "detail": "mentor_offer \u00b7 2026-07-22 20:18:15",
       "tone": "is-warning"
     },
     {
       "title": "Weekly infection control study circle",
-      "detail": "study_group \u00b7 2026-07-04 05:23:01",
+      "detail": "study_group \u00b7 2026-07-22 20:18:15",
       "tone": "is-warning"
     },
     {
       "title": "Practice partner search for Prometric clinical skills",
-      "detail": "practice_partner \u00b7 2026-07-04 05:23:01",
+      "detail": "practice_partner \u00b7 2026-07-22 20:18:15",
       "tone": "is-warning"
     }
   ]

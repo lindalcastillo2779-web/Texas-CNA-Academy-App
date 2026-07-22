@@ -1,6 +1,15 @@
-const CACHE_NAME = 'texas-cna-academy-shell-v1';
+const CACHE_NAME = 'texas-cna-academy-shell-v2';
 const OFFLINE_URL = '/offline.html';
-const PRECACHE_URLS = ['/', '/offline.html', '/manifest.json', '/icon-192.png', '/icon-512.png'];
+const PRECACHE_URLS = [
+  '/',
+  '/offline.html',
+  '/manifest.json',
+  '/pwa.js',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-512-maskable.png',
+  '/apple-touch-icon.png',
+];
 const EXCLUDED_PREFIXES = ['/app', '/api/'];
 
 self.addEventListener('install', event => {

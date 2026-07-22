@@ -114,6 +114,23 @@ The revised app now includes additional built-in pages and tools to support Texa
 
 These additions are intended to support internal organization and awareness. They do not replace official HHSC, TULIP, NAR, SEMARC, or Prometric processes. [code_file:147][web:52][web:131][web:59]
 
+## Installable mobile app (PWA)
+
+The site is an installable Progressive Web App, so students and staff can add it to their phone's home screen and launch it like a native app:
+
+- **Android / Chrome / Edge** – A branded "Install" banner appears automatically (via the `beforeinstallprompt` event); tapping **Install** adds the app to the home screen.
+- **iOS Safari** – Since iOS does not support the install prompt, a banner explains how to use **Share → Add to Home Screen**.
+- Dismissing the banner hides it for 14 days (stored in `localStorage`).
+
+Key files:
+
+- `public/manifest.json` – Web app manifest (name, colors, standalone display, icons including a maskable variant).
+- `public/pwa.js` – Registers the service worker and renders the install/instruction banner on every page.
+- `public/service-worker.js` – App-shell caching with an offline fallback (`public/offline.html`); `/app` (Streamlit) and `/api/` requests are never cached.
+- `public/icon-192.png`, `public/icon-512.png`, `public/icon-512-maskable.png`, `public/apple-touch-icon.png` – Home-screen icons.
+
+`app_server.py` serves these files at the site root (e.g. `/manifest.json`, `/pwa.js`), which is required for the service worker to control the whole origin.
+
 ## Local development
 
 ```bash

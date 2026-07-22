@@ -630,6 +630,27 @@ async def admin_dashboard(_: Request) -> FileResponse:
     return _html_file(DIST_DIR / "admin-dashboard.html")
 
 
+PWA_PUBLIC_DIR = BASE_DIR / "public"
+PWA_ASSETS = {
+    "manifest.json",
+    "pwa.js",
+    "service-worker.js",
+    "offline.html",
+    "icon-192.png",
+    "icon-512.png",
+    "icon-512-maskable.png",
+    "apple-touch-icon.png",
+}
+
+
+async def pwa_asset(request: Request) -> Response:
+    name = request.path_params["name"]
+    path = PWA_PUBLIC_DIR / name
+    if name not in PWA_ASSETS or not path.exists():
+        return Response("Not Found", status_code=404)
+    return FileResponse(path)
+
+
 async def root_redirect(_: Request) -> RedirectResponse:
     return RedirectResponse(f"/{STREAMLIT_BASE_PATH}/", status_code=307)
 
@@ -809,6 +830,7 @@ routes = [
     Route(f"/{STREAMLIT_BASE_PATH}", root_redirect),
     Route(f"/{STREAMLIT_BASE_PATH}/{{path:path}}", proxy_streamlit_http, methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]),
     WebSocketRoute(f"/{STREAMLIT_BASE_PATH}/{{path:path}}", proxy_streamlit_websocket),
+    Route("/{name:str}", pwa_asset, methods=["GET"], name="pwa-asset"),
     Mount("/compiled", app=StaticFiles(directory=str(COMPILED_DIR)), name="compiled"),
     Mount("/assets", app=StaticFiles(directory=str(ASSET_DIR)), name="assets"),
     Mount("/css", app=StaticFiles(directory=str(CSS_DIR)), name="css"),
