@@ -830,11 +830,11 @@ routes = [
     Route(f"/{STREAMLIT_BASE_PATH}", root_redirect),
     Route(f"/{STREAMLIT_BASE_PATH}/{{path:path}}", proxy_streamlit_http, methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]),
     WebSocketRoute(f"/{STREAMLIT_BASE_PATH}/{{path:path}}", proxy_streamlit_websocket),
-    Route("/{name:str}", pwa_asset, methods=["GET"], name="pwa-asset"),
     Mount("/compiled", app=StaticFiles(directory=str(COMPILED_DIR)), name="compiled"),
     Mount("/assets", app=StaticFiles(directory=str(ASSET_DIR)), name="assets"),
     Mount("/css", app=StaticFiles(directory=str(CSS_DIR)), name="css"),
     Mount("/portal-data", app=StaticFiles(directory=str(PORTAL_DATA_DIR)), name="portal-data"),
+    Route("/{name:str}", pwa_asset, methods=["GET"], name="pwa-asset"),
 ]
 
 app = Starlette(debug=False, routes=routes, lifespan=lifespan)

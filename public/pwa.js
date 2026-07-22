@@ -82,7 +82,7 @@
   function showInstallBanner() {
     if (banner) return;
     banner = buildBanner(
-      '<strong>Texas CNA Academy</strong>Install the app for quick access from your home screen.',
+      '<strong>Texas CNA Academy</strong> Install the app for quick access from your home screen.',
       '<button type="button" class="tca-pwa-install">Install</button>' +
       '<button type="button" class="tca-pwa-dismiss">Not now</button>'
     );
@@ -104,7 +104,7 @@
   function showIosBanner() {
     if (banner) return;
     banner = buildBanner(
-      '<strong>Texas CNA Academy</strong>Add this app to your home screen: tap the Share button ' +
+      '<strong>Texas CNA Academy</strong> Add this app to your home screen: tap the Share button ' +
       '<span aria-hidden="true">&#x2191;</span> then choose <b>&ldquo;Add to Home Screen&rdquo;</b>.',
       '<button type="button" class="tca-pwa-dismiss">Got it</button>'
     );
